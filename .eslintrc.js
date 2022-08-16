@@ -1,21 +1,23 @@
 module.exports = {
     root: true,
     parser: '@typescript-eslint/parser',
-    parserOptions: {
-        project: "./tsconfig.json"
-    },
     plugins: [
-        '@typescript-eslint',
-        'import'
+      '@typescript-eslint',
+      'jest'
     ],
+    parserOptions: {
+      project: "./tsconfig.json"
+    },
     extends: [
-        'eslint:recommended',
-        'plugin:node/recommended',
-        'plugin:@typescript-eslint/eslint-recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:import/recommended',
-        'plugin:import/typescript'
+      'eslint:recommended',
+      'plugin:@typescript-eslint/recommended',
+      'plugin:jest/recommended',
     ],
+    env: {
+      browser: true,
+      es6: true,
+      jest: true,
+    },
     rules: {
         // Generic JS
         "space-before-function-paren": "off",
@@ -26,7 +28,7 @@ module.exports = {
         "spaced-comment": "off",
         "brace-style": "off",
         "lines-between-class-members": "off", // Jump lines between class properties - useless
-        "node/no-deprecated-api": "warn",
+        //"node/no-deprecated-api": "warn",
         "eol-last": "off",
         "curly": "off",
         "prefer-const": "off",
@@ -35,12 +37,10 @@ module.exports = {
         "no-mixed-spaces-and-tabs": "off",
         "no-constant-condition": "warn",
         "no-class-assign": "warn",
-        "require-yield": "warn",
         "require-await": "error",
         "no-async-promise-executor": "error",
         "no-promise-executor-return": "error",
         "no-non-null-assertion": "off",
-        "import/no-duplicates": "off",
 
         // Node
         "node/no-unsupported-features/es-syntax": "off",
@@ -60,6 +60,13 @@ module.exports = {
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-empty-interface": "off",
 
-        "import/no-unresolved": "error"
+        // Test specific
+        "jest/expect-expect":"off",
+        "jest/no-disabled-tests":"warn",
+        "jest/no-focused-tests": "warn",
+        "jest/no-identical-title": "warn",
+        "jest/prefer-to-have-length": "warn",
+        "jest/no-commented-out-tests":"warn",
+        "jest/valid-expect": "error"
     }
 };

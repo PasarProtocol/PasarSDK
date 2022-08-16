@@ -1,5 +1,8 @@
-import { pasarCollection } from "./pasarCollection"
 
-export type {
+'use strict';
+
+import { pasarCollection } from "./pasarCollection";
+
+export {
     pasarCollection
 }
