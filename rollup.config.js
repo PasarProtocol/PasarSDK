@@ -38,14 +38,6 @@ const now = new Date(
     process.env.SOURCE_DATE_EPOCH ? process.env.SOURCE_DATE_EPOCH * 1000 : new Date().getTime()
 ).toUTCString();
 
-// const banner = `/*
-//   @license
-//     pasarSDK.js v${pkg.version}
-//     ${now} - commit ${commitHash}
-
-//     Released under the MIT License.
-// */`;
-
 const onwarn = warning => {
     // eslint-disable-next-line no-console
     if (warning.code && warning.code === "CIRCULAR_DEPENDENCY" && warning.importer.indexOf('node_modules') < 0 && warning.importer.indexOf("internals.ts") >= 0)
@@ -132,6 +124,7 @@ export default command => {
             'stream',
             'url',
             'util',
+            '@PasarProtocol/PasarSDK'
         ],
         treeshake,
         strictDeprecations: true,
@@ -180,7 +173,7 @@ export default command => {
         input: rollupSourceFile,
         onwarn,
         external: [
-            '@/did-js-sdk'
+            '@PasarProtocol/PasarSDK'
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */
@@ -291,14 +284,10 @@ export default command => {
         treeshake,
         strictDeprecations: true,
         output: [
-            //{ file: 'dist/did.browser.js', format: 'umd', name: 'did.js', banner, sourcemap: true },
             {
                 file: 'dist/es/pasarSDK.browser.js',
                 format: 'es',
-                //banner,
                 sourcemap: !prodBuild,
-                //intro: 'var process: { env: {}};'
-                //intro: 'var global = typeof self !== undefined ? self : this;' // Fix "global is not defined"
             },
         ]
     };
