@@ -1,3 +1,3 @@
 export namespace utils {
-    export var testNet: boolean = false;
+    export var testNet: boolean = true;
 }
