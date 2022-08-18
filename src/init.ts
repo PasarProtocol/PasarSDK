@@ -4,7 +4,7 @@
 
 import { utils } from "./utils";
 
-export class init {
+export class Initialize {
 
     /**
      * initialize the values on sdk.
