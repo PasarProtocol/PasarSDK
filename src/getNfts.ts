@@ -5,7 +5,7 @@
 import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 
-export class getNfts {
+export class GetNfts {
 
     /**
      * get all nfts listed on Pasar marketplace.

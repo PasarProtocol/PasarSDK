@@ -1,12 +1,12 @@
 
 'use strict';
 
-import { init } from "./init";
-import { pasarCollection } from "./pasarCollection";
-import { getNfts } from "./getNfts"
+import { Initialize } from "./init";
+import { PasarCollection } from "./pasarCollection";
+import { GetNfts } from "./getNfts"
 
 export {
-    init,
-    pasarCollection,
-    getNfts
+    Initialize,
+    PasarCollection,
+    GetNfts
 }
