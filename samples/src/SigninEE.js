@@ -148,6 +148,10 @@ function SigninEE() {
     }
   }
 
+  const handleClickMint = () => {
+    
+  }
+
   return (
     !walletAddress?
     <div>
@@ -158,7 +162,14 @@ function SigninEE() {
     <div>
         <h5>{walletAddress}</h5>
         <button onClick={handleSignout}>Sign out</button>
+
+        <div>
+          <button onClick={handleClickMint}>Add New NFT</button>
+        </div>
+        
     </div>
+
+    
   );
 }
 
