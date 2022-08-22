@@ -1,8 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
 import { Web3ReactProvider } from '@web3-react/core'
 import { Web3Provider } from "@ethersproject/providers";
 import App from './App';
+import MintNFT from './mintNFT';
 
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider);
@@ -10,9 +16,17 @@ const getLibrary = (provider) => {
   return library;
 };
 
+const RouterCom = ()=>{
+  return <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />} />
+      <Route path="/mint" element={<MintNFT />} />
+    </Routes>
+  </BrowserRouter>
+}
 ReactDOM.render(
   <Web3ReactProvider getLibrary={getLibrary}>
-    <App />
+    <RouterCom />
   </Web3ReactProvider>,
   document.getElementById('root')
 );
