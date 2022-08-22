@@ -1,5 +1,5 @@
 export namespace valuesOnTestNet {
-    export var assistURL: string = "https://testnet.assist.pasarprotocol.io";
+    export var assistURL: string = "https://assist-test.pasarprotocol.io";
 
     export var elastos: any = {
         pasarContract: '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087',
@@ -11,6 +11,8 @@ export namespace valuesOnTestNet {
 
         chainType: 1,
     }
+
+    export var urlIPFS: string = "https://ipfs-test.pasarprotocol.io";
 }
 
 export namespace valuesOnMainNet {
@@ -26,4 +28,6 @@ export namespace valuesOnMainNet {
 
         chainType: 1,
     }
+
+    export var urlIPFS: string = "https://ipfs.pasarprotocol.io";
 }
