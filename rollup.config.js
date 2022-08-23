@@ -124,7 +124,7 @@ export default command => {
             'stream',
             'url',
             'util',
-            '@PasarProtocol/PasarSDK'
+            'ipfs-http-client',
         ],
         treeshake,
         strictDeprecations: true,
