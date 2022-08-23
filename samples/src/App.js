@@ -4,10 +4,8 @@ import { useEffect } from 'react';
 function App() {
 
   useEffect(() => {
-    console.log(1111111);
     let initialize = new Initialize();
     initialize.init();
-
     getNFT();
   }, [])
 
