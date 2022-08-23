@@ -2,7 +2,7 @@
  * This class is to process the functions on pasar collection.
  */
 
-import { create } from "ipfs-http-client";
+import { create } from 'ipfs-http-client';
 import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 
@@ -16,8 +16,8 @@ export class PasarCollection {
         } else {
             ipfsURL = valuesOnMainNet.urlIPFS;
         }
-
-		const client = create({url: ipfsURL});
+		console.log(ipfsURL);
+		const client = create({ url: ipfsURL });
 
 		let image_add = await client.add(image);
 		console.log(image_add);
