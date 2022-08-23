@@ -41,7 +41,7 @@
     "buffer": "^5.6.0",
     "cd": "^0.3.3",
     "dayjs": "^1.10.4",
-    "ipfs-http-client": "^57.0.3",
+    "ipfs-http-client": "^55.0.0",
     "jsrsasign": "^10.5.0",
     "jsrsasign-util": "^1.0.2",
     "postcss": "^8.4.4",
