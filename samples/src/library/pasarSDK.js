@@ -2,6 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var ipfsHttpClient = require('ipfs-http-client');
+
 var utils;
 (function (utils) {
     utils.testNet = true;
@@ -18,15 +20,6 @@ class Initialize {
      */
     init(testnet = true) {
         utils.testNet = testnet;
-    }
-}
-
-/**
- * This class is to process the functions on pasar collection.
- */
-class PasarCollection {
-    getFilesService() {
-        return 1;
     }
 }
 
@@ -83,6 +76,28 @@ var valuesOnMainNet;
     };
     valuesOnMainNet.urlIPFS = "https://ipfs.pasarprotocol.io";
 })(valuesOnMainNet || (valuesOnMainNet = {}));
+
+/**
+ * This class is to process the functions on pasar collection.
+ */
+class PasarCollection {
+    mintNFT(image, name, description) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let ipfsURL;
+            if (utils.testNet) {
+                ipfsURL = valuesOnTestNet.urlIPFS;
+            }
+            else {
+                ipfsURL = valuesOnMainNet.urlIPFS;
+            }
+            console.log(ipfsURL);
+            const client = ipfsHttpClient.create({ url: ipfsURL });
+            let image_add = yield client.add(image);
+            console.log(image_add);
+            return "success";
+        });
+    }
+}
 
 /**
  * This class get the nfts from pasar assist backend
