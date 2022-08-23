@@ -8,19 +8,17 @@ const MintNFT = () => {
     const [urlImage, setUrlImage] = useState('');
 
     const handleMint = async () => {
-        console.log(image);
         console.log(name);
         console.log(description);
+
         let pasarCollection = new PasarCollection();
 
-        let result = await pasarCollection.mintNFT(image, name, description);
-        console.log(result);
+        let result = await pasarCollection.mintNFT(urlImage, name, description);
+        // console.log(result);
     }
 
     const handleChangeImage = (e) => {
-        var reader = new FileReader();
-        reader.readAsDataURL(e.target.files[0]);
-        setImage(reader.result);
+        setUrlImage(e.target.files[0]);
     }
 
     return (
