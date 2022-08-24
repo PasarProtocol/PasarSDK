@@ -1,5 +1,5 @@
 import SigninEE from './SigninEE'
-import { Initialize, GetNfts } from './library/pasarSDK';
+import { Initialize, GetNfts } from '@pasarprotocol/pasar-sdk';
 import { useEffect } from 'react';
 function App() {
 
