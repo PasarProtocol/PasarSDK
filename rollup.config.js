@@ -112,18 +112,6 @@ export default command => {
         ],
         // fsevents is a dependency of chokidar that cannot be bundled as it contains binary code
         external: [
-            'assert',
-            'axios',
-            'crypto',
-            'events',
-            'fs',
-            'fsevents',
-            'module',
-            'path',
-            'os',
-            'stream',
-            'url',
-            'util',
             'ipfs-http-client',
         ],
         treeshake,
@@ -133,7 +121,7 @@ export default command => {
             chunkFileNames: 'shared/[name].js',
             dir: 'dist',
             entryFileNames: '[name]',
-            externalLiveBindings: false,
+            externalLiveBindings: true,
             format: 'cjs',
             freeze: false,
             // TODO: delete occurences of fsevents - not used in did sdk
@@ -160,6 +148,9 @@ export default command => {
             emitModulePackageFile(),
             //collectLicenses()
         ],
+        external: [
+            'ipfs-http-client',
+        ],
         output: {
             ...commonJSBuild.output,
             dir: 'dist/es',
@@ -173,7 +164,7 @@ export default command => {
         input: rollupSourceFile,
         onwarn,
         external: [
-            '@PasarProtocol/PasarSDK'
+            'ipfs-http-client',
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */

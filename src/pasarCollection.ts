@@ -5,6 +5,7 @@
 import { create } from 'ipfs-http-client';
 import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import { resizeImage } from "./global";
 
 export class PasarCollection {
 
@@ -16,11 +17,17 @@ export class PasarCollection {
         } else {
             ipfsURL = valuesOnMainNet.urlIPFS;
         }
-		console.log(ipfsURL);
+		
 		const client = create({ url: ipfsURL });
 
 		let image_add = await client.add(image);
-		console.log(image_add);
+		let thumbnail:any = await resizeImage(image, 300, 300);
+		let thumbnail_add = image_add;
+
+		if(thumbnail.success === 0) {
+			thumbnail_add = await client.add(thumbnail.fileContent);
+		}
+		
 		return "success";
 	}
 }
