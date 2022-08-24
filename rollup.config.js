@@ -102,7 +102,7 @@ export default command => {
     //const { collectLicenses, writeLicense } = getLicenseHandler();
     const commonJSBuild = {
         input: {
-            'pasarSDK.js': rollupSourceFile
+            'pasar-sdk.js': rollupSourceFile
         },
         onwarn,
         plugins: [
@@ -142,7 +142,7 @@ export default command => {
 
     const esmBuild = {
         ...commonJSBuild,
-        input: { 'pasarSDK.js': rollupSourceFile },
+        input: { 'pasar-sdk.js': rollupSourceFile },
         plugins: [
             ...nodePlugins,
             emitModulePackageFile(),
@@ -276,7 +276,7 @@ export default command => {
         strictDeprecations: true,
         output: [
             {
-                file: 'dist/es/pasarSDK.browser.js',
+                file: 'dist/es/pasar-sdk.browser.js',
                 format: 'es',
                 sourcemap: !prodBuild,
             },

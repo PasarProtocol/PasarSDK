@@ -1,19 +1,19 @@
 {
-  "name": "@PasarProtocol/PasarSDK",
+  "name": "@pasarprotocol/pasar-sdk",
   "version": "1.0.0",
   "description": "PasarProtocol NFT Marketplace SDK",
   "exports": {
-    "node": "./dist/pasarSDK.js",
+    "node": "./dist/pasar-sdk.js",
     "browser": {
-      "import": "./dist/es/pasarSDK.browser.js"
+      "import": "./dist/es/pasar-sdk.browser.js"
     }
   },
-  "main": "./dist/pasarSDK.js",
-  "module": "./dist/es/pasarSDK.js",
+  "main": "./dist/pasar-sdk.js",
+  "module": "./dist/es/pasar-sdk.js",
   "typings": "typings/",
   "browser": {
-    "./dist/pasarSDK.js": "./dist/pasarSDK.browser.js",
-    "./dist/es/pasarSDK.js": "./dist/es/pasarSDK.browser.js"
+    "./dist/pasar-sdk.js": "./dist/pasar-sdk.browser.js",
+    "./dist/es/pasar-sdk.js": "./dist/es/pasar-sdk.browser.js"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
@@ -118,7 +118,7 @@
     "nft",
     "marketplace"
   ],
-  "author": "",
+  "author": "PasarProtocol",
   "license": "MIT",
   "repository": "git@github.com:PasarProtocol/PasarSDK.git",
   "lint-staged": {

@@ -1,3 +1,4 @@
+
 /**
  * get new width and height of resizing image.
  *
