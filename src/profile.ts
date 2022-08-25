@@ -1,32 +1,27 @@
-
-class NFTItem {};
-class NFTCollection {}
-interface Dispatcher<T> {
-    dispatch(t: T);
-}
+import { AppContext } from "./AppContext"
+import { Dispatcher } from "./dispatcher";
+import { NftCollection } from "./nftcollection";
+import { NftItem } from "./nftitem"
 
 export class Profile {
-    public async fetchAndDispatchListedNFTItems(dispatcher: Dispatcher<NFTItem>) {
-        throw new Error("TODO");
+    private appContext: AppContext;
+
+    private walletAddr: string;
+    private userDid: string;
+
+    public async fetchAndDispatchListedNFTItems(dispatcher: Dispatcher<NftItem>) {
+        // TODO:
     }
 
-    public async fetchAndDispatchOwnedNFTItems(dispatcher: Dispatcher<NFTItem>) {
-        throw new Error("TODO");
+    public async fetchAndDispatchOwnedNFTItems(dispatcher: Dispatcher<NftItem>) {
+        // TODO:
     }
 
-    public async fetchAndDispatchBidNFTItems(dispatcher: Dispatcher<NFTItem>) {
-        throw new Error("TODO");
+    public async fetchAndDispatchCreatedNFTItems(dispatcher: Dispatcher<NftItem>) {
+        // TODO:
     }
 
-    public async fetchAndDispatchCreatedNFTItems(dispatcher: Dispatcher<NFTItem>) {
-        throw new Error("TODO");
-    }
-
-    public async fetchAndDispatchSoldNFTItems(dispatcher: Dispatcher<NFTItem>) {
-        throw new Error("TODO");
-    }
-
-    public async fetchAndDispatchOwnedCollections(dispatcher: Dispatcher<NFTCollection>) {
-        throw new Error("TODO");
+    public async fetchAndDispatchOwnedCollections(dispatcher: Dispatcher<NftCollection>) {
+        // TODO:
     }
 }
