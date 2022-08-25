@@ -12,7 +12,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
  * @param pageNum the page number, default 1; 
  * @param pageSize the count of nft per page, default value = 10; 
  */
-const getNftsOnMarketPlace = async (collection: string = '', pageNum: number = 1, pageSize: number = 10) => {
+const getNftsOnMarketPlace = async (collection = '', pageNum = 1, pageSize = 10) => {
     let baseUrl;
 
     if(utils.testNet) {
