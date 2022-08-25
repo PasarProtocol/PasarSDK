@@ -165,6 +165,7 @@ export default command => {
         onwarn,
         external: [
             'ipfs-http-client',
+            'stream',
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */
