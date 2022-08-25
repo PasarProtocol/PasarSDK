@@ -1,6 +1,6 @@
 
 class NFTItem {};
-class NFTCollection {]}
+class NFTCollection {}
 interface Dispatcher<T> {
     dispatch(t: T);
 }
