@@ -1,7 +1,7 @@
 export namespace valuesOnTestNet {
-    export var assistURL: string = "https://assist-test.pasarprotocol.io";
+    export const assistURL: string = "https://assist-test.pasarprotocol.io";
 
-    export var elastos: any = {
+    export const elastos: any = {
         pasarContract: '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087',
         stickerContract: '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961',
         pasarV2Contract: '0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7',
@@ -12,7 +12,8 @@ export namespace valuesOnTestNet {
         chainType: 1,
     }
 
-    export var urlIPFS: string = "https://ipfs-test.pasarprotocol.io";
+    export const urlIPFS: string = "https://ipfs-test.pasarprotocol.io";
+    export const didApplication: string = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB";
 }
 
 export namespace valuesOnMainNet {
@@ -30,4 +31,7 @@ export namespace valuesOnMainNet {
     }
 
     export var urlIPFS: string = "https://ipfs.pasarprotocol.io";
+    export const didApplication: string = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY";
 }
+
+export const DidResolverUrl = 'https://api.trinity-tech.io/eid'
