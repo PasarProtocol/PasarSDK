@@ -1,6 +1,7 @@
-import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
+import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
+import { statSync } from 'fs';
 import { DidResolverUrl, valuesOnTestNet, valuesOnMainNet } from './constant';
 import { utils } from './utils'; 
 
@@ -45,7 +46,7 @@ const signOutWithEssentials = async () => {
     sessionStorage.removeItem('USER_DID');
 
     try {
-        if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
+        if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())statSync
             await essentialsConnector.disconnectWalletConnect();
         if (isInAppBrowser() && (await window['elastos'].getWeb3Provider().isConnected()))
             await window['elastos'].getWeb3Provider().disconnect();
@@ -72,7 +73,7 @@ const signInWithEssentials = async () => {
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');
-          return;
+          return false;
         }
         // Optional name
         const nameCredential = vp.getCredential(`name`);
@@ -81,18 +82,20 @@ const signInWithEssentials = async () => {
         const bioCredential = vp.getCredential(`description`);
         const bio = bioCredential ? bioCredential.getSubject().getProperty('description') : '';
 
-        let user = {
-            name: name,
-            bio: bio,
-            did: sDid
-        }
-
-        sessionStorage.setItem("USER_DID", JSON.stringify(user));
         let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
         if (isInAppBrowser())
           essentialAddress = await window['elastos'].getWeb3Provider().address
-        // setWalletAddress(essentialAddress);
-        // setActivatingConnector(essentialsConnector);
+
+          let user = {
+            name: name,
+            bio: bio,
+            did: sDid,
+            address: essentialAddress
+        }
+
+        sessionStorage.setItem("USER_DID", JSON.stringify(user));
+
+        return true;
       }
     } catch (e) {
       try {
@@ -109,9 +112,15 @@ const signin = async () => {
     } else if (essentialsConnector.hasWalletConnectSession()) {
       await essentialsConnector.disconnectWalletConnect();
     }
-    await signInWithEssentials();
+    let result = await signInWithEssentials();
+    return result;
+}
+
+const signout = async () => {
+  await signOutWithEssentials();
 }
 
 export {
-    signin
+    signin,
+    signout,
 }
