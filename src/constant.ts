@@ -1,5 +1,5 @@
 export namespace valuesOnTestNet {
-    export const assistURL: string = "https://assist-test.pasarprotocol.io";
+    export const assistURL = "https://assist-test.pasarprotocol.io";
 
     export const elastos: any = {
         pasarContract: '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087',
@@ -12,12 +12,12 @@ export namespace valuesOnTestNet {
         chainType: 1,
     }
 
-    export const urlIPFS: string = "https://ipfs-test.pasarprotocol.io";
-    export const didApplication: string = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB";
+    export const urlIPFS = "https://ipfs-test.pasarprotocol.io";
+    export const didApplication = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB";
 }
 
 export namespace valuesOnMainNet {
-    export var assistURL: string = "https://assist.pasarprotocol.io";
+    export var assistURL = "https://assist.pasarprotocol.io";
 
     export var elastos: any = {
         pasarContract: '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0',
@@ -30,8 +30,8 @@ export namespace valuesOnMainNet {
         chainType: 1,
     }
 
-    export var urlIPFS: string = "https://ipfs.pasarprotocol.io";
-    export const didApplication: string = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY";
+    export var urlIPFS = "https://ipfs.pasarprotocol.io";
+    export const didApplication = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY";
 }
 
 export const DidResolverUrl = 'https://api.trinity-tech.io/eid'
