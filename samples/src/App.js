@@ -1,17 +1,15 @@
 import SigninEE from './SigninEE'
-import { Initialize, GetNfts } from '@pasarprotocol/pasar-sdk';
+import { initialize, getNftsOnMarketPlace } from '@pasarprotocol/pasar-sdk-development';
 import { useEffect } from 'react';
 function App() {
 
   useEffect(() => {
-    let initialize = new Initialize();
-    initialize.init();
+    initialize();
     getNFT();
   }, [])
 
   const getNFT = async () => {
-    let getNFT = new GetNfts();
-    let result = await getNFT.getNftsOnMarketPlace();
+    let result = await getNftsOnMarketPlace();
     console.log(result);
   }
 

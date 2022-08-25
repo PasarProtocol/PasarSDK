@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PasarCollection } from "@pasarprotocol/pasar-sdk";
+import { mintNFT } from "@pasarprotocol/pasar-sdk-development";
 
 const MintNFT = () => {
     const [name, setName] = useState('');
@@ -11,9 +11,7 @@ const MintNFT = () => {
         console.log(name);
         console.log(description);
 
-        let pasarCollection = new PasarCollection();
-
-        let result = await pasarCollection.mintNFT(urlImage, name, description);
+        let result = await mintNFT(urlImage, name, description);
         // console.log(result);
     }
 
