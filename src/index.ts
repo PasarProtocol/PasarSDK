@@ -1,12 +1,17 @@
 
 'use strict';
 
-import { Initialize } from "./init";
-import { PasarCollection } from "./pasarCollection";
-import { GetNfts } from "./getNfts"
+import { mintNFT } from "./pasarCollection";
+import { getNftsOnMarketPlace } from "./getNfts"
+import { utils } from "./utils";
+
+
+const initialize = (testnet: boolean = true) => {
+    utils.testNet = testnet;
+}
 
 export {
-    Initialize,
-    PasarCollection,
-    GetNfts
+    initialize,
+    getNftsOnMarketPlace,
+    mintNFT,
 }
