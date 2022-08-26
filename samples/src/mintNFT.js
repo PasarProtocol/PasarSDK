@@ -10,8 +10,8 @@ const MintNFT = () => {
     const handleMint = async () => {
         console.log(name);
         console.log(description);
-
-        let result = await mintNFT(urlImage, name, description);
+        console.log(urlImage);
+        let result = await mintNFT(urlImage, name, description, "", false);
         // console.log(result);
     }
 
