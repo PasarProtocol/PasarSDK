@@ -8,7 +8,7 @@ import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage } from "./global";
 
-const mintNFT = async (image: any, name: string, description: string) => {
+const mintNFT = async (image: any, name: string, description: string,  properties, adult = false,) => {
 	let ipfsURL;
 
 	if(utils.testNet) {
@@ -27,11 +27,34 @@ const mintNFT = async (image: any, name: string, description: string) => {
 		thumbnail_add = await client.add(thumbnail.fileContent);
 	}
 	
-	let id_image = `0x${sha256(image_add.path)}`;
-	let id_thumbnail = `0x${sha256(thumbnail_add.path)}`;
+	let _id = `0x${sha256(image_add.path)}`;
 
-	console.log(id_image);
-	console.log(id_thumbnail);
+	let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+	const createObject = {
+		"did": jsonDid.did,
+		"name": jsonDid.name || "",
+		"description": jsonDid.bio || ""
+	}
+
+	const metaObj = {
+        "version": "2",
+        "type": 'image',
+        "name": name,
+        "description": description,
+        "creator": createObject,
+        "data": {
+          "image": `pasar:image:${image_add.path}`,
+          "kind": image.type.replace('image/', ''),
+          "size": image.size,
+          "thumbnail": `pasar:image:${thumbnail_add.path}`,
+        },
+        "adult": adult,
+        "properties": properties || "",
+	}
+	
+	let metaData = await client.add(JSON.stringify(metaObj));
+
+	console.log(metaData);
 
 	return "success";
 }
