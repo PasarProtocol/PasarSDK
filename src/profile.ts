@@ -1,4 +1,4 @@
-import { AppContext } from "./AppContext"
+import { AppContext } from "./appcontext"
 import { Dispatcher } from "./dispatcher";
 import { NftCollection } from "./nftcollection";
 import { NftItem } from "./nftitem"
