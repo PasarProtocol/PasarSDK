@@ -56,7 +56,7 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 	}
 	
 	let metaData = await client.add(JSON.stringify(metaObj));
-
+	let uriData = `pasar:json:${metaData.path}`;
 	const essentialsConnector = new EssentialsConnector();
 
 	const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -65,12 +65,12 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 
 	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
 	gasPrice = getFilteredGasPrice(gasPrice);
-	console.log("gas price: " + gasPrice);
+	
 	try {
-		await handleMintFunction(accounts, _id, totalSupply, metaData, royaltyFee, essentialsConnector, gasPrice)
-		return {result: true};
+		await handleMintFunction(accounts, _id, totalSupply, uriData, royaltyFee, essentialsConnector, gasPrice)
+		return {result: true, data: _id};
 	} catch(err) {
-		return {result: false, code: err};
+		return {result: false, data: err};
 	}
 }
 
@@ -91,9 +91,7 @@ let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essen
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.mint(id, totalSupply, metaData, royaltyFee).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);
-			console.log(receipt);
 		}).on('error', (error) => {
-			console.error("error", error);
 			reject(error)
 		});
 	})
