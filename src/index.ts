@@ -1,7 +1,7 @@
 
 'use strict';
 
-import { mintNFT } from "./pasarCollection";
+import { mintNFT, burn } from "./pasarCollection";
 import { getNftsOnMarketPlace } from "./getNfts"
 import { utils } from "./utils";
 import { signin, signout } from "./signin";
@@ -14,6 +14,7 @@ export {
     initialize,
     getNftsOnMarketPlace,
     mintNFT,
+    burn,
     signin,
     signout
 }
