@@ -11,7 +11,18 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 
-const mintNFT = async (image: any, name: string, description: string,  properties, totalSupply=1, royaltyFee=10, adult = false) => {
+/**
+ * resize the image.
+ *
+ * @param image the image file
+ * @param name name of nft
+ * @param description description of nft
+ * @param properties properties of nft
+ * @param totalSupply count of nft; default = 1
+ * @param royaltyFee royaltify of nft; default = 10
+ * @param adult adult property; default = false
+ */
+const mintNFT = async (image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
 	let ipfsURL;
 
 	if(utils.testNet) {
