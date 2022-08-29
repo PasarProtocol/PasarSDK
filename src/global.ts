@@ -106,4 +106,11 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
     })
 }
 
-export {resizeImage}
+const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
+const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+
+export {
+    resizeImage,
+    isInAppBrowser,
+    getFilteredGasPrice
+}
