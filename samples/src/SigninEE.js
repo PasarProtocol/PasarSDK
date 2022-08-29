@@ -19,8 +19,12 @@ function SigninEE() {
     setLogin(false);
   }
 
-  const handleClickMint = async () => {
+  const handleClickMint = () => {
     navigate("/mint");
+  }
+
+  const handleClickBurn = () => {
+    navigate("/burn");
   }
 
   return (
@@ -34,6 +38,7 @@ function SigninEE() {
 
         <div>
           <button onClick={handleClickMint}>Add New NFT</button>
+          <button onClick={handleClickBurn}>Burn NFT</button>
         </div>
         
     </div>
