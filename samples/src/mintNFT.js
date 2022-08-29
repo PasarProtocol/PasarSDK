@@ -11,8 +11,8 @@ const MintNFT = () => {
         console.log(name);
         console.log(description);
         console.log(urlImage);
-        let result = await mintNFT(urlImage, name, description, "", false);
-        // console.log(result);
+        let result = await mintNFT(urlImage, name, description, "");
+        console.log(result);
     }
 
     const handleChangeImage = (e) => {
