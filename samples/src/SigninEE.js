@@ -1,9 +1,12 @@
 
 import React, {useState} from 'react'
 import { signin, signout } from '@pasarprotocol/pasar-sdk-development';
+import {
+  useNavigate
+} from "react-router-dom";
 
 function SigninEE() {
-
+  const navigate = useNavigate();
   const [login, setLogin] = useState(false);
 
   const handleSigninEE1 = async () => {
@@ -17,7 +20,7 @@ function SigninEE() {
   }
 
   const handleClickMint = async () => {
-    
+    navigate("/mint");
   }
 
   return (
