@@ -224,7 +224,7 @@ export class MyProfile extends Profile {
      *        Pasar marketplace
      * @returns The orderId of the order listed on marketplace.
      */
-    public listNFItem(baseToken: string,
+    public listItem(baseToken: string,
         tokenId: string,
         pricingToken: string,
         price: number,
@@ -248,7 +248,7 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        Pasar marketplace
      */
-    public listNFTItemOnAuction(baseToken: string,
+    public listItemOnAuction(baseToken: string,
         tokenId: string,
         pricingToken: string,
         minPrice: number,
