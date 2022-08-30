@@ -1,4 +1,4 @@
-import { ChainNetwork } from "./chainnetwork";
+import { ChainNetwork } from "./chaintype";
 
 export class CollectionAddress {
     private contractAddr: string;

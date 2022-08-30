@@ -4,6 +4,9 @@ import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 
+/**
+ * This class represent the Profile of current signed-in user.
+ */
 export class MyProfile extends Profile {
 
     /**

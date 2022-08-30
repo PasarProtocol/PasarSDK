@@ -1,4 +1,4 @@
-import { ChainNetwork } from "./chainnetwork";
+import { ChainNetwork } from "./chaintype";
 import { CollectionAddress } from "./contractaddress";
 
 export class AppContext {

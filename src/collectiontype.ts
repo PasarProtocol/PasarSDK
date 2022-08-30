@@ -1,4 +1,4 @@
-export enum CollectionCategory {
+export enum CollectionType {
     General,
     Collectibles,
     Art,
