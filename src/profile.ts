@@ -9,6 +9,10 @@ export class Profile {
     private walletAddr: string;
     private userDid: string;
 
+    /**
+     *
+     * @param dispatcher
+     */
     public async fetchAndDispatchListedNFTItems(dispatcher: Dispatcher<NftItem>) {
         // TODO:
     }

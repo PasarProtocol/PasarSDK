@@ -8,7 +8,7 @@ import Web3 from 'web3';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
-import { isTestNetwork } from './networkType';
+import { isTestnetNetwork } from './networkType';
 import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 
  /**  the function of being minted the nft
@@ -26,12 +26,12 @@ import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 const mintNFT = async (image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
 	let ipfsURL;
 
-	if(isTestNetwork()) {
+	if(isTestnetNetwork()) {
 		ipfsURL = valuesOnTestNet.urlIPFS;
 	} else {
 		ipfsURL = valuesOnMainNet.urlIPFS;
 	}
-	
+
 	const client = create({ url: ipfsURL });
 
 	let image_add = await client.add(image);
@@ -41,7 +41,7 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 	if(thumbnail.success === 0) {
 		thumbnail_add = await client.add(thumbnail.fileContent);
 	}
-	
+
 	let _id = `0x${sha256(image_add.path)}`;
 
 	let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
@@ -66,7 +66,7 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 		"adult": adult,
 		"properties": properties || "",
 	}
-	
+
 	let metaData = await client.add(JSON.stringify(metaObj));
 	let uriData = `pasar:json:${metaData.path}`;
 	const essentialsConnector = new EssentialsConnector();
@@ -77,7 +77,7 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 
 	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
 	gasPrice = getFilteredGasPrice(gasPrice);
-	
+
 	try {
 		await handleMintFunction(accounts, _id, totalSupply, uriData, royaltyFee, essentialsConnector, gasPrice)
 		return {result: true, data: _id};
@@ -103,7 +103,7 @@ let burn = async (id, totalSupply = 1) => {
 
 	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
 	gasPrice = getFilteredGasPrice(gasPrice);
-	
+
 	try {
 		await handleBurn(accounts, id, totalSupply, essentialsConnector, gasPrice)
 		return {result: true, data: id};
@@ -130,7 +130,7 @@ let burn = async (id, totalSupply = 1) => {
 
 	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
 	gasPrice = getFilteredGasPrice(gasPrice);
-	
+
 	try {
 		await handleTransfer(accounts, id, to, totalSupply, essentialsConnector, gasPrice)
 		return {result: true, data: id};
@@ -148,10 +148,10 @@ let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essen
 			'gas': _gasLimit,
 			'value': 0
 		};
-	
+
 		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-	
-		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+
+		let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.mint(id, totalSupply, metaData, royaltyFee).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);
@@ -159,7 +159,7 @@ let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essen
 			reject(error)
 		});
 	})
-	
+
 }
 
 let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
@@ -171,10 +171,10 @@ let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
 			'gas': _gasLimit,
 			'value': 0
 		};
-	
+
 		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-	
-		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+
+		let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.burn(id, totalSupply).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);
@@ -182,7 +182,6 @@ let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
 			reject(error)
 		});
 	})
-	
 }
 
 let handleTransfer = (accounts, id, to, totalSupply, essentialsConnector, gasPrice) => {
@@ -194,10 +193,10 @@ let handleTransfer = (accounts, id, to, totalSupply, essentialsConnector, gasPri
 			'gas': _gasLimit,
 			'value': 0
 		};
-	
+
 		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-	
-		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+
+		let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.safeTransferFrom(accounts[0], to, id, totalSupply).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);

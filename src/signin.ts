@@ -3,7 +3,7 @@ import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-j
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { statSync } from 'fs';
 import { DidResolverUrl, valuesOnTestNet, valuesOnMainNet } from './constant';
-import { isTestNetwork } from './networkType';
+import { isTestnetNetwork } from './networkType';
 
 const essentialsConnector = new EssentialsConnector();
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
@@ -16,18 +16,18 @@ const isUsingEssentialsConnector = () => {
 
 const initConnectivitySDK = async () => {
     if (connectivityInitialized) return;
-  
+
     console.log('Preparing the Elastos connectivity SDK');
-  
+
     // unregistear if already registerd
     const arrIConnectors = connectivity.getAvailableConnectors();
     if (arrIConnectors.findIndex((option) => option.name === essentialsConnector.name) !== -1) {
         await connectivity.unregisterConnector(essentialsConnector.name);
         console.log('unregister connector succeed.');
     }
-  
+
     await connectivity.registerConnector(essentialsConnector).then(async () => {
-        connectivity.setApplicationDID(isTestNetwork() ? valuesOnTestNet.didApplication : valuesOnMainNet.didApplication);
+        connectivity.setApplicationDID(isTestnetNetwork() ? valuesOnTestNet.didApplication : valuesOnMainNet.didApplication);
         connectivityInitialized = true;
 
         console.log('essentialsConnector', essentialsConnector);
@@ -69,7 +69,7 @@ const signInWithEssentials = async () => {
         DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        
+
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');

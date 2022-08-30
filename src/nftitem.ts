@@ -1,1 +1,3 @@
-export class NftItem {}
+export class NftItem {
+
+}

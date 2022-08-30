@@ -4,10 +4,10 @@
 import { mintNFT, burn, transfer } from "./pasarCollection";
 import { getNftsOnMarketPlace } from "./getNfts";
 import { signin, signout } from "./signin";
-import { setNetWorkType } from "./networkType";
+import { setNetworkType } from "./networkType";
 
 const initialize = (testnet = true) => {
-    setNetWorkType(testnet);
+    setNetworkType(testnet);
 }
 
 export {

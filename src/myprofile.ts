@@ -1,4 +1,4 @@
-import { CollectionCategory } from "./collectioncategory";
+import { CollectionType } from "./collectiontype";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
@@ -43,7 +43,7 @@ export class MyProfile extends Profile {
     public createCollectionMetadata(name: string,
         description: string,
         avatar: string,
-        category: CollectionCategory,
+        category: CollectionType,
         socialMedias: any,
         avatarHandler: ProgressHandler,
         metadataHandler: ProgressHandler) : Promise<string> {
