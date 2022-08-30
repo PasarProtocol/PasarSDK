@@ -1,7 +1,7 @@
 
 'use strict';
 
-import { mintNFT, burn } from "./pasarCollection";
+import { mintNFT, burn, transfer } from "./pasarCollection";
 import { getNftsOnMarketPlace } from "./getNfts";
 import { signin, signout } from "./signin";
 import { setNetWorkType } from "./networkType";
@@ -15,6 +15,7 @@ export {
     getNftsOnMarketPlace,
     mintNFT,
     burn,
+    transfer,
     signin,
     signout
 }

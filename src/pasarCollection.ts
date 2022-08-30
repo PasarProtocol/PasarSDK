@@ -112,6 +112,33 @@ let burn = async (id, totalSupply = 1) => {
 	}
 }
 
+/**
+ *  the function of transfer the nft
+ *
+ * @param id tokenId
+ * @param to the address of receving the nft
+ * @param totalSupply count of nft; default = 1
+ * @return result result of mint; true = success, false = failed
+ * @return data data of mint; if success is tokenId whereas with failed, is an error code
+ */
+ let transfer = async (id, to, totalSupply = 1) => {
+	const essentialsConnector = new EssentialsConnector();
+
+	const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+	let accounts = await walletConnectWeb3.eth.getAccounts();
+
+	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+	gasPrice = getFilteredGasPrice(gasPrice);
+	
+	try {
+		await handleTransfer(accounts, id, to, totalSupply, essentialsConnector, gasPrice)
+		return {result: true, data: id};
+	} catch(err) {
+		return {result: false, data: err};
+	}
+}
+
 let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essentialsConnector, gasPrice) => {
 	return new Promise((resolve, reject) => {
 		const _gasLimit = 5000000;
@@ -158,7 +185,30 @@ let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
 	
 }
 
+let handleTransfer = (accounts, id, to, totalSupply, essentialsConnector, gasPrice) => {
+	return new Promise((resolve, reject) => {
+		const _gasLimit = 5000000;
+		const transactionParams = {
+			'from': accounts[0],
+			'gasPrice': gasPrice,
+			'gas': _gasLimit,
+			'value': 0
+		};
+	
+		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+	
+		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
+		pasarContract.methods.safeTransferFrom(accounts[0], to, id, totalSupply).send(transactionParams).on('receipt', (receipt) => {
+			resolve(receipt);
+		}).on('error', (error) => {
+			reject(error)
+		});
+	})
+}
+
 export {
 	mintNFT,
 	burn,
+	transfer
 }
