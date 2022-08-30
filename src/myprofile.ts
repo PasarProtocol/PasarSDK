@@ -1,9 +1,12 @@
-import { CollectionCategory } from "./collectioncategory";
+import { CollectionType } from "./collectiontype";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 
+/**
+ * This class represent the Profile of current signed-in user.
+ */
 export class MyProfile extends Profile {
 
     /**
@@ -40,7 +43,7 @@ export class MyProfile extends Profile {
     public createCollectionMetadata(name: string,
         description: string,
         avatar: string,
-        category: CollectionCategory,
+        category: CollectionType,
         socialMedias: any,
         avatarHandler: ProgressHandler,
         metadataHandler: ProgressHandler) : Promise<string> {
@@ -221,7 +224,7 @@ export class MyProfile extends Profile {
      *        Pasar marketplace
      * @returns The orderId of the order listed on marketplace.
      */
-    public listNFItem(baseToken: string,
+    public listItem(baseToken: string,
         tokenId: string,
         pricingToken: string,
         price: number,
@@ -245,7 +248,7 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        Pasar marketplace
      */
-    public listNFTItemOnAuction(baseToken: string,
+    public listItemOnAuction(baseToken: string,
         tokenId: string,
         pricingToken: string,
         minPrice: number,

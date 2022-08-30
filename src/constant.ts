@@ -36,7 +36,3 @@ export namespace valuesOnMainNet {
 
 export const DidResolverUrl = 'https://api.trinity-tech.io/eid'
 
-export const networkType = {
-    MainNet: "Mainnet",
-    TestNet: "Testnet"
-}

@@ -1,20 +1,19 @@
 /**
- * This is of setting the testnet or network
+ * Chain network enviroment - Mainnet or Testnet
  */
 
-import { networkType } from "./constant";
+export enum NetworkType {
+    TestNet = "TestNet",
+    MainNet = "MainNet",
+}
 
 /**
  * set the network type
  *
  * @param testnet the value of network, if testnet, true, else false
  */
-const setNetWorkType = (testnet) => {
-    if(testnet) {
-        sessionStorage.setItem("network", networkType.TestNet);
-    } else {
-        sessionStorage.setItem("network", networkType.MainNet);
-    }
+const setNetworkType = (testnet) => {
+    sessionStorage.setItem("network", testnet ? NetworkType.TestNet: NetworkType.MainNet)
 }
 
 /**
@@ -22,17 +21,11 @@ const setNetWorkType = (testnet) => {
  *
  * @return if testnet, true, else false
  */
-const isTestNetwork = () => {
-    let currentNetwork = sessionStorage.getItem("network");
-
-    if(currentNetwork == networkType.TestNet) {
-        return true;
-    } else {
-        return false;
-    }
+const isTestnetNetwork = () => {
+    return (sessionStorage.getItem("network") == NetworkType.TestNet)
 }
 
 export {
-    setNetWorkType,
-    isTestNetwork
+    setNetworkType,
+    isTestnetNetwork
 }
