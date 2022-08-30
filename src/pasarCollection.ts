@@ -9,7 +9,7 @@ import { EssentialsConnector } from '@elastosfoundation/essentials-connector-cli
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { isTestnetNetwork } from './networkType';
-import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
+import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 
  /**  the function of being minted the nft
  *
