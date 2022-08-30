@@ -11,7 +11,6 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 
-/**
  *  the function of being minted the nft
  *
  * @param image the image file
