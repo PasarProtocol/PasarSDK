@@ -10,6 +10,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import App from './App';
 import MintNFT from './mintNFT';
 import BurnNFT from './burnNFT';
+import TransferNFT from './transfer';
 
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider);
@@ -23,6 +24,7 @@ const RouterCom = ()=>{
       <Route path="/" element={<App />} />
       <Route path="/mint" element={<MintNFT />} />
       <Route path="/burn" element={<BurnNFT />} />
+      <Route path="/transfer" element={<TransferNFT />} />
     </Routes>
   </BrowserRouter>
 }
