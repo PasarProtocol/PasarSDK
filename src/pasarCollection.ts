@@ -11,8 +11,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 
-/**
- * resize the image.
+ *  the function of being minted the nft
  *
  * @param image the image file
  * @param name name of nft
@@ -21,6 +20,8 @@ import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
  * @param totalSupply count of nft; default = 1
  * @param royaltyFee royaltify of nft; default = 10
  * @param adult adult property; default = false
+ * @return result result of mint; true = success, false = failed
+ * @return data data of mint; if success is tokenId whereas with failed, is an error code
  */
 const mintNFT = async (image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
 	let ipfsURL;
@@ -85,6 +86,31 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 	}
 }
 
+/**
+ *  the function of being burn the nft
+ *
+ * @param id tokenId
+ * @param totalSupply count of nft; default = 1
+ * @return result result of mint; true = success, false = failed
+ * @return data data of mint; if success is tokenId whereas with failed, is an error code
+ */
+let burn = async (id, totalSupply = 1) => {
+	const essentialsConnector = new EssentialsConnector();
+
+	const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+	let accounts = await walletConnectWeb3.eth.getAccounts();
+
+	let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+	gasPrice = getFilteredGasPrice(gasPrice);
+	
+	try {
+		await handleBurn(accounts, id, totalSupply, essentialsConnector, gasPrice)
+		return {result: true, data: id};
+	} catch(err) {
+		return {result: false, data: err};
+	}
+}
 
 let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essentialsConnector, gasPrice) => {
 	return new Promise((resolve, reject) => {
@@ -109,6 +135,30 @@ let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essen
 	
 }
 
+let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
+	return new Promise((resolve, reject) => {
+		const _gasLimit = 5000000;
+		const transactionParams = {
+			'from': accounts[0],
+			'gasPrice': gasPrice,
+			'gas': _gasLimit,
+			'value': 0
+		};
+	
+		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+	
+		let contractAddress = utils.testNet ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
+		pasarContract.methods.burn(id, totalSupply).send(transactionParams).on('receipt', (receipt) => {
+			resolve(receipt);
+		}).on('error', (error) => {
+			reject(error)
+		});
+	})
+	
+}
+
 export {
 	mintNFT,
+	burn,
 }
