@@ -23,7 +23,7 @@ import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
  * @return result result of mint; true = success, false = failed
  * @return data data of mint; if success is tokenId whereas with failed, is an error code
  */
-const mintNFT = async (image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
+const mintNFT = async (setProgress: any, image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
 	let ipfsURL;
 
 	if(isTestnetNetwork()) {
@@ -31,13 +31,13 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 	} else {
 		ipfsURL = valuesOnMainNet.urlIPFS;
 	}
-
+	setProgress(10);
 	const client = create({ url: ipfsURL });
 
 	let image_add = await client.add(image);
 	let thumbnail:any = await resizeImage(image, 300, 300);
 	let thumbnail_add = image_add;
-
+	setProgress(20);
 	if(thumbnail.success === 0) {
 		thumbnail_add = await client.add(thumbnail.fileContent);
 	}
@@ -45,6 +45,7 @@ const mintNFT = async (image: any, name: string, description: string,  propertie
 	let _id = `0x${sha256(image_add.path)}`;
 
 	let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+	setProgress(30);
 	const createObject = {
 		"did": jsonDid.did,
 		"name": jsonDid.name || "",
