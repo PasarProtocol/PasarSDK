@@ -2,12 +2,12 @@
 'use strict';
 
 import { mintNFT, burn } from "./pasarCollection";
-import { getNftsOnMarketPlace } from "./getNfts"
-import { utils } from "./utils";
+import { getNftsOnMarketPlace } from "./getNfts";
 import { signin, signout } from "./signin";
+import { setNetWorkType } from "./networkType";
 
 const initialize = (testnet = true) => {
-    utils.testNet = testnet;
+    setNetWorkType(testnet);
 }
 
 export {

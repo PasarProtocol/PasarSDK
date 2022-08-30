@@ -6,9 +6,9 @@ import { create } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
+import { isTestNetwork } from './networkType';
 import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 
  /**  the function of being minted the nft
@@ -26,7 +26,7 @@ import PASAR_CONTRACT_ABI from './contracts/stickerV2ABI';
 const mintNFT = async (image: any, name: string, description: string,  properties:any, totalSupply=1, royaltyFee=10, adult = false) => {
 	let ipfsURL;
 
-	if(utils.testNet) {
+	if(isTestNetwork()) {
 		ipfsURL = valuesOnTestNet.urlIPFS;
 	} else {
 		ipfsURL = valuesOnMainNet.urlIPFS;
@@ -124,7 +124,7 @@ let handleMintFunction = (accounts, id, totalSupply, metaData, royaltyFee, essen
 	
 		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 	
-		let contractAddress = utils.testNet ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.mint(id, totalSupply, metaData, royaltyFee).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);
@@ -147,7 +147,7 @@ let handleBurn = (accounts, id, totalSupply, essentialsConnector, gasPrice) => {
 	
 		const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 	
-		let contractAddress = utils.testNet ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
+		let contractAddress = isTestNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract
 		let pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, contractAddress);
 		pasarContract.methods.burn(id, totalSupply).send(transactionParams).on('receipt', (receipt) => {
 			resolve(receipt);

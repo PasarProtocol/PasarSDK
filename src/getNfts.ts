@@ -2,8 +2,8 @@
  * This class get the nfts from pasar assist backend
  */
 
-import { utils } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import { isTestNetwork } from "./networkType";
 
 /**
  * get all nfts listed on Pasar marketplace.
@@ -15,7 +15,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 const getNftsOnMarketPlace = async (collection = '', pageNum = 1, pageSize = 10) => {
     let baseUrl;
 
-    if(utils.testNet) {
+    if(isTestNetwork()) {
         baseUrl = valuesOnTestNet.assistURL;
     } else {
         baseUrl = valuesOnMainNet.assistURL;

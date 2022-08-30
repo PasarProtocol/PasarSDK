@@ -3,7 +3,7 @@ import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-j
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { statSync } from 'fs';
 import { DidResolverUrl, valuesOnTestNet, valuesOnMainNet } from './constant';
-import { utils } from './utils'; 
+import { isTestNetwork } from './networkType';
 
 const essentialsConnector = new EssentialsConnector();
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
@@ -27,7 +27,7 @@ const initConnectivitySDK = async () => {
     }
   
     await connectivity.registerConnector(essentialsConnector).then(async () => {
-        connectivity.setApplicationDID(utils.testNet ? valuesOnTestNet.didApplication : valuesOnMainNet.didApplication);
+        connectivity.setApplicationDID(isTestNetwork() ? valuesOnTestNet.didApplication : valuesOnMainNet.didApplication);
         connectivityInitialized = true;
 
         console.log('essentialsConnector', essentialsConnector);
