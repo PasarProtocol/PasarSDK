@@ -12,7 +12,6 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
-import Feed_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import { CallContract } from './callcontract';
 import { AppContext } from './appcontext';
 
@@ -160,26 +159,26 @@ export class MyProfile {
             handleProgress ? handleProgress(30) : null;
 
             let thumbnail_add = image_add;
-    
+
             if(thumbnail.success === 0) {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
 
             let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
-    
+
             const creatorObject: UserDidInfo = {
                 "did": jsonDid.did,
                 "name": jsonDid.name || "",
                 "description": jsonDid.bio || ""
             }
-    
+
             const imageObject: ImageDidInfo = {
                 "image": `pasar:image:${image_add.path}`,
                 "kind": itemImage.type.replace('image/', ''),
                 "size": itemImage.size,
                 "thumbnail": `pasar:image:${thumbnail_add.path}`,
             }
-    
+
             const metaObj: NFTDidInfo = {
                 "version": version,
                 "type": 'image',
@@ -190,7 +189,7 @@ export class MyProfile {
                 "adult": sensitive,
                 "properties": properties || "",
             }
-    
+
             let metaData = await client.add(JSON.stringify(metaObj));
             console.log(`0x${sha256(image_add.path)}`);
             console.log(metaData.path);
@@ -252,7 +251,7 @@ export class MyProfile {
         handleProgress:any = null
     ): Promise<any> {
         let result: ResultCallContract;
-        
+
         const essentialsConnector = new EssentialsConnector();
 
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -268,7 +267,7 @@ export class MyProfile {
             result = {
                 success: true,
                 data: tokenId
-            }    
+            }
             handleProgress ? handleProgress(100) : null;
         } catch(err) {
             result = {
