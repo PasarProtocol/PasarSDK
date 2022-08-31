@@ -1,5 +1,7 @@
 import { create } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
+import Web3 from 'web3';
+import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { CollectionType } from "./collectiontype";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
@@ -8,12 +10,15 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
-import { ImageDidInfo, NFTDidInfo, ResultOnIpfs, UserDidInfo } from './utils';
+import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
+import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
+import Feed_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 
 /**
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile extends Profile {
+    
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
@@ -119,13 +124,11 @@ export class MyProfile extends Profile {
      * @param itemName The name of NFT item to be minted
      * @param itemDescription The brief description of an NFT item
      * @param itemImage The actual image of an NFT item
+     * @param version The version of nft
      * @param properties
      * @param sensitive Indicator whether the NFT item contains sensitive content or not.
-     * @param acutalImageHandler: The handler to deal with the progress on uploading acutal
-     *        image and (maybe) thumbnail of this iamge as well to IPFS storage.
-     * @param metadataHandler: The handler to deal with the progress on uploading metadata
-     *        json file onto IPFS storage
-     * @returns The uri of this NFT item metadata.
+     * @param handleProgress The function to set the progress value of being uploaded ipfs process
+     * @returns The result included tokenId, metadata, etc.
      */
     public async createItemMetadata(
         itemName: string,
@@ -188,24 +191,22 @@ export class MyProfile extends Profile {
             let metaData = await client.add(JSON.stringify(metaObj));
             console.log(`0x${sha256(image_add.path)}`);
             console.log(metaData.path);
+            handleProgress ? handleProgress(40) : null;
 
-            result = {
+            return result = {
                 success: true,
                 result: "success",
                 tokenId: `0x${sha256(image_add.path)}`,
                 medadata: `pasar:json:${metaData.path}`
             }
-            handleProgress ? handleProgress(40) : null;
         } catch(err) {
-            result = {
+            return result = {
                 success: false,
                 result: err,
                 tokenId: null,
                 medadata: null,
             }
         }
-
-        return result;
     }
 
     /**
@@ -231,17 +232,49 @@ export class MyProfile extends Profile {
      * on tokenURI string of metadata json file on IPFS sotrage.
      * Notice: This function should be used for minting NFTs from public collection.
      *
+     * @param tokenId The token id of being minted
      * @param baseToken The collection contract where NFT items would be minted
+     * @param totalSupply The quantity of nft of being minted
      * @param tokenUri The token uri to this new NFT item
      * @param roylatyFee:The royalty fee to the new NFT item
-     * @param progressHandler: The handler to deal with progress on minting a new NFT item
-     * @returns The tokenId of the new NFT.
+     * @param handleProgress: The handler to deal with progress on minting a new NFT item
+     * @returns The result of being minted the nft. if success = true, data is tokenId, else data is error infomation
      */
-    public createItemWithRoyalties(baseToken: string,
+    public async createItemWithRoyalties(
+        tokenId: string,
+        baseToken: string,
+        totalSupply: number,
         tokenUri: string,
         roylatyFee: number,
-        progressHandler: ProgressHandler): Promise<string> {
-        throw new Error("Method Not implemented");
+        handleProgress:any = null
+    ): Promise<any> {
+        let result: ResultCallContract;
+        
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        handleProgress ? handleProgress(50) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        handleProgress ? handleProgress(60) : null;
+        try {
+            await super.callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenId
+            }    
+            handleProgress ? handleProgress(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**

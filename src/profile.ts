@@ -2,12 +2,19 @@ import { AppContext } from "./appcontext"
 import { Dispatcher } from "./dispatcher";
 import { NftCollection } from "./nftcollection";
 import { NftItem } from "./nftitem"
+import { CallContract } from './callcontract';
 
 export class Profile {
+    protected callContract: CallContract;
+
     private appContext: AppContext;
 
     private walletAddr: string;
     private userDid: string;
+
+    constructor() {
+        this.callContract = new CallContract;
+    };
 
     /**
      * Fetch the listed NFTs owned by this profile.

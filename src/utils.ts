@@ -28,3 +28,15 @@ export interface ResultOnIpfs {
     "tokenId": string,
     "medadata"
 }
+
+export interface TransactionParams {
+    'from': string,
+    'gasPrice': string,
+    'gas': number,
+    'value': number
+}
+
+export interface ResultCallContract {
+    "success": boolean;
+    "data": any
+}

@@ -1,3 +1,3 @@
 export interface ProgressHandler {
-    onProgress(): void;
+    onProgress(value: number): void;
 }
