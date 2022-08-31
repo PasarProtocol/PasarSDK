@@ -10,8 +10,8 @@ export class Profile {
     private userDid: string;
 
     constructor() {
-
-    };
+        
+    }
 
     /**
      * Fetch the listed NFTs owned by this profile.
