@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { burn } from "@pasarprotocol/pasar-sdk-development";
+import { burnNft } from "@pasarprotocol/pasar-sdk-development";
 
 const BurnNFT = () => {
     const [tokenId, setTokenId] = useState("");
 
     const handleBurn = async () => {
-        let result = await burn(tokenId, 1);
+        let result = await burnNft(tokenId, 1);
         console.log(result);
     }
 

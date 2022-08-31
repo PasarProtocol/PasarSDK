@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { transfer } from "@pasarprotocol/pasar-sdk-development";
+import { transferNft } from "@pasarprotocol/pasar-sdk-development";
 
 const TransferNFT = () => {
     const [tokenId, setTokenId] = useState("");
     const [toAddress, setToAddress] = useState("");
 
     const handleTransfer = async () => {
-        let result = await transfer(tokenId, toAddress, 1);
+        let result = await transferNft(tokenId, toAddress, 1);
         console.log(result);
     }
 

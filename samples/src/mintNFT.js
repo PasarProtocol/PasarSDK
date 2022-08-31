@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { mintNFT } from "@pasarprotocol/pasar-sdk-development";
+import { mintNft } from "@pasarprotocol/pasar-sdk-development";
 
 const MintNFT = () => {
     const [name, setName] = useState('');
@@ -16,7 +16,7 @@ const MintNFT = () => {
         console.log(name);
         console.log(description);
         console.log(urlImage);
-        let result = await mintNFT(setProgress, urlImage, name, description, "");
+        let result = await mintNft(name, description, urlImage, 2, "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", 1, 10, null, false, setProgress);
         console.log(result);
     }
 
