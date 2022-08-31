@@ -21,10 +21,6 @@ export class AppContext {
     }
 
     /**
-     *
-     */
-
-    /**
      * Append a remote collection contract address to interact with.
      *
      * @param address The collection contract address

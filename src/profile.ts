@@ -14,7 +14,7 @@ export class Profile {
 
     constructor() {
         this.callContract = new CallContract;
-    };
+    }
 
     /**
      * Fetch the listed NFTs owned by this profile.
