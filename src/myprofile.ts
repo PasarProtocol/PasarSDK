@@ -325,12 +325,12 @@ export class MyProfile extends Profile {
      *
      * @param baseToken The collection of this NFT item
      * @param tokenId The tokenId of NFT item
-     * @param pricingToken The contract address of ERC20 token as pricing token
+     * @param pricingToken The token address of pricing token
      * @param price The price value to sell
      * @param sellerUri The uri of seller information on IPFS storage
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        Pasar marketplace
-     * @returns The orderId of the order listed on marketplace.
+     * @returns The orderId of the NFT item listed on marketplace
      */
     public listItem(baseToken: string,
         tokenId: string,
@@ -340,6 +340,38 @@ export class MyProfile extends Profile {
         progressHandler: ProgressHandler): Promise<string> {
 
         throw new Error("Method not implemnted");
+    }
+
+    /**
+     * Change the listed price for NFT item on marketplace
+     * This function would be used to change the price of listed item with fixed price.
+     *
+     * @param orderId The orderId of NFT item on maketplace
+     * @param newPricingToken The token address of new pricing token
+     * @param newPrice The new listed price
+     * @param progressHandler The handler to deal with the progress on changing price for
+     *        specific listed item on marketplace
+     * @returns The result of bidding action.
+     */
+    public changePrice(orderId: number,
+        newPricingToken: string,
+        newPrice: number,
+        progressHandler: ProgressHandler): Promise<boolean> {
+        throw new Error("Method not implemented");
+    }
+
+    /**
+     * Buy an item listed on marketplace
+     * This function is used to buy the item with fixed price.
+     *
+     * @param orderId The orderId of NFT item on maketplace
+     * @param buyerUri  The uri of buyer information on IPFS storage
+     * @param progressHandler The handler to deal with the progress on buying listed item
+     * @returns The result of buying action.
+     */
+    public buyItem(orderId: number,
+        buyerUri: string): Promise<boolean> {
+        throw new Error("Method not implemented");
     }
 
     /**
@@ -354,7 +386,8 @@ export class MyProfile extends Profile {
      * @param expirationTime: The time for ending the auction
      * @param sellerUri The uri of seller information on IPFS storage
      * @param progressHandler The handler to deal with the progress on listing NFT item on
-     *        Pasar marketplace
+     *        marketplace.
+     * @returns The orderId of the NFT item listed on marketplace
      */
     public listItemOnAuction(baseToken: string,
         tokenId: string,
@@ -366,6 +399,75 @@ export class MyProfile extends Profile {
         exipirationTime: number,
         sellerUri: string,
         progressHandler: ProgressHandler): Promise<string> {
+
+        throw new Error("Method not implemented");
+    }
+
+    /**
+     * Change the auction price for listed item on marketplace
+     * This function would be used to change the price of listed item on auction
+     *
+     * @param orderId The orderId of NFT item on maketplace
+     * @param newPricingToken The token address of new pricing token
+     * @param newMinPrice The new minimum starting price for bidding on the auction
+     * @param newReservedPrice The new minimum pricing that user
+     * @param newBuyoutPrice The new buyout price for the auction order, set to 0 to disable
+     *        buyout
+     * @param progressHandler The handler to deal with the progress on chaning price for
+     *        specific auction item on marketplace
+     * @returns The result of bidding action.
+     */
+    public changePriceOnAuction(orderId: number,
+        newPricingToken: string,
+        newMinPrice: number,
+        newReservedPrice: number,
+        newBuyoutPrice: number,
+        progressHandler: ProgressHandler): Promise<boolean> {
+
+        throw new Error("Method not implemented");
+    }
+
+    /**
+     * Offer a bidding price on list item that is being on auciton on marketplace.
+     *
+     * @param orderId The orderId of NFT item on auction
+     * @param value The price offered by bidder
+     * @param bidderUri The uri of bidder information on IPFS storage
+     * @param progressHandler The handler to deal with the progress on bidding for NFT item
+     *        on marketplace
+     * @returns The result of bidding action.
+     */
+    public bidItemOnAuction(orderId: number,
+        value: number,
+        bidderUri: string,
+        progressHandler: ProgressHandler): Promise<boolean> {
+
+        throw new Error("Method not implemented");
+    }
+
+    /**
+     * Settle the listed NFT item on auction on marketplace
+     *
+     * @param orderId The orderId of NFT item on auction
+     * @param progressHandler The handler to deal with the progress on settling auction.
+     * @returns The result of settling action.
+     */
+    public settleAuction(orderId: number,
+        progressHandler: ProgressHandler): Promise<boolean> {
+        throw new Error("Method not implemented");
+    }
+
+    /**
+     * Unlist an item from marketplace, either it's with fixed price or on auction
+     * When the item is on auction with bidding price, it would fail to call this function
+     * to unlist NFT item.
+     *
+     * @param orderId The orderId of NFT listed item on marketplace
+     * @param progressHandler The handler to deal with the progress on unlisting the NFT item.
+     * @returns The result of unlisting action.
+     */
+    public unlistItem(orderId: number,
+        progressHandler: ProgressHandler): Promise<boolean> {
 
         throw new Error("Method not implemented");
     }
