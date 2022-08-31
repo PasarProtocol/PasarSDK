@@ -1,8 +1,14 @@
+import { create } from 'ipfs-http-client';
+import sha256 from 'crypto-js/sha256';
 import { CollectionType } from "./collectiontype";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
+import { isTestnetNetwork } from './networkType';
+import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
+import { ImageDidInfo, NFTDidInfo, ResultOnIpfs, UserDidInfo } from './utils';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -121,16 +127,85 @@ export class MyProfile extends Profile {
      *        json file onto IPFS storage
      * @returns The uri of this NFT item metadata.
      */
-    public createItemMetadata(
+    public async createItemMetadata(
         itemName: string,
         itemDescription: string,
-        itemImage: string,
+        itemImage: any,
+        version: number,
         properties: any = [],
         sensitive = false,
-        acutalImageHandler: ProgressHandler,
-        metadataHandler: ProgressHandler,
-    ): Promise<string> {
-        throw new Error("Method not implemented");
+        handleProgress:any = null,
+    ): Promise<ResultOnIpfs> {
+        let result:ResultOnIpfs;
+        let ipfsURL;
+        try {
+            if(isTestnetNetwork()) {
+                ipfsURL = valuesOnTestNet.urlIPFS;
+            } else {
+                ipfsURL = valuesOnMainNet.urlIPFS;
+            }
+            const client = create({ url: ipfsURL });
+            handleProgress ? handleProgress(10) : null;
+
+            let image_add = await client.add(itemImage);
+            handleProgress ? handleProgress(20) : null;
+
+            let thumbnail:any = await resizeImage(itemImage, 300, 300);
+            handleProgress ? handleProgress(30) : null;
+
+            let thumbnail_add = image_add;
+    
+            if(thumbnail.success === 0) {
+                thumbnail_add = await client.add(thumbnail.fileContent);
+            }
+
+            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+    
+            const creatorObject: UserDidInfo = {
+                "did": jsonDid.did,
+                "name": jsonDid.name || "",
+                "description": jsonDid.bio || ""
+            }
+    
+            const imageObject: ImageDidInfo = {
+                "image": `pasar:image:${image_add.path}`,
+                "kind": itemImage.type.replace('image/', ''),
+                "size": itemImage.size,
+                "thumbnail": `pasar:image:${thumbnail_add.path}`,
+            }
+    
+            const metaObj: NFTDidInfo = {
+                "version": version,
+                "type": 'image',
+                "name": itemName,
+                "description": itemDescription,
+                "creator": creatorObject,
+                "data": imageObject,
+                "adult": sensitive,
+                "properties": properties || "",
+            }
+    
+            let metaData = await client.add(JSON.stringify(metaObj));
+            console.log(`0x${sha256(image_add.path)}`);
+            console.log(metaData.path);
+
+            result = {
+                success: true,
+                result: "success",
+                tokenId: `0x${sha256(image_add.path)}`,
+                medadata: `pasar:json:${metaData.path}`
+            }
+            handleProgress ? handleProgress(40) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                result: err,
+                tokenId: null,
+                medadata: null,
+            }
+        }
+
+        return result;
     }
 
     /**
