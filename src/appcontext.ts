@@ -1,6 +1,7 @@
 import { CollectionAddress } from "./contractaddress";
 import { ChainType } from "./chaintype";
-import { NetworkType } from "./networkType";
+import { isTestnetNetwork, NetworkType } from "./networkType";
+import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 
 export class AppContext {
     private network: NetworkType;
@@ -73,6 +74,13 @@ export class AppContext {
      * @returns The customized ipfs service endpoint.
      */
     public getIpfsEndpint(): string {
-        return this.ipfsEndpoint;
+        let ipfsEndpoint;
+        if(isTestnetNetwork) {
+            ipfsEndpoint = valuesOnTestNet.urlIPFS;
+        } else {
+            ipfsEndpoint = valuesOnMainNet.urlIPFS;
+        }
+
+        return ipfsEndpoint;
     }
 }

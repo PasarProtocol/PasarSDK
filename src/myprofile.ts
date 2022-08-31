@@ -14,13 +14,19 @@ import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import Feed_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import { CallContract } from './callcontract';
+import { AppContext } from './appcontext';
 
 /**
  * This class represent the Profile of current signed-in user.
  */
-export class MyProfile extends Profile {
-    
+export class MyProfile {
+    private appContext;
+    private callContract;
 
+    constructor() {
+        this.appContext = new AppContext;
+        this.callContract = new CallContract();
+    }
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      *
@@ -141,13 +147,9 @@ export class MyProfile extends Profile {
         handleProgress:any = null,
     ): Promise<ResultOnIpfs> {
         let result:ResultOnIpfs;
-        let ipfsURL;
         try {
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
+            let ipfsURL = this.appContext.getIpfsEndpint();
+
             const client = create({ url: ipfsURL });
             handleProgress ? handleProgress(10) : null;
 
@@ -262,8 +264,7 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            let callContract = new CallContract();
-            await callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
+            await this.callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenId
