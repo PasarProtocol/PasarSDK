@@ -1,6 +1,6 @@
 import { AppContext } from "./appcontext"
 import { Dispatcher } from "./dispatcher";
-import { NftCollection } from "./nftcollection";
+import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 
 export class Profile {
@@ -102,7 +102,7 @@ export class Profile {
      * Fetch all the collection regsitered onto Pasar marketplace
      * @returns: A list of NFT items.
      */
-     public fetchCollections(): Promise<NftItem[]> {
+     public fetchCollections(): Promise<Collection[]> {
         throw new Error("Method not implemented");
     }
 
@@ -111,7 +111,7 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchCollections(dispatcher: Dispatcher<NftItem>) {
+     public async fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
         // TODO:
     }
 }

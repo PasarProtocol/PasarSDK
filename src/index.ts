@@ -17,13 +17,13 @@ const mintNft = async (
     itemImage: any,
     version: number,
     baseToken: string,
-    totalSupply: number = 1,
-    royaltyFee: number = 10,
+    totalSupply = 1,
+    royaltyFee = 10,
     properties: any = [],
-    sensitive: boolean = false,
+    sensitive = false,
     handleProgress: any = null
 ) => {
-    let result: ResultApi; 
+    let result: ResultApi;
     try {
         let profile = new MyProfile();
         let resultMetadata:ResultOnIpfs = await profile.createItemMetadata(itemName, itemDescription, itemImage, version, properties, sensitive, handleProgress);
@@ -52,7 +52,7 @@ const mintNft = async (
             data: err
         }
     }
-    
+
     return result;
 }
 
