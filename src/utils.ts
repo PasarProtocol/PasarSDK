@@ -26,7 +26,7 @@ export interface ResultOnIpfs {
     "success": boolean,
     "result": string,
     "tokenId": string,
-    "medadata"
+    "medadata": string
 }
 
 export interface TransactionParams {
@@ -38,5 +38,10 @@ export interface TransactionParams {
 
 export interface ResultCallContract {
     "success": boolean;
+    "data": any
+}
+
+export interface ResultApi {
+    "success": boolean,
     "data": any
 }
