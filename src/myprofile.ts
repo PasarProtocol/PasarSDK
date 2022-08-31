@@ -13,6 +13,7 @@ import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import Feed_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
+import { CallContract } from './callcontract';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -261,7 +262,8 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            await super.callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
+            let callContract = new CallContract();
+            await callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenId
