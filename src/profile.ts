@@ -10,7 +10,11 @@ export class Profile {
     private userDid: string;
 
     constructor() {
-        
+
+    }
+
+    protected getAppContext(): AppContext {
+        return this.appContext
     }
 
     /**
