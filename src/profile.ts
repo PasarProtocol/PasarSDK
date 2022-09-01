@@ -2,10 +2,11 @@ import { AppContext } from "./appcontext"
 import { Dispatcher } from "./dispatcher";
 import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
+import { CallContract } from "./callcontract";
 
 export class Profile {
     private appContext: AppContext;
-
+    private callContract: CallContract;
     private walletAddr: string;
     private userDid: string;
 
@@ -15,6 +16,10 @@ export class Profile {
 
     protected getAppContext(): AppContext {
         return this.appContext
+    }
+
+    protected getCallContext(): CallContract {
+        return this.callContract
     }
 
     /**

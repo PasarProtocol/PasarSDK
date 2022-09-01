@@ -1,5 +1,6 @@
 import { CollectionAddress } from "./contractaddress";
 import { ChainType } from "./chaintype";
+import { CallContract } from './callcontract';
 import { isTestnetNetwork, NetworkType } from "./networkType";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 

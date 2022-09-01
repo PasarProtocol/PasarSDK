@@ -12,15 +12,13 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
-import { CallContract } from './callcontract';
-import { AppContext } from './appcontext';
 import { ItemInfo } from './iteminfo';
 
 /**
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile extends Profile {
-
+    
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      *
@@ -140,102 +138,48 @@ export class MyProfile extends Profile {
         handleProgress:any = null,
     ): Promise<string> {
         let client: IPFSHTTPClient;
-        let itemInfo = new ItemInfo();
+        let imageObject: ImageDidInfo;
+        let itemInfo:NFTDidInfo;
+        
+        let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));        
+        const creatorObject: UserDidInfo = {
+            "did": jsonDid.did,
+            "name": jsonDid.name || "",
+            "description": jsonDid.bio || ""
+        };
 
         return new Promise<IPFSHTTPClient>( () => {
             client = create({ url: this.getAppContext().getIpfsEndpint()})
         }).then( async client => {
+            handleProgress(10)
             return await client.add(itemImage)
         }).then( async result => {
-            itemInfo.imagePath = result.path
+            imageObject.image = `pasar:image:${result.path}`;
+            imageObject.kind = itemImage.type.replace('image/', '');
+            imageObject.size = itemImage.size;
+            handleProgress(20)
             return await resizeImage(itemImage, 300, 300)
         }).then( async (thumbnail: any)  => {
-            itemInfo.thumbnailPath = (thumbnail.success === 0)
-                ? (await client.add(thumbnail.fileContent)).path
-                    : itemInfo.imagePath
+            handleProgress(30)
+            imageObject.thumbnail = (thumbnail.success === 0)
+                ? `pasar:image:${(await client.add(thumbnail.fileContent)).path}`
+                    : imageObject.image
         }).then( async () => {
             // TODO
-            itemInfo.name = itemName
-            itemInfo.description = itemDescription
-            itemInfo.sensitive = sensitive
+            itemInfo.type = "image";
+            itemInfo.version = 2,
+            itemInfo.name = itemName;
+            itemInfo.description = itemDescription;
+            itemInfo.adult = sensitive;
+            itemInfo.properties = properties ? properties : "";
 
-            let result = await client.add(JSON.stringify(itemInfo.toJson))
+            let result = await client.add(JSON.stringify(itemInfo))
+            handleProgress(40)
             return `pasar:json:${result.path}`
         }).catch (error => {
             // logger.error("Creating NFT item metadata erorr: ", error);
             throw new Error(error);
         })
-/*
-
-        let result:ResultOnIpfs;
-        let ipfsURL;
-        try {
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
-            const client = create({ url: ipfsURL });
-            handleProgress ? handleProgress(10) : null;
-
-            let image_add = await client.add(itemImage);
-            handleProgress ? handleProgress(20) : null;
-
-            let thumbnail:any = await resizeImage(itemImage, 300, 300);
-            handleProgress ? handleProgress(30) : null;
-
-            let thumbnail_add = image_add;
-
-            if(thumbnail.success === 0) {
-                thumbnail_add = await client.add(thumbnail.fileContent);
-            }
-
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
-
-            const creatorObject: UserDidInfo = {
-                "did": jsonDid.did,
-                "name": jsonDid.name || "",
-                "description": jsonDid.bio || ""
-            }
-
-            const imageObject: ImageDidInfo = {
-                "image": `pasar:image:${image_add.path}`,
-                "kind": itemImage.type.replace('image/', ''),
-                "size": itemImage.size,
-                "thumbnail": `pasar:image:${thumbnail_add.path}`,
-            }
-
-            const metaObj: NFTDidInfo = {
-                "version": version,
-                "type": 'image',
-                "name": itemName,
-                "description": itemDescription,
-                "creator": creatorObject,
-                "data": imageObject,
-                "adult": sensitive,
-                "properties": properties || "",
-            }
-
-            let metaData = await client.add(JSON.stringify(metaObj));
-            console.log(`0x${sha256(image_add.path)}`);
-            console.log(metaData.path);
-            handleProgress ? handleProgress(40) : null;
-
-            return result = {
-                success: true,
-                result: "success",
-                tokenId: `0x${sha256(image_add.path)}`,
-                medadata: `pasar:json:${metaData.path}`
-            }
-        } catch(err) {
-            return result = {
-                success: false,
-                result: err,
-                tokenId: null,
-                medadata: null,
-            }
-        }
-    */
     }
 
     /**
@@ -285,9 +229,9 @@ export class MyProfile extends Profile {
         let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
+        let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let callContract = new CallContract();
-            await callContract.mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, tokenUri, roylatyFee, essentialsConnector, gasPrice);
+            await this.getCallContext().mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, 1, tokenUri, roylatyFee, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenId
@@ -331,7 +275,7 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            await this.callContract.deleteFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, essentialsConnector, gasPrice);
+            await this.getCallContext().deleteFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenId

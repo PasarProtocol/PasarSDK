@@ -26,24 +26,17 @@ const mintNft = async (
     let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultMetadata:ResultOnIpfs = await profile.createItemMetadata(itemName, itemDescription, itemImage, version, properties, sensitive, handleProgress);
-        if(resultMetadata.success === true) {
-            let resultContract:ResultCallContract = await profile.createItemWithRoyalties(resultMetadata.tokenId, baseToken, totalSupply, resultMetadata.medadata, royaltyFee, handleProgress);
-            if(resultContract.success) {
-                result = {
-                    success: true,
-                    data: resultMetadata.tokenId,
-                }
-            } else {
-                result = {
-                    success: false,
-                    data: resultContract.data,
-                }
+        let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
+        let resultContract:ResultCallContract = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: resultContract.data,
             }
         } else {
             result = {
                 success: false,
-                data: resultMetadata.result,
+                data: resultContract.data,
             }
         }
     } catch(err) {
