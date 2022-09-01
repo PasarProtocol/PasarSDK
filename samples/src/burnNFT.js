@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { burnNft } from "@pasarprotocol/pasar-sdk-development";
+import { deleteNft } from "@pasarprotocol/pasar-sdk-development";
 
 const BurnNFT = () => {
     const [tokenId, setTokenId] = useState("");
 
     const handleBurn = async () => {
-        let result = await burnNft(tokenId, 1);
+        let result = await deleteNft("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, 1);
         console.log(result);
     }
 
