@@ -56,8 +56,34 @@ const mintNft = async (
     return result;
 }
 
-const burnNft = () => {
-
+const deleteNft = async (
+    baseToken: string,
+    tokenId: string,
+    totalSupply = 1,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+        let resultContract:ResultCallContract = await profile.deleteItem(tokenId, baseToken, totalSupply, handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: tokenId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
 }
 
 const transferNft = () => {
@@ -68,7 +94,7 @@ export {
     initialize,
     getNftsOnMarketPlace,
     mintNft,
-    burnNft,
+    deleteNft,
     transferNft,
     signin,
     signout

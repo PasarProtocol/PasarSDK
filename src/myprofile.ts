@@ -249,7 +249,7 @@ export class MyProfile {
         tokenUri: string,
         roylatyFee: number,
         handleProgress:any = null
-    ): Promise<any> {
+    ): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
         const essentialsConnector = new EssentialsConnector();
@@ -286,13 +286,41 @@ export class MyProfile {
      *
      * @param baseToken The collection contract where NFT items would be burned
      * @param tokenId The tokenId of NFT item to be burned
-     * @param progressHandler: The handler to deal with progress on deletion of an NFT item
+     * @param handleProgress The handler to deal with progress on deletion of an NFT item
      * @returns The result of whether the NFT is deleted or not.
      */
-    public deleteItem(baseToken: string,
+    public async deleteItem(
+        baseToken: string,
         tokenId: string,
-        progressHandler: ProgressHandler): Promise<boolean> {
-        throw new Error("Method Not implemented");
+        totalSupply: number,
+        handleProgress:any = null): Promise<ResultCallContract> {
+        let result: ResultCallContract;
+
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        handleProgress ? handleProgress(50) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        handleProgress ? handleProgress(60) : null;
+        try {
+            await this.callContract.deleteFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenId
+            }
+            handleProgress ? handleProgress(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
