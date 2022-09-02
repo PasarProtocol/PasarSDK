@@ -138,4 +138,41 @@ export class CallContract {
             });
         })
     }
+
+    /**
+     * approval the item
+     *
+     * @param contractAbi the abi file of collection
+     * @param account my wallet address
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being been approval the nft
+     */
+     public approvalForAll (
+        contractAbi: any,
+        approvalAddress: any,
+        account: string,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const _gasLimit = 5000000;
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+            };
+            
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract;
+
+            let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+            stickerContract.methods.setApprovalForAll(approvalAddress, true).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
 }

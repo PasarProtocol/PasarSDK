@@ -6,13 +6,18 @@ const ListNFT = () => {
     const [price, setPrice] = useState("");
     const [listPricingToken, setListPricingToken] = useState([]);
     const [pricingToken, setPricingToken] = useState("");
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         setListPricingToken(getCoinType());
     }, []);
 
+    useEffect(() => {
+        console.log(progress);
+    }, [progress]);
+
     const handleList = async () => {
-        let result = await listItem("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price);
+        let result = await listItem("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price, setProgress);
         console.log(result);
     }
 

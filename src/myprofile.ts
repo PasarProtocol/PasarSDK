@@ -352,7 +352,6 @@ export class MyProfile extends Profile {
      * @param tokenId The tokenId of NFT item
      * @param pricingToken The token address of pricing token
      * @param price The price value to sell
-     * @param sellerUri The uri of seller information on IPFS storage
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        Pasar marketplace
      * @returns The orderId of the NFT item listed on marketplace
@@ -370,13 +369,17 @@ export class MyProfile extends Profile {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
             let accounts = await walletConnectWeb3.eth.getAccounts();
-            progressHandler ? progressHandler(50) : null;
+            progressHandler ? progressHandler(20) : null;
 
             let gasPrice = await walletConnectWeb3.eth.getGasPrice();
             gasPrice = getFilteredGasPrice(gasPrice);
-            progressHandler ? progressHandler(60) : null;
+            progressHandler ? progressHandler(30) : null;
             let priceValue = BigInt(price*1e18).toString();
             try {
+                let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+                progressHandler ? progressHandler(50) : null;
+
                 await this.getCallContext().createOrderForSale(accounts[0], tokenId, baseToken, priceValue, pricingToken, essentialsConnector, gasPrice);
                 result = {
                     success: true,
