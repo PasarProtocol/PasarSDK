@@ -353,7 +353,7 @@ module.exports = [
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
-      },
+      }, 
       {
         "indexed": false,
         "internalType": "uint256",

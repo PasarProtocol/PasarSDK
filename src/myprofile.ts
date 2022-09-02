@@ -334,7 +334,7 @@ export class MyProfile extends Profile {
         throw new Error("Method not impelmented");
     }
 
-    /**
+    /**List
      * Create a metadata json file for trading either buyer or seller.
      *
      * @param progressHandler The handler to deal with the progress on uploading json
@@ -357,14 +357,40 @@ export class MyProfile extends Profile {
      *        Pasar marketplace
      * @returns The orderId of the NFT item listed on marketplace
      */
-    public listItem(baseToken: string,
+    public async listItem(
+        baseToken: string,
         tokenId: string,
         pricingToken: string,
         price: number,
-        sellerUri: string,
-        progressHandler: ProgressHandler): Promise<string> {
+        progressHandler: any=null): Promise<ResultCallContract> {
+            let result: ResultCallContract;
 
-        throw new Error("Method not implemnted");
+            const essentialsConnector = new EssentialsConnector();
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+            let accounts = await walletConnectWeb3.eth.getAccounts();
+            progressHandler ? progressHandler(50) : null;
+
+            let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+            gasPrice = getFilteredGasPrice(gasPrice);
+            progressHandler ? progressHandler(60) : null;
+            let priceValue = BigInt(price*1e18).toString();
+            try {
+                await this.getCallContext().createOrderForSale(accounts[0], tokenId, baseToken, priceValue, pricingToken, essentialsConnector, gasPrice);
+                result = {
+                    success: true,
+                    data: tokenId
+                }
+                progressHandler ? progressHandler(100) : null;
+            } catch(err) {
+                result = {
+                    success: false,
+                    data: err
+                }
+            }
+
+            return result;
     }
 
     /**

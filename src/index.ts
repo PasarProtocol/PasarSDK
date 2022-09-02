@@ -8,7 +8,7 @@ import { MyProfile } from "./myprofile";
 import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
-
+import { CoinType } from "./cointype";
 const initialize = (testnet = true) => {
     setNetworkType(testnet);
 }
@@ -92,8 +92,44 @@ const deleteNft = async (
     return result;
 }
 
+const listItem = async (
+    baseToken: string,
+    tokenId: string,
+    pricingToken: string,
+    price: string,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+        let resultContract:ResultCallContract = await profile.listItem(baseToken, tokenId, pricingToken, parseInt(price), handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: tokenId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
+}
+
 const transferNft = () => {
 
+}
+
+const getCoinType = () => {
+    let coinType = new CoinType();
+    return coinType.getCoinTypeList();
 }
 
 export {
@@ -103,5 +139,7 @@ export {
     deleteNft,
     transferNft,
     signin,
-    signout
+    signout,
+    getCoinType,
+    listItem
 }

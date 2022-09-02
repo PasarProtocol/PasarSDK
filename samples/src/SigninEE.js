@@ -31,6 +31,10 @@ function SigninEE() {
     navigate("/transfer");
   }
 
+  const handleClickButton = (path) => {
+    navigate(path);
+  }
+
   return (
     !login ?
     <div>
@@ -44,6 +48,7 @@ function SigninEE() {
           <button onClick={handleClickMint}>Add New NFT</button>
           <button onClick={handleClickBurn}>Burn NFT</button>
           <button onClick={handleClickTransfer}>Transfer NFT</button>
+          <button onClick={handleClickButton('/list')}>List NFT</button>
         </div>
         
     </div>
