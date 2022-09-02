@@ -23,27 +23,34 @@ export class Profile {
     }
 
     /**
-     * Fetch the listed NFTs owned by this profile.
+     * Query the listed NFTs owned by this profile.
      * @returns: A list of NFT items.
      */
-    public fetchListedItems(): Promise<NftItem[]> {
+    public queryListedItems(): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 
     /**
-     * Fetch and dispatch listed NFT items from remote assist service to dispatcher routine.
+     * Query the listed NFT item from remote assist service and dispatch tem to customized
+     * routine to handle.
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-    public async fetchAndDispatchListedItems(dispatcher: Dispatcher<NftItem>) {
-        // TODO:
+    public queryAndDispatchListedItems(dispatcher: Dispatcher<NftItem>) {
+        return this.queryListedItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the owned NFTs by this profile.
      * @returns: A list of NFT items.
      */
-    public fetchOwnedItems(): Promise<NftItem[]> {
+    public queryOwnedItems(): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 
@@ -52,15 +59,21 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchOwnedItems(dispatcher: Dispatcher<NftItem>) {
-        // TODO:
+     public queryAndDispatchOwnedItems(dispatcher: Dispatcher<NftItem>) {
+        return this.queryOwnedItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the bidding NFTs by this profile.
      * @returns: A list of NFT items.
      */
-    public fetchBiddingItems(): Promise<NftItem[]> {
+    public queryBiddingItems(): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 
@@ -69,15 +82,21 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchBiddingItems(dispatcher: Dispatcher<NftItem>) {
-        // TODO:
+     public queryAndDispatchBiddingItems(dispatcher: Dispatcher<NftItem>) {
+        return this.queryBiddingItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the created NFTs by this profile.
      * @returns: A list of NFT items.
      */
-     public fetchCreatedItems(): Promise<NftItem[]> {
+     public queryCreatedItems(): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 
@@ -86,15 +105,21 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchCreatedItems(dispatcher: Dispatcher<NftItem>) {
-        // TODO:
+     public queryAndDispatchCreatedItems(dispatcher: Dispatcher<NftItem>) {
+        return this.queryCreatedItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the sold NFTs by this profile.
      * @returns: A list of NFT items.
      */
-     public fetchSoldItems(): Promise<NftItem[]> {
+     public querySoldItems(): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 
@@ -103,15 +128,21 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchSoldItems(dispatcher: Dispatcher<NftItem>) {
-        // TODO:
+     public queryAndDispatchSoldItems(dispatcher: Dispatcher<NftItem>) {
+        return this.querySoldItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch all the collection regsitered onto Pasar marketplace
      * @returns: A list of NFT items.
      */
-     public fetchCollections(): Promise<Collection[]> {
+     public queryCollections(): Promise<Collection[]> {
         throw new Error("Method not implemented");
     }
 
@@ -120,7 +151,13 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public async fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
-        // TODO:
+     public fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
+        return this.queryCollections().then ( collections => {
+            collections.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 }
