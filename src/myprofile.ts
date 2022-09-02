@@ -124,62 +124,89 @@ export class MyProfile extends Profile {
      * @param itemDescription The brief description of an NFT item
      * @param itemImage The actual image of an NFT item
      * @param version The version of nft
-     * @param properties
+     * @param properties properties of nft
      * @param sensitive Indicator whether the NFT item contains sensitive content or not.
      * @param handleProgress The function to set the progress value of being uploaded ipfs process
      * @returns The result included tokenId, metadata, etc.
      */
-    public createItemMetadata(
+    public async createItemMetadata(
         itemName: string,
         itemDescription: string,
         itemImage: any,
-        properties: any = [],
+        baseToken: string,
+        properties: any = null,
         sensitive = false,
         handleProgress:any = null,
-    ): Promise<string> {
-        let client: IPFSHTTPClient;
-        let imageObject: ImageDidInfo;
-        let itemInfo:NFTDidInfo;
-        
-        let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));        
-        const creatorObject: UserDidInfo = {
-            "did": jsonDid.did,
-            "name": jsonDid.name || "",
-            "description": jsonDid.bio || ""
-        };
+    ): Promise<ResultOnIpfs> {
+        let result:ResultOnIpfs;
+        try {
+            let ipfsURL:string;
+            let version:number;
 
-        return new Promise<IPFSHTTPClient>( () => {
-            client = create({ url: this.getAppContext().getIpfsEndpint()})
-        }).then( async client => {
-            handleProgress(10)
-            return await client.add(itemImage)
-        }).then( async result => {
-            imageObject.image = `pasar:image:${result.path}`;
-            imageObject.kind = itemImage.type.replace('image/', '');
-            imageObject.size = itemImage.size;
-            handleProgress(20)
-            return await resizeImage(itemImage, 300, 300)
-        }).then( async (thumbnail: any)  => {
-            handleProgress(30)
-            imageObject.thumbnail = (thumbnail.success === 0)
-                ? `pasar:image:${(await client.add(thumbnail.fileContent)).path}`
-                    : imageObject.image
-        }).then( async () => {
-            // TODO
-            itemInfo.type = "image";
-            itemInfo.version = 2,
-            itemInfo.name = itemName;
-            itemInfo.description = itemDescription;
-            itemInfo.adult = sensitive;
-            itemInfo.properties = properties ? properties : "";
+            if(isTestnetNetwork()) {
+                ipfsURL = valuesOnTestNet.urlIPFS;
+                version = baseToken == valuesOnTestNet.elastos.stickerContract ? 1 : 2;
+            } else {
+                ipfsURL = valuesOnMainNet.urlIPFS;
+                version = baseToken == valuesOnMainNet.elastos.stickerContract ? 1 : 2;
+            }
+            const client = create({ url: ipfsURL });
+            handleProgress ? handleProgress(10) : null;
 
-            let result = await client.add(JSON.stringify(itemInfo))
-            handleProgress(40)
-            return `pasar:json:${result.path}`
-        }).catch (error => {
-            // logger.error("Creating NFT item metadata erorr: ", error);
-            throw new Error(error);
-        })
+            let image_add = await client.add(itemImage);
+            handleProgress ? handleProgress(20) : null;
+
+            let thumbnail:any = await resizeImage(itemImage, 300, 300);
+            handleProgress ? handleProgress(30) : null;
+
+            let thumbnail_add = image_add;
+
+            if(thumbnail.success === 0) {
+                thumbnail_add = await client.add(thumbnail.fileContent);
+            }
+
+            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+
+            const creatorObject: UserDidInfo = {
+                "did": jsonDid.did,
+                "name": jsonDid.name || "",
+                "description": jsonDid.bio || ""
+            }
+
+            const imageObject: ImageDidInfo = {
+                "image": `pasar:image:${image_add.path}`,
+                "kind": itemImage.type.replace('image/', ''),
+                "size": itemImage.size,
+                "thumbnail": `pasar:image:${thumbnail_add.path}`,
+            }
+
+            const metaObj: NFTDidInfo = {
+                "version": version,
+                "type": 'image',
+                "name": itemName,
+                "description": itemDescription,
+                "creator": creatorObject,
+                "data": imageObject,
+                "adult": sensitive,
+                "properties": properties || "",
+            }
+
+            let metaData = await client.add(JSON.stringify(metaObj));
+            console.log(metaData.path);
+            handleProgress ? handleProgress(40) : null;
+
+            return result = {
+                success: true,
+                result: "success",
+                medadata: `pasar:json:${metaData.path}`,
+            }
+        } catch(err) {
+            return result = {
+                success: false,
+                result: err,
+                medadata: null,
+            }
+        }
     }
 
     /**

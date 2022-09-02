@@ -25,7 +25,6 @@ export interface NFTDidInfo {
 export interface ResultOnIpfs {
     "success": boolean,
     "result": string,
-    "tokenId": string,
     "medadata": string
 }
 

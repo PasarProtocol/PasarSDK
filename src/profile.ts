@@ -5,8 +5,8 @@ import { NftItem } from "./nftitem"
 import { CallContract } from "./callcontract";
 
 export class Profile {
-    private appContext: AppContext;
-    private callContract: CallContract;
+    private appContext: AppContext = new AppContext();
+    private callContract: CallContract = new CallContract();
     private walletAddr: string;
     private userDid: string;
 
