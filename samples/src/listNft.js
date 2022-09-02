@@ -20,8 +20,9 @@ const ListNFT = () => {
 
     const handleList = async () => {
         console.log(pricingToken);
-        // let result = await listItem("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price, setProgress);
-        // console.log(result);
+        let result = await listItem("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price, setProgress);
+        console.log(result);
+        
     }
 
     return (
