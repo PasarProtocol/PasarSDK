@@ -327,11 +327,36 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with progress on transferring NFT item
      * @returns The result of whether the NFT is transfered or not.
      */
-    public transferItem(baseToken: string,
+    public async transferItem(
+        baseToken: string,
         tokenId: string,
         toAddr: string,
-        progressHandler: ProgressHandler): Promise<boolean> {
-        throw new Error("Method not impelmented");
+        progressHandler: any): Promise<boolean> {
+            let result: boolean;
+
+            const essentialsConnector = new EssentialsConnector();
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+            let accounts = await walletConnectWeb3.eth.getAccounts();
+            progressHandler ? progressHandler(20) : null;
+
+            let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+            gasPrice = getFilteredGasPrice(gasPrice);
+            progressHandler ? progressHandler(30) : null;
+            
+            try {
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, toAddr, accounts[0], essentialsConnector, gasPrice);
+                progressHandler ? progressHandler(50) : null;
+
+                await this.getCallContext().transferNFT(PASAR_CONTRACT_ABI, accounts[0], toAddr, tokenId, baseToken, essentialsConnector, gasPrice);
+                result = true
+                progressHandler ? progressHandler(100) : null;
+            } catch(err) {
+                result = false
+            }
+
+            return result;
     }
 
     /**List

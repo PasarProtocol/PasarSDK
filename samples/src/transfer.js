@@ -6,7 +6,7 @@ const TransferNFT = () => {
     const [toAddress, setToAddress] = useState("");
 
     const handleTransfer = async () => {
-        let result = await transferNft(tokenId, toAddress, 1);
+        let result = await transferNft("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, toAddress);
         console.log(result);
     }
 

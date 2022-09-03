@@ -19,18 +19,6 @@ function SigninEE() {
     setLogin(false);
   }
 
-  const handleClickMint = () => {
-    navigate("/mint");
-  }
-
-  const handleClickBurn = () => {
-    navigate("/burn");
-  }
-
-  const handleClickTransfer = () => {
-    navigate("/transfer");
-  }
-
   const handleClickButton = (path) => {
     navigate(path);
   }
@@ -45,10 +33,10 @@ function SigninEE() {
         <button onClick={handleSignout}>Sign out</button>
 
         <div>
-          <button onClick={handleClickMint}>Add New NFT</button>
-          <button onClick={handleClickBurn}>Burn NFT</button>
-          <button onClick={handleClickTransfer}>Transfer NFT</button>
-          <button onClick={handleClickButton('/list')}>List NFT</button>
+          <button onClick={()=> handleClickButton('/mint')}>Add New NFT</button>
+          <button onClick={()=> handleClickButton('/burn')}>Burn NFT</button>
+          <button onClick={()=> handleClickButton('/transfer')}>Transfer NFT</button>
+          <button onClick={()=> handleClickButton('/list')}>List NFT</button>
         </div>
         
     </div>

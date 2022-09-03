@@ -92,6 +92,19 @@ const deleteNft = async (
     return result;
 }
 
+
+const transferNft = async (
+    baseToken: string,
+    tokenId: string,
+    toAddr: string,
+    handleProgress: any = null
+) => {
+    let profile = new MyProfile();
+    let resultContract:boolean = await profile.transferItem(baseToken, tokenId, toAddr, handleProgress);
+    return resultContract;
+}
+
+
 const listItem = async (
     baseToken: string,
     tokenId: string,
@@ -121,10 +134,6 @@ const listItem = async (
         }
     }
     return result;
-}
-
-const transferNft = () => {
-
 }
 
 const getCoinType = () => {
