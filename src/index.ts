@@ -178,6 +178,70 @@ const listItemonAuction = async (
     return result;
 }
 
+const changePrice = async (
+    orderId: string,
+    newPrice: string,
+    pricingToken: string,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultContract:ResultCallContract = await profile.changePrice(parseInt(orderId), pricingToken, parseInt(newPrice), handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: orderId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
+}
+
+const changePriceOnAuction = async (
+    orderId: string,
+    newMinPrice: string,
+    newReservedPrice: string,
+    newBuyoutPrice: string,
+    pricingToken: string,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultContract:ResultCallContract = await profile.changePriceOnAuction(parseInt(orderId), pricingToken, parseInt(newMinPrice), parseInt(newReservedPrice), parseInt(newBuyoutPrice), handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: orderId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
@@ -206,4 +270,6 @@ export {
     listItemonAuction,
     getListType,
     isAuction,
+    changePrice,
+    changePriceOnAuction,
 }

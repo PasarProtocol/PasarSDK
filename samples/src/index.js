@@ -12,6 +12,7 @@ import MintNFT from './mintNFT';
 import BurnNFT from './burnNFT';
 import TransferNFT from './transfer';
 import ListNFT from './listNft';
+import ChangePrice from './changePrice';
 
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider);
@@ -27,6 +28,7 @@ const RouterCom = ()=>{
       <Route path="/burn" element={<BurnNFT />} />
       <Route path="/transfer" element={<TransferNFT />} />
       <Route path="/list" element={<ListNFT />} />
+      <Route path="/changeprice" element={<ChangePrice />} />
     </Routes>
   </BrowserRouter>
 }

@@ -37,6 +37,7 @@ function SigninEE() {
           <button onClick={()=> handleClickButton('/burn')}>Burn NFT</button>
           <button onClick={()=> handleClickButton('/transfer')}>Transfer NFT</button>
           <button onClick={()=> handleClickButton('/list')}>List NFT</button>
+          <button onClick={()=> handleClickButton('/changeprice')}>Change Price</button>
         </div>
         
     </div>
