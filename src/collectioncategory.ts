@@ -1,4 +1,4 @@
-export enum CollectionType {
+enum CollectionCategory {
     General,
     Collectibles,
     Art,
@@ -6,4 +6,8 @@ export enum CollectionType {
     TradingCards,
     Utility,
     Domains
+}
+
+export {
+    CollectionCategory
 }
