@@ -1,7 +1,7 @@
 import { AppContext } from "./appcontext";
 import { Dispatcher } from "./dispatcher";
 import { Collection } from "./collection";
-import { Filter } from "./filters/Filter";
+import { Filter } from "./filters/filter";
 
 class CollectionRegistry {
     private appContext: AppContext;

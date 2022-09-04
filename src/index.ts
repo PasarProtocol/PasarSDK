@@ -242,6 +242,35 @@ const changePriceOnAuction = async (
     return result;
 }
 
+const buyItem = async (
+    orderId: string,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultContract:ResultCallContract = await profile.buyItem(parseInt(orderId), handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: orderId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
@@ -272,4 +301,6 @@ export {
     isAuction,
     changePrice,
     changePriceOnAuction,
+    buyItem,
+    
 }

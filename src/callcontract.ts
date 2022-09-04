@@ -55,7 +55,7 @@ export class CallContract {
     }
 
     /**
-     * call the mint function on contract
+     * burn the nft
      *
      * @param contractAbi abi file for calling
      * @param contractAddress address of contract
@@ -97,7 +97,7 @@ export class CallContract {
     }
 
     /**
-     * call the mint function on contract
+     * list the nft on marketplace
      *
      * @param account my wallet address
      * @param tokenId tokenId of being minted
@@ -177,7 +177,7 @@ export class CallContract {
     }
 
     /**
-     * approval the item
+     * transfer the nft to another
      *
      * @param contractAbi the abi file of collection
      * @param account my wallet address
@@ -215,7 +215,7 @@ export class CallContract {
     }
 
     /**
-     * call the mint function on contract
+     * list the nft on auction
      *
      * @param account my wallet address
      * @param tokenId tokenId of being minted
@@ -269,7 +269,7 @@ export class CallContract {
     }
 
     /**
-     * call the mint function on contract
+     * call the change function on contract
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
@@ -309,7 +309,7 @@ export class CallContract {
     }
 
     /**
-     * call the mint function on contract
+     * call the change function on contract for auction listed
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
@@ -345,6 +345,44 @@ export class CallContract {
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
+
+    /**
+     * buy the fixed listed nft
+     *
+     * @param account my wallet address
+     * @param orderId The orderId of NFT item on maketplace
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public buyItem (
+        account: string,
+        orderId: number,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const _gasLimit = 5000000;
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+            };
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            
+            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
+            pasarContract.methods.buyOrder(orderId, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)

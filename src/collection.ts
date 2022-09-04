@@ -1,5 +1,5 @@
 import { CollectionCategory } from "./collectioncategory";
-import { Filter } from "./filters/Filter";
+import { Filter } from "./filters/filter";
 import { CollectionAddress } from "./contractaddress";
 import { Dispatcher } from "./dispatcher";
 import { ItemType } from "./itemtype";

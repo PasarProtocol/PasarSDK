@@ -472,13 +472,39 @@ export class MyProfile extends Profile {
      * This function is used to buy the item with fixed price.
      *
      * @param orderId The orderId of NFT item on maketplace
-     * @param buyerUri  The uri of buyer information on IPFS storage
      * @param progressHandler The handler to deal with the progress on buying listed item
      * @returns The result of buying action.
      */
-    public buyItem(orderId: number,
-        buyerUri: string): Promise<boolean> {
-        throw new Error("Method not implemented");
+    public async buyItem(
+        orderId: number,
+        progressHandler: any): Promise<ResultCallContract> {
+            let result: ResultCallContract;
+
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(20) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(30) : null;
+        try {
+            await this.getCallContext().buyItem(accounts[0], orderId, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: orderId
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -560,37 +586,37 @@ export class MyProfile extends Profile {
         newBuyoutPrice: number,
         progressHandler: any): Promise<ResultCallContract> {
 
-            let result: ResultCallContract;
+        let result: ResultCallContract;
 
-            const essentialsConnector = new EssentialsConnector();
-    
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-    
-            let accounts = await walletConnectWeb3.eth.getAccounts();
-            progressHandler ? progressHandler(20) : null;
-    
-            let gasPrice = await walletConnectWeb3.eth.getGasPrice();
-            gasPrice = getFilteredGasPrice(gasPrice);
-            progressHandler ? progressHandler(30) : null;
-            let priceValue = BigInt(newMinPrice*1e18).toString();
-            let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
-            let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
+        const essentialsConnector = new EssentialsConnector();
 
-            try {
-                await this.getCallContext().changePriceOnAuction(accounts[0], orderId, priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, essentialsConnector, gasPrice);
-                result = {
-                    success: true,
-                    data: orderId
-                }
-                progressHandler ? progressHandler(100) : null;
-            } catch(err) {
-                result = {
-                    success: false,
-                    data: err
-                }
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(20) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(30) : null;
+        let priceValue = BigInt(newMinPrice*1e18).toString();
+        let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
+        let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
+
+        try {
+            await this.getCallContext().changePriceOnAuction(accounts[0], orderId, priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: orderId
             }
-    
-            return result;
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -603,9 +629,9 @@ export class MyProfile extends Profile {
      *        on marketplace
      * @returns The result of bidding action.
      */
-    public bidItemOnAuction(orderId: number,
+    public bidItemOnAuction(
+        orderId: number,
         value: number,
-        bidderUri: string,
         progressHandler: ProgressHandler): Promise<boolean> {
 
         throw new Error("Method not implemented");
