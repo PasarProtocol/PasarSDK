@@ -149,7 +149,7 @@ export class Profile {
     /**
      * Fetch and dispatch collections from remote assist service to dispatcher routine.
      *
-     * @param dispatcher The dispatcher routine to deal with the NFT items.
+     * @param dispatcher The dispatcher routine to deal with the NFT item.
      */
      public fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
         return this.queryCollections().then ( collections => {

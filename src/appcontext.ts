@@ -1,45 +1,36 @@
 import { CollectionAddress } from "./contractaddress";
 import { ChainType } from "./chaintype";
-import { CallContract } from './callcontract';
 import { isTestnetNetwork, NetworkType } from "./networkType";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import Web3 from "web3";
 
 export class AppContext {
-    private network: NetworkType;
     private appDID: string;
     private appInstanceDID: string;
 
-    private assistEndpoint: string;
-    private ipfsEndpoint: string;
+    private assistNode: string;
+    private ipfsNode: string;
+    private chainNode: string;
 
-    private collections: Array<CollectionAddress>;
-
-    /**
-     * Get the network enviroment like Testnet or Mainnet.
-     * @returns The network type.
-     */
-    public getNetworkType(): NetworkType {
-        return this.network;
-    }
+    private suppoertedCollections: CollectionAddress[] = null;
 
     /**
-     * Append a remote collection contract address to interact with.
+     * Set the collections that will be interacting with in this SDK.
      *
-     * @param address The collection contract address
-     * @param chain The chain network, like ESC or FUSION.
-     * @returns The current object of this class.
+     * @param collections A list of collection contract address, including chain type.
+     * @returns The current object.
      */
-    public addCollection(address: string, chain: ChainType): AppContext {
-        this.collections.push(new CollectionAddress(address, chain));
-        return this;
+    public setSupportedCollections(collections: CollectionAddress[]): AppContext {
+        this.suppoertedCollections = collections
+        return this
     }
 
     /**
-     * Get the list of collection contract addresses.
-     * @returns A list of collection contract addresses.
+     * Get the supported collections being interacted with.
+     * @returns The list of supported contract collections.
      */
-    public getCollections(): Array<CollectionAddress> {
-        return this.collections;
+    public getSupportedCollections(): CollectionAddress[] {
+        return this.suppoertedCollections;
     }
 
     /**
@@ -47,8 +38,8 @@ export class AppContext {
      * @param assistEndpoint The target assist serivce endpoint
      * @returns The current object of this class.
      */
-    public setAssistEndpoint(assistEndpoint: string): AppContext {
-        this.assistEndpoint = assistEndpoint;
+    public setAssistNode(assistNode: string): AppContext {
+        this.assistNode = assistNode;
         return this;
     }
 
@@ -56,8 +47,8 @@ export class AppContext {
      * Get the customized assist service endpoint.
      * @returns The customized assist service endpoint.
      */
-    public getAssistEndpoint(): string {
-        return this.assistEndpoint;
+    public getAssistNode(): string {
+        return this.assistNode;
     }
 
     /**
@@ -65,8 +56,8 @@ export class AppContext {
      * @param ipfsEndpoint The target ipfs service endpoint.
      * @returns
      */
-    public setIpfsEndpoint(ipfsEndpoint: string): AppContext {
-        this.ipfsEndpoint = ipfsEndpoint;
+    public setIPFSNode(ipfsNode: string): AppContext {
+        this.ipfsNode = ipfsNode;
         return this;
     }
 
@@ -74,14 +65,20 @@ export class AppContext {
      * Get the cutomized ipfs service endpoint.
      * @returns The customized ipfs service endpoint.
      */
-    public getIpfsEndpint(): string {
-        let ipfsEndpoint;
-        if(isTestnetNetwork) {
-            ipfsEndpoint = valuesOnTestNet.urlIPFS;
-        } else {
-            ipfsEndpoint = valuesOnMainNet.urlIPFS;
-        }
+    public getIPFSNode(): string {
+        return this.ipfsNode;
+    }
 
-        return ipfsEndpoint;
+    public setChainNode(chainNode: string): AppContext {
+        this.chainNode = chainNode
+        return this
+    }
+
+    public getChainNode(): string {
+        return this.chainNode
+    }
+
+    public getWeb3Provider(): Web3 {
+        return null
     }
 }
