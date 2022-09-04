@@ -1,11 +1,11 @@
 import { CollectionType } from "./collectiontype";
+import { Filter } from "./filters/Filter";
 import { CollectionAddress } from "./contractaddress";
 import { Dispatcher } from "./dispatcher";
 import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";
 
-class Condition {}
-export class Collection {
+class Collection {
     private contractAddr: CollectionAddress;
     private ownerDid: string;
     private ownerAddr: string;
@@ -62,13 +62,11 @@ export class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryTradingVolume(
-        pricingToken: string): Promise<number> {
+    public queryTradingVolume(pricingToken: string): Promise<number> {
         throw new Error("Method not implemented");
     }
 
-    public queryFloorPrice(
-        pricingToken: string): Promise<number> {
+    public queryFloorPrice(pricingToken: string): Promise<number> {
         throw new Error("Method not implemented");
     }
 
@@ -76,11 +74,13 @@ export class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryItems(earlierThen: number,
-        maximum: number,
-        queryCondition: Condition,
+    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter,
         dispatcher: Dispatcher<NftItem>): Promise<NftItem[]> {
 
         throw new Error("Method not implemented");
     }
+}
+
+export {
+    Collection,
 }

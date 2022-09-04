@@ -3,7 +3,7 @@
 
 import { getNftsOnMarketPlace } from "./getNfts";
 import { signin, signout } from "./signin";
-import { setNetworkType } from "./networkType";
+import { NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
 import { isTestnetNetwork } from './networkType';
@@ -11,7 +11,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
 const initialize = (testnet = true) => {
-    setNetworkType(testnet);
+    setNetworkType(NetworkType.TestNet);
 }
 
 const mintNft = async (
@@ -34,7 +34,7 @@ const mintNft = async (
         if(resultMetadata.success == true) {
             if(baseToken == valuesOnMainNet.elastos.stickerContract || baseToken == valuesOnMainNet.elastos.stickerV2Contract || baseToken == valuesOnTestNet.elastos.stickerContract || baseToken == valuesOnTestNet.elastos.stickerV2Contract)
                 resultContract = await profile.createItemWithRoyalties(baseToken, resultMetadata.medadata, royaltyFee, handleProgress);
-                
+
             if(resultContract.success) {
                 result = {
                     success: true,
