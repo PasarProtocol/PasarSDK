@@ -46,7 +46,6 @@ export class CallContract {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-            console.log(timeParts);
             pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
