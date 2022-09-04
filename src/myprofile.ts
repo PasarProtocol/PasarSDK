@@ -475,7 +475,7 @@ export class MyProfile extends Profile {
         minPrice: number,
         reservePrice: number,
         buyoutPrice: number,
-        exipirationTime: number,
+        expirationTime: number,
         progressHandler: any
     ): Promise<ResultCallContract> {
         let result: ResultCallContract;
@@ -490,16 +490,12 @@ export class MyProfile extends Profile {
         let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
-        let minPriceValue = BigInt(minPrice*1e18).toString();
-        let reservePriceValue = BigInt(reservePrice*1e18).toString();
-        let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
 
         try {
             let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
             progressHandler ? progressHandler(50) : null;
-
-            await this.getCallContext().createOrderForAuction(accounts[0], baseToken, tokenId, pricingToken, minPriceValue, reservePriceValue, buyoutPriceValue, exipirationTime, essentialsConnector, gasPrice);
+            await this.getCallContext().createOrderForAuction(accounts[0], baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenId

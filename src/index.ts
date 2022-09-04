@@ -143,13 +143,21 @@ const listItemonAuction = async (
     minPrice: string,
     reservePrice: string,
     buyoutPrice: string,
-    exipirationTime: number,
+    expirationTime: number,
     handleProgress: any = null
 ) => {
     let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseInt(minPrice), parseInt(reservePrice), parseInt(buyoutPrice), exipirationTime, handleProgress);
+        let current = new Date().getTime();
+        if(expirationTime <= current) {
+            return {
+                success: false,
+                data: "The expiration time is wrong",
+            }
+        }
+
+        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseInt(minPrice), parseInt(reservePrice), parseInt(buyoutPrice), expirationTime, handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,

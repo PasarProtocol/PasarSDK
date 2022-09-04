@@ -46,7 +46,8 @@ export class CallContract {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-            pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee).send(transactionParams).on('receipt', (receipt) => {
+            console.log(timeParts);
+            pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -230,10 +231,10 @@ export class CallContract {
         baseToken: string,
         tokenId: string,
         quoteToken: string,
-        minPrice: string,
-        reservePrice: string,
-        buyoutPrice: string,
-        exipirationTime: number,
+        minPrice: number,
+        reservePrice: number,
+        buyoutPrice: number,
+        expirationTime: number,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
@@ -246,13 +247,18 @@ export class CallContract {
                 'value': 0
             };
     
+            let minPriceValue = BigInt(minPrice*1e18).toString();
+            let reservePriceValue = BigInt(reservePrice*1e18).toString();
+            let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
+
             let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPrice, reservePrice, buyoutPrice, (new Date().getTime()/1000).toFixed(), exipirationTime, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+
+            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPriceValue, reservePriceValue, buyoutPriceValue, (new Date().getTime()/1000).toFixed(), (expirationTime/1000).toFixed(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
