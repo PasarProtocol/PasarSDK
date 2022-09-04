@@ -1,4 +1,4 @@
-import { Filter, FilterType} from "./Filter";
+import { Filter, FilterType} from "./filter";
 
 class SensitiveFilter extends Filter {
     public constructor(sensitive: boolean) {

@@ -1,5 +1,5 @@
 import { CollectionAddress } from "../contractaddress";
-import { Filter, FilterType } from "./Filter";
+import { Filter, FilterType } from "./filter";
 
 class CollectionFilter extends Filter {
     public constructor(collections: CollectionAddress[]) {
