@@ -9,6 +9,7 @@ import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
+import { ListType } from "./listtype";
 const initialize = (testnet = true) => {
     setNetworkType(testnet);
 }
@@ -18,7 +19,6 @@ const mintNft = async (
     itemDescription: string,
     itemImage: any,
     baseToken: string,
-    totalSupply = 1,
     royaltyFee = 10,
     properties: any = null,
     sensitive = false,
@@ -136,9 +136,53 @@ const listItem = async (
     return result;
 }
 
+const listItemonAuction = async (
+    baseToken: string,
+    tokenId: string,
+    pricingToken: string,
+    minPrice: string,
+    reservePrice: string,
+    buyoutPrice: string,
+    exipirationTime: number,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseInt(minPrice), parseInt(reservePrice), parseInt(buyoutPrice), exipirationTime, handleProgress);
+        if(resultContract.success) {
+            result = {
+                success: true,
+                data: tokenId,
+            }
+        } else {
+            result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+    } catch(err) {
+        result = {
+            success: false,
+            data: err
+        }
+    }
+    return result;
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
+}
+
+const getListType = () => {
+    let listType = new ListType();
+    return listType.getListTypes();
+}
+
+const isAuction = (type:string) => {
+    let listType = new ListType();
+    return listType.isAuction(type);
 }
 
 export {
@@ -150,5 +194,8 @@ export {
     signin,
     signout,
     getCoinType,
-    listItem
+    listItem,
+    listItemonAuction,
+    getListType,
+    isAuction,
 }

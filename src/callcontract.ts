@@ -213,4 +213,50 @@ export class CallContract {
             });
         })
     }
+
+    /**
+     * call the mint function on contract
+     *
+     * @param account my wallet address
+     * @param tokenId tokenId of being minted
+     * @param baseToken the collection address of nft
+     * @param royaltyFee royalty fee of nft
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public createOrderForAuction (
+        account: string,
+        baseToken: string,
+        tokenId: string,
+        quoteToken: string,
+        minPrice: string,
+        reservePrice: string,
+        buyoutPrice: string,
+        exipirationTime: number,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const _gasLimit = 5000000;
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+            };
+    
+            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
+            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPrice, reservePrice, buyoutPrice, (new Date().getTime()/1000).toFixed(), exipirationTime, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
 }

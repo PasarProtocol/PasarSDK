@@ -468,18 +468,51 @@ export class MyProfile extends Profile {
      *        marketplace.
      * @returns The orderId of the NFT item listed on marketplace
      */
-    public listItemOnAuction(baseToken: string,
+    public async listItemOnAuction(
+        baseToken: string,
         tokenId: string,
         pricingToken: string,
         minPrice: number,
         reservePrice: number,
         buyoutPrice: number,
-        startTime: number,
         exipirationTime: number,
-        sellerUri: string,
-        progressHandler: ProgressHandler): Promise<string> {
+        progressHandler: any
+    ): Promise<ResultCallContract> {
+        let result: ResultCallContract;
 
-        throw new Error("Method not implemented");
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(20) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(30) : null;
+        let minPriceValue = BigInt(minPrice*1e18).toString();
+        let reservePriceValue = BigInt(reservePrice*1e18).toString();
+        let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
+
+        try {
+            let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+            progressHandler ? progressHandler(50) : null;
+
+            await this.getCallContext().createOrderForAuction(accounts[0], baseToken, tokenId, pricingToken, minPriceValue, reservePriceValue, buyoutPriceValue, exipirationTime, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenId
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**

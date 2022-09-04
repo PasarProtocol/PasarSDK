@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, listItem } from "@pasarprotocol/pasar-sdk-development";
+import { getCoinType, listItem, getListType, isAuction } from "@pasarprotocol/pasar-sdk-development";
 
 const ListNFT = () => {
     const [tokenId, setTokenId] = useState("");
@@ -7,11 +7,17 @@ const ListNFT = () => {
     const [listPricingToken, setListPricingToken] = useState([]);
     const [pricingToken, setPricingToken] = useState('');
     const [progress, setProgress] = useState(0);
+    const [listType, setListType] = useState([]);
+    const [currentListType, setCurrentListType] = useState("");
 
     useEffect(() => {
         let listTokens = getCoinType();
         setListPricingToken(listTokens);
         setPricingToken(listTokens[0].address);
+
+        let listType = getListType();
+        setListType(listType);
+        setCurrentListType(listType[0]);
     }, []);
 
     useEffect(() => {
@@ -27,6 +33,12 @@ const ListNFT = () => {
 
     return (
         <div>
+            <select onChange={(e) => setCurrentListType(e.target.value)}>
+                {listType.map((cell) => {
+                    return <option key={cell} value={cell}>{cell}</option>
+                })}
+            </select>
+
             <div>
                 <h3 className="sub_title">tokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
