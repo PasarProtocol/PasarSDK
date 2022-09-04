@@ -1,4 +1,4 @@
-import { CollectionType } from "./collectiontype";
+import { CollectionCategory } from "./collectioncategory";
 import { Filter } from "./filters/Filter";
 import { CollectionAddress } from "./contractaddress";
 import { Dispatcher } from "./dispatcher";
@@ -16,7 +16,7 @@ class Collection {
     private symbol: string;
     private description: string;
     private itemType: ItemType;
-    private category: CollectionType;
+    private category: CollectionCategory;
 
     public getContractAddress(): CollectionAddress {
         return this.contractAddr;
