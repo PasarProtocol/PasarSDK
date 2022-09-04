@@ -476,7 +476,8 @@ export class MyProfile extends Profile {
      * @returns The result of buying action.
      */
     public async buyItem(
-        orderId: number,
+        orderId: string,
+        price: number,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -490,8 +491,10 @@ export class MyProfile extends Profile {
         let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
+        let did = await this.getUserDid();
+        let buyoutPriceValue = Number(BigInt(price*1e18));
         try {
-            await this.getCallContext().buyItem(accounts[0], orderId, essentialsConnector, gasPrice);
+            await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, did, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -630,8 +633,8 @@ export class MyProfile extends Profile {
      * @returns The result of bidding action.
      */
     public async bidItemOnAuction(
-        orderId: number,
-        value: number,
+        orderId: string,
+        price: number,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -645,10 +648,10 @@ export class MyProfile extends Profile {
         let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
-        let priceValue = BigInt(value*1e18).toString();
+        
 
         try {
-            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, priceValue, essentialsConnector, gasPrice);
+            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, price, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -671,7 +674,7 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with the progress on settling auction.
      * @returns The result of settling action.
      */
-    public async settleAuction(orderId: number,
+    public async settleAuction(orderId: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -715,5 +718,33 @@ export class MyProfile extends Profile {
         progressHandler: ProgressHandler): Promise<boolean> {
 
         throw new Error("Method not implemented");
+    }
+
+    /**
+     * Upload the user did info to ipfs
+     *
+     * @returns ipfs path.
+     */
+    public async getUserDid(): Promise<string> {
+        let ipfsURL:string;
+
+        if(isTestnetNetwork()) {
+            ipfsURL = valuesOnTestNet.urlIPFS;
+        } else {
+            ipfsURL = valuesOnMainNet.urlIPFS;
+        }
+
+        const client = create({ url: ipfsURL });
+        
+        let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+
+        const creatorObject: UserDidInfo = {
+            "did": jsonDid.did,
+            "name": jsonDid.name || "",
+            "description": jsonDid.bio || ""
+        }
+
+        let didUri = await client.add(JSON.stringify(creatorObject));
+        return `pasar:json:${didUri.path}`;
     }
 }

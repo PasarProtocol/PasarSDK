@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { getCoinType, bidItemOnAuction} from "@pasarprotocol/pasar-sdk-development";
+import { getCoinType, settleAuction} from "@pasarprotocol/pasar-sdk-development";
+import { useNavigate } from "react-router-dom";
 
 const SettleAuction = () => {
+    const navigate = useNavigate();
     const [orderId, setOrderId] = useState("");
     const [progress, setProgress] = useState(0);
 

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { getCoinType, buyItem} from "@pasarprotocol/pasar-sdk-development";
+import { buyItem } from "@pasarprotocol/pasar-sdk-development";
+import { useNavigate } from "react-router-dom";
 
 const BuyNFT = () => {
+    const navigate = useNavigate();
     const [orderId, setOrderId] = useState("");
+    const [price, setPrice] = useState("");
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
@@ -11,7 +14,7 @@ const BuyNFT = () => {
 
     const handleBuy = async () => {
         let result;
-        result = await buyItem(orderId, setProgress);
+        result = await buyItem(orderId, price, setProgress);
         console.log(result);
     }
 
@@ -25,6 +28,10 @@ const BuyNFT = () => {
             <div>
                 <h3 className="sub_title">OrderId</h3>
                 <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
+            </div>
+            <div>
+                <h3 className="sub_title">Price</h3>
+                <input value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
             <button className="button" onClick={handleBuy}>Buy</button>
         </div>

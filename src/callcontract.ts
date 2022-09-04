@@ -363,26 +363,30 @@ export class CallContract {
      */
      public buyItem (
         account: string,
-        orderId: number,
+        orderId: string,
+        price: number,
+        did: string,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
+            console.log(orderId);
+            console.log(price);
+            console.log(did);
             const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
                 'gas': _gasLimit,
-                'value': 0
+                'value': price
             };
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
-
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.buyOrder(orderId, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+
+            pasarContract.methods.buyOrder(orderId, did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -402,18 +406,20 @@ export class CallContract {
      */
      public bidItemOnAuction (
         account: string,
-        orderId: number,
-        price: string,
+        orderId: string,
+        price: number,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const _gasLimit = 5000000;
+            let priceValue = Number(BigInt(price*1e18)).toString();
+
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
                 'gas': _gasLimit,
-                'value': 0
+                'value': price*1e18
             };
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -422,7 +428,7 @@ export class CallContract {
 
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.bidForOrder(orderId, price, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+            pasarContract.methods.bidForOrder(orderId, priceValue, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -441,7 +447,7 @@ export class CallContract {
      */
      public settleAuction (
         account: string,
-        orderId: number,
+        orderId: string,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { getCoinType, bidItemOnAuction} from "@pasarprotocol/pasar-sdk-development";
+import { useNavigate } from "react-router-dom";
 
 const BidNFT = () => {
+    const navigate = useNavigate();
     const [orderId, setOrderId] = useState("");
     const [price, setPrice] = useState("");
     const [progress, setProgress] = useState(0);

@@ -13,6 +13,9 @@ import BurnNFT from './burnNFT';
 import TransferNFT from './transfer';
 import ListNFT from './listNft';
 import ChangePrice from './changePrice';
+import BuyNFT from './buyNft';
+import BidNFT from './bidNft';
+import SettleAuction from './settleAuction';
 
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider);
@@ -29,6 +32,9 @@ const RouterCom = ()=>{
       <Route path="/transfer" element={<TransferNFT />} />
       <Route path="/list" element={<ListNFT />} />
       <Route path="/changeprice" element={<ChangePrice />} />
+      <Route path="/buy" element={<BuyNFT />} />
+      <Route path="/bid" element={<BidNFT />} />
+      <Route path="/settle" element={<SettleAuction />} />
     </Routes>
   </BrowserRouter>
 }

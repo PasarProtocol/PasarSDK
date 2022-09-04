@@ -244,13 +244,14 @@ const changePriceOnAuction = async (
 
 const buyItem = async (
     orderId: string,
+    price: string,
     handleProgress: any = null
 ) => {
     let result: ResultApi;
     try {
         let profile = new MyProfile();
-
-        let resultContract:ResultCallContract = await profile.buyItem(parseInt(orderId), handleProgress);
+        
+        let resultContract:ResultCallContract = await profile.buyItem(orderId, parseInt(price), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -280,7 +281,7 @@ const bidItemOnAuction = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.bidItemOnAuction(parseInt(orderId), parseInt(price), handleProgress);
+        let resultContract:ResultCallContract = await profile.bidItemOnAuction(orderId, parseInt(price), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -309,7 +310,7 @@ const settleAuction = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.settleAuction(parseInt(orderId), handleProgress);
+        let resultContract:ResultCallContract = await profile.settleAuction(orderId, handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
