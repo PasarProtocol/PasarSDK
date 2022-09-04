@@ -478,7 +478,7 @@ export class MyProfile extends Profile {
     public async buyItem(
         orderId: number,
         progressHandler: any): Promise<ResultCallContract> {
-            let result: ResultCallContract;
+        let result: ResultCallContract;
 
         const essentialsConnector = new EssentialsConnector();
 
@@ -629,12 +629,39 @@ export class MyProfile extends Profile {
      *        on marketplace
      * @returns The result of bidding action.
      */
-    public bidItemOnAuction(
+    public async bidItemOnAuction(
         orderId: number,
         value: number,
-        progressHandler: ProgressHandler): Promise<boolean> {
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
 
-        throw new Error("Method not implemented");
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(20) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(30) : null;
+        let priceValue = BigInt(value*1e18).toString();
+
+        try {
+            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, priceValue, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: orderId
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
