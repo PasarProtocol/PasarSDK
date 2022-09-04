@@ -2,7 +2,7 @@ import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import { CollectionType } from "./collectiontype";
+import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
@@ -18,7 +18,7 @@ import { ItemInfo } from './iteminfo';
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile extends Profile {
-    
+
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      *
@@ -53,7 +53,7 @@ export class MyProfile extends Profile {
     public createCollectionMetadata(name: string,
         description: string,
         avatar: string,
-        category: CollectionType,
+        category: CollectionCategory,
         socialMedias: any,
         avatarHandler: ProgressHandler,
         metadataHandler: ProgressHandler) : Promise<string> {
@@ -344,7 +344,7 @@ export class MyProfile extends Profile {
             let gasPrice = await walletConnectWeb3.eth.getGasPrice();
             gasPrice = getFilteredGasPrice(gasPrice);
             progressHandler ? progressHandler(30) : null;
-            
+
             try {
                 await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, toAddr, accounts[0], essentialsConnector, gasPrice);
                 progressHandler ? progressHandler(50) : null;
