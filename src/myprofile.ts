@@ -714,10 +714,36 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with the progress on unlisting the NFT item.
      * @returns The result of unlisting action.
      */
-    public unlistItem(orderId: number,
-        progressHandler: ProgressHandler): Promise<boolean> {
+    public async unlistItem(
+        orderId: string,
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
 
-        throw new Error("Method not implemented");
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(20) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(30) : null;
+        try {
+            await this.getCallContext().unlistItem(accounts[0], orderId, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: orderId
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**

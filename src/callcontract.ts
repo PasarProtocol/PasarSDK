@@ -471,4 +471,42 @@ export class CallContract {
             });
         })
     }
+
+    /**
+     * Unlist an item from marketplace, either it's with fixed price or on auction
+     * When the item is on auction with bidding price, it would fail to call this function
+     * to unlist NFT item.
+     *
+     * @param account my wallet address
+     * @param orderId The orderId of NFT item on maketplace
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public unlistItem (
+        account: string,
+        orderId: string,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const _gasLimit = 5000000;
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+            };
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
+            pasarContract.methods.cancelOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
 }

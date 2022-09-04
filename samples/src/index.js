@@ -16,6 +16,7 @@ import ChangePrice from './changePrice';
 import BuyNFT from './buyNft';
 import BidNFT from './bidNft';
 import SettleAuction from './settleAuction';
+import UnlistNFT from './unlistNft';
 
 const getLibrary = (provider) => {
   const library = new Web3Provider(provider);
@@ -35,6 +36,7 @@ const RouterCom = ()=>{
       <Route path="/buy" element={<BuyNFT />} />
       <Route path="/bid" element={<BidNFT />} />
       <Route path="/settle" element={<SettleAuction />} />
+      <Route path="/unlist" element={<UnlistNFT />} />
     </Routes>
   </BrowserRouter>
 }
