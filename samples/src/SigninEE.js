@@ -1,22 +1,22 @@
 
 import React, {useState} from 'react'
-import { signin, signout } from '@pasarprotocol/pasar-sdk-development';
+import { signin, signout, checkSign } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
 
 function SigninEE() {
   const navigate = useNavigate();
-  const [login, setLogin] = useState(false);
+  const [login, setLogin] = useState(checkSign());
 
   const handleSigninEE1 = async () => {
     let result = await signin();
-    setLogin(result);
+    setLogin(checkSign());
   }
 
   const handleSignout = async () => {
     await signout();
-    setLogin(false);
+    setLogin(checkSign());
   }
 
   const handleClickButton = (path) => {

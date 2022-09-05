@@ -4,6 +4,8 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
+import { getUserInfo } from './userinfo';
+import { UserInfo } from './userinfo';
 
 /**
  * This class is to call the contract functions
@@ -125,7 +127,7 @@ export class CallContract {
                 'value': 0
             };
     
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+            let jsonDid:UserInfo = getUserInfo();
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -253,7 +255,7 @@ export class CallContract {
             let reservePriceValue = BigInt(reservePrice*1e18).toString();
             let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
 
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+            let jsonDid:UserInfo = getUserInfo();
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -424,7 +426,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+            let jsonDid:UserInfo = getUserInfo();
 
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);

@@ -10,6 +10,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { isTestnetNetwork } from './networkType';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
+import { getUserInfo, UserInfo } from './userinfo';
 
  /**  the function of being minted the nft
  *
@@ -44,7 +45,7 @@ const mintNFT = async (setProgress: any, image: any, name: string, description: 
 
 	let _id = `0x${sha256(image_add.path)}`;
 
-	let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+	let jsonDid:UserInfo = getUserInfo();
 	setProgress(30);
 	const createObject = {
 		"did": jsonDid.did,

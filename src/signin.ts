@@ -4,10 +4,12 @@ import { EssentialsConnector } from '@elastosfoundation/essentials-connector-cli
 import { statSync } from 'fs';
 import { DidResolverUrl, valuesOnTestNet, valuesOnMainNet } from './constant';
 import { isTestnetNetwork } from './networkType';
+import { deleteUserInfo, setUserInfo, UserInfo } from './userinfo';
 
 const essentialsConnector = new EssentialsConnector();
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
 let connectivityInitialized = false;
+let isSignin = false;
 
 const isUsingEssentialsConnector = () => {
     const activeConnector = connectivity.getActiveConnector();
@@ -43,7 +45,7 @@ const initConnectivitySDK = async () => {
 }
 
 const signOutWithEssentials = async () => {
-    sessionStorage.removeItem('USER_DID');
+    deleteUserInfo();
 
     try {
         if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())statSync
@@ -86,15 +88,14 @@ const signInWithEssentials = async () => {
         if (isInAppBrowser())
           essentialAddress = await window['elastos'].getWeb3Provider().address
 
-          let user = {
-            name: name,
-            bio: bio,
+          let user:UserInfo = {
+            name: name.toString(),
+            bio: bio.toString(),
             did: sDid,
             address: essentialAddress
         }
 
-        sessionStorage.setItem("USER_DID", JSON.stringify(user));
-
+        setUserInfo(user);
         return true;
       }
     } catch (e) {
@@ -113,14 +114,21 @@ const signin = async () => {
       await essentialsConnector.disconnectWalletConnect();
     }
     let result = await signInWithEssentials();
+    isSignin = true;
     return result;
 }
 
 const signout = async () => {
   await signOutWithEssentials();
+  isSignin = false;
+}
+
+const checkSign = () => {
+  return isSignin;
 }
 
 export {
     signin,
     signout,
+    checkSign
 }

@@ -6,13 +6,14 @@ export enum NetworkType {
     MainNet = "MainNet",
 }
 
+let networkType;
 /**
  * set the network type
  *
  * @param testnet the value of network, if testnet, true, else false
  */
-const setNetworkType = (testnet: NetworkType) => {
-    sessionStorage.setItem("network", testnet ? NetworkType.TestNet: NetworkType.MainNet)
+const setNetworkType = (net: NetworkType) => {
+    networkType = net;
 }
 
 /**
@@ -21,7 +22,7 @@ const setNetworkType = (testnet: NetworkType) => {
  * @return if testnet, true, else false
  */
 const isTestnetNetwork = () => {
-    return (sessionStorage.getItem("network") == NetworkType.TestNet)
+    return networkType == NetworkType.TestNet;
 }
 
 export {

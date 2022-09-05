@@ -17,13 +17,8 @@ const SettleAuction = () => {
         console.log(result);
     }
 
-    const handleClickHome = () => {
-        navigate('/')
-    }
-
     return (
         <div>
-            <button className="button" onClick={handleClickHome}>Go to first page</button>
             <div>
                 <h3 className="sub_title">OrderId</h3>
                 <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>

@@ -13,6 +13,8 @@ import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import { ItemInfo } from './iteminfo';
+import { getUserInfo } from './userinfo';
+import { UserInfo } from './userinfo';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -165,7 +167,7 @@ export class MyProfile extends Profile {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
 
-            let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+            let jsonDid:UserInfo = getUserInfo();
 
             const creatorObject: UserDidInfo = {
                 "did": jsonDid.did,
@@ -762,7 +764,7 @@ export class MyProfile extends Profile {
 
         const client = create({ url: ipfsURL });
         
-        let jsonDid = JSON.parse(sessionStorage.getItem('USER_DID'));
+        let jsonDid:UserInfo = getUserInfo();
 
         const creatorObject: UserDidInfo = {
             "did": jsonDid.did,

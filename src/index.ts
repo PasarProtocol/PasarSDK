@@ -2,16 +2,15 @@
 'use strict';
 
 import { getNftsOnMarketPlace } from "./getNfts";
-import { signin, signout } from "./signin";
+import { signin, signout, checkSign } from "./signin";
 import { NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
-import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
 const initialize = (testnet = true) => {
-    setNetworkType(NetworkType.TestNet);
+    setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
 
 const mintNft = async (
@@ -383,6 +382,7 @@ export {
     transferNft,
     signin,
     signout,
+    checkSign,
     getCoinType,
     listItem,
     listItemonAuction,
