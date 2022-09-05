@@ -1,6 +1,7 @@
 import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
+import bs58 from 'bs58'
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
@@ -9,7 +10,7 @@ import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import { ItemInfo } from './iteminfo';
@@ -52,15 +53,81 @@ export class MyProfile extends Profile {
      *        file onto IPFS storage
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    public createCollectionMetadata(name: string,
+    public async createCollectionMetadata(
+        name: string,
         description: string,
-        avatar: string,
+        avatar: any,
+        background: any,
         category: CollectionCategory,
         socialMedias: any,
-        avatarHandler: ProgressHandler,
-        metadataHandler: ProgressHandler) : Promise<string> {
+        handleProgress: any) : Promise<ResultOnIpfs> {
+        let result:ResultOnIpfs;
+        let ipfsURL:string;
+        
+        try {
+            if(isTestnetNetwork()) {
+                ipfsURL = valuesOnTestNet.urlIPFS;
+            } else {
+                ipfsURL = valuesOnMainNet.urlIPFS;
+            }
+            const client = create({ url: ipfsURL });
+            handleProgress ? handleProgress(10) : null;
 
-        throw new Error("Method not implemtend");
+            let avatar_add = await client.add(avatar);
+            handleProgress ? handleProgress(20) : null;
+
+            let background_add = await client.add(background);
+            handleProgress ? handleProgress(30) : null;
+
+            let avatarsrc =  `pasar:image:${avatar_add.path}`;
+            let backgroundsrc =  `pasar:image:${background_add.path}`;
+
+            let jsonDid:UserInfo = getUserInfo();
+            
+            const dataObj = { 
+                avatar: avatarsrc, 
+                background: backgroundsrc,
+                name,
+                description,
+                category: category.toString().toLowerCase(), 
+                socials: socialMedias
+            }
+            const plainBuffer = Buffer.from(JSON.stringify(dataObj))
+            const plainText = bs58.encode(plainBuffer)
+
+            const signature = await requestSigndataOnTokenID(plainText);
+            handleProgress ? handleProgress(40) : null;
+            const creatorObject = {
+                did: jsonDid.did,
+                name: jsonDid.name || "",
+                description: jsonDid.bio || "",
+                signature: signature && signature.signature ? signature.signature : ""
+            }
+
+            const metaObj = {
+                "version": "1",
+                "creator": creatorObject,
+                "data": dataObj
+            }
+            
+            let metaData = await client.add(JSON.stringify(metaObj));
+            handleProgress ? handleProgress(50) : null;
+
+            result = {
+                success: true,
+                result: "success",
+                medadata: `pasar:json:${metaData.path}`,
+            }
+        } catch(err) {
+            result = {
+                success: false,
+                result: err,
+                medadata: "",
+            }
+        }
+
+        console.log(result);
+        return result;
     }
 
     /**

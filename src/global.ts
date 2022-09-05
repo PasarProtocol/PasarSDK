@@ -1,3 +1,4 @@
+import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 
 /**
  * get new width and height of resizing image.
@@ -106,11 +107,21 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
     })
 }
 
+const requestSigndataOnTokenID = async (tokenId:string) =>  {
+    const didAccess = new ConnDID.DIDAccess();
+    const signedData = await didAccess.signData(tokenId, { extraField: 0 }, "signature");
+    console.log(signedData)
+    return signedData
+  }
+
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
 const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+
+
 
 export {
     resizeImage,
     isInAppBrowser,
-    getFilteredGasPrice
+    getFilteredGasPrice,
+    requestSigndataOnTokenID
 }
