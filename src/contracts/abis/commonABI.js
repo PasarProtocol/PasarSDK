@@ -1,4 +1,4 @@
-module.exports.COMMON_CONTRACT_ABI = [
+module.exports = [
     {
       type: 'function',
       stateMutability: 'view',

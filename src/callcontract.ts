@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import raw from "raw.macro";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
@@ -534,20 +533,18 @@ export class CallContract {
             gasPrice = getFilteredGasPrice(gasPrice);
 
             let registerContract = new walletConnectWeb3.eth.Contract(contractData.abi);
-
             let registeredContract = registerContract.deploy({
-                data: '0x'.concat(raw(contractData.code)),
+                data: `0x${contractData.code}`,
                 arguments: deployArgs,
             })
-
-            const transactionParams = {
+            let transactionParams = {
                 'from': account,
                 'gas': LimitGas,
                 'gasPrice': gasPrice
             }
+            
             if(isInAppBrowser())
               transactionParams['to'] = ""
-
               registeredContract.send(transactionParams).then(newContractInstance=>{
                 console.log('Contract deployed at address: ', newContractInstance.options.address)
                 resolve(newContractInstance.options.address)
@@ -619,11 +616,15 @@ export class CallContract {
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
         const tokenContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, tokenAddress);
 
-        let collectionInfo: NormalCollectionInfo;
-        collectionInfo.name = await tokenContract.methods.name().call();
-        collectionInfo.symbol = await tokenContract.methods.symbol().call();
-        collectionInfo.owner = await tokenContract.methods.owner().call();
-
+        let name = await tokenContract.methods.name().call();
+        let symbol = await tokenContract.methods.symbol().call();
+        let owner = await tokenContract.methods.owner().call();
+        
+        const collectionInfo: NormalCollectionInfo = {
+            name: name,
+            symbol: symbol,
+            owner: owner
+        };
         return collectionInfo;
     }
 }

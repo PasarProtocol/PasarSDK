@@ -17,6 +17,8 @@ import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
+import TOKEN_721_CODE from './contracts/bytecode/token721Code';
+import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -49,10 +51,10 @@ export class MyProfile extends Profile {
         let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         const tokenStandard = {
-            "ERC721": {abi: TOKEN_721_ABI, code: './contracts/bytecode/token721.code'},
-            "ERC1155": {abi: TOKEN_1155_ABI, code: './contracts/bytecode/token1155.code'}
+            "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
+            "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
         }
-        
+        console.log(tokenStandard[itemType]);
         try {
             let collectionAddress = await this.getCallContext().createCollection(accounts[0], name, symbol, collectionUri, tokenStandard[itemType], essentialsConnector, gasPrice);
             result = {
