@@ -3,9 +3,10 @@ import raw from "raw.macro";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
-import { TransactionParams } from './utils';
+import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
+import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import { RoyaltyRate } from './RoyaltyRate';
@@ -505,7 +506,7 @@ export class CallContract {
      *
      * @param account my wallet address
      * @param name The name of NFT collection
-     * @param symobl The symbol of NFT collection
+     * @param symbol The symbol of NFT collection
      * @param collectionUri the uri of nft on ipfs
      * @param contractData the contract file data
      * @param essentialsConnector essestial connector for creating web3
@@ -561,10 +562,10 @@ export class CallContract {
      * Register an specific NFT collection onto Pasar marketplace.
      *
      * @param account my wallet address
+     * @param tokenAddress the address of collection
      * @param name The name of NFT collection
-     * @param symobl The symbol of NFT collection
      * @param collectionUri the uri of nft on ipfs
-     * @param contractData the contract file data
+     * @param royaltyRates the list of owners and royalties
      * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
@@ -594,7 +595,7 @@ export class CallContract {
 
             for(var i = 0; i < royaltyRates.length; i++) {
                 owners.push(royaltyRates[i].address);
-                royalties.push(royaltyRates[i].rate)
+                royalties.push(royaltyRates[i].rate*10000)
             }
             pasarRegister.methods.registerToken(tokenAddress, name, collectionUri, owners, royalties).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -602,5 +603,27 @@ export class CallContract {
                 reject(error)
             });
         })
+    }
+
+    /**
+     * Get the name, symbol, owner of collection
+     *
+     * @param tokenAddress address of collection
+     * @param essentialsConnector essestial connector for creating web3
+     * @returns result of being listed the nft
+     */
+     public async getCollectionInfo (
+        tokenAddress: string,
+        essentialsConnector: any,
+    ): Promise<NormalCollectionInfo> {
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+        const tokenContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, tokenAddress);
+
+        let collectionInfo: NormalCollectionInfo;
+        collectionInfo.name = await tokenContract.methods.name().call();
+        collectionInfo.symbol = await tokenContract.methods.symbol().call();
+        collectionInfo.owner = await tokenContract.methods.owner().call();
+
+        return collectionInfo;
     }
 }

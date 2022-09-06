@@ -44,3 +44,9 @@ export interface ResultApi {
     "success": boolean,
     "data": any
 }
+
+export interface NormalCollectionInfo {
+    "name": string,
+    "symbol": string,
+    "owner": string
+}

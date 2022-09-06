@@ -9,6 +9,9 @@ import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
+import { CollectionCategory } from "./collectioncategory";
+import { ItemType } from "./itemtype";
+import { RoyaltyRate } from "./RoyaltyRate";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -359,6 +362,86 @@ const unlistItem = async (
     return result;
 }
 
+const createCollection = async (
+    name: string,
+    description: string,
+    symbol: string,
+    avatar: any,
+    background: any,
+    itemType: ItemType,
+    category: CollectionCategory,
+    socialMedias: any,
+    royalties: RoyaltyRate[],
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        if(!resultIpfs.success) {
+            return result = {
+                success: false,
+                data: resultIpfs.result,
+            }
+        }
+        let resultContract:ResultCallContract = await profile.createCollection(name, symbol, resultIpfs.medadata, itemType, handleProgress);
+        if(!resultContract.success) {
+            return result = {
+                success: false,
+                data: resultContract.data,
+            }
+        }
+        resultContract = await profile.registerCollection(resultContract.data, resultIpfs.medadata, royalties, handleProgress);
+        return result = {
+            success: resultContract.success,
+            data: resultContract.data,
+        }
+        
+    } catch(err) {
+        return result = {
+            success: false,
+            data: err
+        }
+    }
+}
+
+const registerCollection = async (
+    tokenAddress:string,
+    description: string,
+    avatar: any,
+    background: any,
+    category: CollectionCategory,
+    socialMedias: any,
+    royalties: RoyaltyRate[],
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        if(!resultIpfs.success) {
+            return result = {
+                success: false,
+                data: resultIpfs.result,
+            }
+        }
+        
+        let resultContract:ResultCallContract = await profile.registerCollection(tokenAddress, resultIpfs.medadata, royalties, handleProgress);
+        return result = {
+            success: resultContract.success,
+            data: resultContract.data,
+        }
+        
+    } catch(err) {
+        return result = {
+            success: false,
+            data: err
+        }
+    }
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
@@ -393,5 +476,7 @@ export {
     buyItem,
     bidItemOnAuction,
     settleAuction,
-    unlistItem
+    unlistItem,
+    createCollection,
+    registerCollection,
 }

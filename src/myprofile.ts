@@ -11,7 +11,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID } from "./global";
-import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
+import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
@@ -27,7 +27,8 @@ export class MyProfile extends Profile {
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      *
      * @param name The name of NFT collection
-     * @param symobl The symbol of NFT collection
+     * @param symbol The symbol of NFT collection
+     * @param collectionUri The uri of NFT collection
      * @param itemType The type of NFT collection, currenly only supports ERC721 and ERC1155.
      * @param progressHandler The handler to deal with progress on creating and deploying an
      *        NFT collection contract
@@ -75,16 +76,13 @@ export class MyProfile extends Profile {
      * @param name The name of NFT collection
      * @param description The brief description of NFT collection
      * @param avatar The avatar image path
+     * @param background The background image path
      * @param category The category of NFT collection
      * @param socialMedias The social media related to this NFT collection
-     * @param avatarHandler The handler to deal with the progress on uploading avatar image onto
-     *        IPFS storage
-     * @param metadataHandler The handler to deal with the progress on uploading a metadata json
-     *        file onto IPFS storage
+     * @param handleProgress The handler to deal with the progress
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
     public async createCollectionMetadata(
-        name: string,
         description: string,
         avatar: any,
         background: any,
@@ -164,8 +162,7 @@ export class MyProfile extends Profile {
      * Once the collection is registered to Pasar marketplace, the NFTs in this collection can
      * be listed onto market for trading.
      *
-     * @param tokenAddress The NFT collection contract address.
-     * @param name The name of NFT collection
+     * @param tokenAddress The NFT collection contract address
      * @param collectionUri The uri of the NFT collection referring to the metadata json file on
      *        IPFS storage
      * @param royaltyRates The roraylty rates for this NFT collection
@@ -175,7 +172,6 @@ export class MyProfile extends Profile {
      */
     public async registerCollection(
         tokenAddress: string,
-        name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
         progressHandler: any): Promise<ResultCallContract> {
@@ -189,7 +185,14 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            await this.getCallContext().registerCollection(accounts[0], tokenAddress, name, collectionUri, royaltyRates, essentialsConnector, gasPrice);
+            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, essentialsConnector);
+            if(collectionInfo.owner.toLowerCase() != accounts[0].toLowerCase()) {
+                return result = {
+                    success: false,
+                    data: "You can't register this collection"
+                }
+            }
+            await this.getCallContext().registerCollection(accounts[0], tokenAddress, collectionInfo.name, collectionUri, royaltyRates, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: tokenAddress
