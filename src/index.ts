@@ -12,6 +12,8 @@ import { ListType } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
+import { StringIsNumber } from "./global";
+import { getUserInfo } from "./userinfo";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -457,6 +459,30 @@ const isAuction = (type:string) => {
     return listType.isAuction(type);
 }
 
+const getCollectionType = () => {
+    let collectionType = [];
+
+    Object.keys(ItemType).filter(StringIsNumber).map((cell) => {
+        collectionType.push(cell);
+    })
+
+    return collectionType;
+}
+
+const getCollectionCategories = () => {
+    let collectionType = [];
+
+    Object.keys(CollectionCategory).filter(StringIsNumber).map((cell) => {
+        collectionType.push(cell);
+    })
+    
+    return collectionType;
+}
+
+const getAccountInfo = () => {
+    return getUserInfo();
+}
+
 export {
     initialize,
     getNftsOnMarketPlace,
@@ -479,4 +505,7 @@ export {
     unlistItem,
     createCollection,
     registerCollection,
+    getCollectionType,
+    getCollectionCategories,
+    getAccountInfo,
 }

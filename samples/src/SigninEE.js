@@ -42,6 +42,7 @@ function SigninEE() {
           <button onClick={()=> handleClickButton('/bid')}>Bid NFT</button>
           <button onClick={()=> handleClickButton('/settle')}>Settle Auction</button>
           <button onClick={()=> handleClickButton('/unlist')}>Unlist NFT</button>
+          <button onClick={()=> handleClickButton('/createcollection')}>Create Collection</button>
         </div>
         
     </div>

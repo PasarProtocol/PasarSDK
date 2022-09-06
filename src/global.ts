@@ -117,11 +117,13 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
 const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
 
+const StringIsNumber = value => isNaN(Number(value)) === true;
 
 
 export {
     resizeImage,
     isInAppBrowser,
     getFilteredGasPrice,
-    requestSigndataOnTokenID
+    requestSigndataOnTokenID,
+    StringIsNumber,
 }
