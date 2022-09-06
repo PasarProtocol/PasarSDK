@@ -1,6 +1,7 @@
 import Web3 from 'web3';
+import raw from "raw.macro";
 import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
@@ -509,6 +510,63 @@ export class CallContract {
             }).on('error', (error) => {
                 reject(error)
             });
+        })
+    }
+
+    /**
+     * Create a NFT collection contract and deploy it on specific EVM blockchain.
+     *
+     * @param account my wallet address
+     * @param name The name of NFT collection
+     * @param symobl The symbol of NFT collection
+     * @param collectionUri the uri of nft on ipfs
+     * @param contractData the contract file data
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public createCollection (
+        account: string,
+        name: string,
+        symbol: string,
+        collectionUri: string,
+        contractData: any,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const diaTokenValue = BigInt((10 ** DiaTokenConfig.diaDecimals * DiaTokenConfig.diaValue * DiaTokenConfig.nPPM) / DiaTokenConfig.PPM).toString();
+            
+            let diaAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.diaTokenContract : valuesOnMainNet.elastos.diaTokenContract
+
+            let deployArgs = [name, symbol, collectionUri, diaAddress, diaTokenValue];
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+            gasPrice = getFilteredGasPrice(gasPrice);
+
+            let registerContract = new walletConnectWeb3.eth.Contract(contractData.abi);
+
+            let registerContract1 = registerContract.deploy({
+                data: '0x'.concat(raw(contractData.code)),
+                arguments: deployArgs,
+            })
+
+            const transactionParams = {
+                'from': account,
+                'gas': LimitGas,
+                'gasPrice': gasPrice
+            }
+            if(isInAppBrowser())
+              transactionParams['to'] = ""
+              
+            registerContract1.send(transactionParams).then(newContractInstance=>{
+                console.log('Contract deployed at address: ', newContractInstance.options.address)
+                resolve(newContractInstance.options.address)
+            }).catch((error) => {
+                reject(error);
+            })
+
         })
     }
 }

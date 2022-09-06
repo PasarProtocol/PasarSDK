@@ -1,7 +1,7 @@
 import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
-import bs58 from 'bs58'
+import bs58 from 'bs58';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
@@ -9,13 +9,14 @@ import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet } from "./constant";
+import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID } from "./global";
 import { ImageDidInfo, NFTDidInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
-import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
-import { ItemInfo } from './iteminfo';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
+import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
+import TOKEN_721_ABI from './contracts/abis/token721ABI';
+import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -32,11 +33,40 @@ export class MyProfile extends Profile {
      *        NFT collection contract
      * @returns The deployed NFT collection contract address.
      */
-     public createCollection(name: string,
-        symobl: string,
+     public async createCollection(
+        name: string,
+        symbol: string,
+        collectionUri: string,
         itemType: ItemType,
-        progressHandler: ProgressHandler): Promise<string> {
-        throw new Error("Method not implemtend");
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
+        const essentialsConnector = new EssentialsConnector();
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        const tokenStandard = {
+            "ERC721": {abi: TOKEN_721_ABI, code: './contracts/bytecode/token721.code'},
+            "ERC1155": {abi: TOKEN_1155_ABI, code: './contracts/bytecode/token1155.code'}
+        }
+        
+        try {
+            let collectionAddress = await this.getCallContext().createCollection(accounts[0], name, symbol, collectionUri, tokenStandard[itemType], essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: collectionAddress
+            }
+            progressHandler ? progressHandler(70) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -87,7 +117,6 @@ export class MyProfile extends Profile {
             const dataObj = { 
                 avatar: avatarsrc, 
                 background: backgroundsrc,
-                name,
                 description,
                 category: category.toString().toLowerCase(), 
                 socials: socialMedias
