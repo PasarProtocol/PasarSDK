@@ -38,11 +38,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
     
@@ -80,11 +79,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
     
@@ -120,11 +118,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
     
@@ -159,11 +156,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
             
@@ -198,11 +194,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
             
@@ -244,11 +239,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
     
@@ -291,11 +285,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
 
@@ -335,11 +328,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
 
@@ -373,14 +365,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            console.log(orderId);
-            console.log(price);
-            console.log(did);
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': price
             };
 
@@ -415,13 +403,12 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             let priceValue = Number(BigInt(price*1e18)).toString();
 
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': price*1e18
             };
 
@@ -455,11 +442,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
 
@@ -493,11 +479,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const _gasLimit = 5000000;
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
-                'gas': _gasLimit,
+                'gas': LimitGas,
                 'value': 0
             };
 
@@ -559,7 +544,7 @@ export class CallContract {
             }
             if(isInAppBrowser())
               transactionParams['to'] = ""
-              
+
             registerContract1.send(transactionParams).then(newContractInstance=>{
                 console.log('Contract deployed at address: ', newContractInstance.options.address)
                 resolve(newContractInstance.options.address)
