@@ -5,8 +5,10 @@ import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./co
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
+import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
+import { RoyaltyRate } from './RoyaltyRate';
 
 /**
  * This class is to call the contract functions
@@ -532,7 +534,7 @@ export class CallContract {
 
             let registerContract = new walletConnectWeb3.eth.Contract(contractData.abi);
 
-            let registerContract1 = registerContract.deploy({
+            let registeredContract = registerContract.deploy({
                 data: '0x'.concat(raw(contractData.code)),
                 arguments: deployArgs,
             })
@@ -545,13 +547,60 @@ export class CallContract {
             if(isInAppBrowser())
               transactionParams['to'] = ""
 
-            registerContract1.send(transactionParams).then(newContractInstance=>{
+              registeredContract.send(transactionParams).then(newContractInstance=>{
                 console.log('Contract deployed at address: ', newContractInstance.options.address)
                 resolve(newContractInstance.options.address)
             }).catch((error) => {
                 reject(error);
             })
 
+        })
+    }
+
+    /**
+     * Register an specific NFT collection onto Pasar marketplace.
+     *
+     * @param account my wallet address
+     * @param name The name of NFT collection
+     * @param symobl The symbol of NFT collection
+     * @param collectionUri the uri of nft on ipfs
+     * @param contractData the contract file data
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public registerCollection (
+        account: string,
+        tokenAddress: string,
+        name: string,
+        collectionUri: string,
+        royaltyRates: RoyaltyRate[],
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': LimitGas,
+                'value': 0
+            };
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarRegisterContract : valuesOnMainNet.elastos.pasarRegisterContract;
+            let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
+            let owners = [], royalties = [];
+
+            for(var i = 0; i < royaltyRates.length; i++) {
+                owners.push(royaltyRates[i].address);
+                royalties.push(royaltyRates[i].rate)
+            }
+            pasarRegister.methods.registerToken(tokenAddress, name, collectionUri, owners, royalties).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
         })
     }
 }

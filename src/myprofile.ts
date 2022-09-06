@@ -173,13 +173,36 @@ export class MyProfile extends Profile {
      *        NFT collection onto Pasar marketplace
      * @returns The result of whether this NFT collection contract is registered ont Pasar or not
      */
-    public registerCollection(tokenAddress: string,
+    public async registerCollection(
+        tokenAddress: string,
         name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: ProgressHandler): Promise<boolean> {
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
+        const essentialsConnector = new EssentialsConnector();
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
-        throw new Error("Method not implemted");
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+
+        gasPrice = getFilteredGasPrice(gasPrice);
+        
+        try {
+            await this.getCallContext().registerCollection(accounts[0], tokenAddress, name, collectionUri, royaltyRates, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenAddress
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**
