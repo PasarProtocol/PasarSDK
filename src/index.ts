@@ -12,7 +12,7 @@ import { ListType } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
-import { StringIsNumber } from "./global";
+import { checkCustomCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
@@ -36,9 +36,11 @@ const mintNft = async (
         let resultMetadata:ResultOnIpfs = await profile.createItemMetadata(itemName, itemDescription, itemImage, baseToken, properties, sensitive, handleProgress);
 
         if(resultMetadata.success == true) {
-            if(baseToken == valuesOnMainNet.elastos.stickerContract || baseToken == valuesOnMainNet.elastos.stickerV2Contract || baseToken == valuesOnTestNet.elastos.stickerContract || baseToken == valuesOnTestNet.elastos.stickerV2Contract)
+            if(!checkCustomCollection(baseToken))
                 resultContract = await profile.createItemWithRoyalties(baseToken, resultMetadata.medadata, royaltyFee, handleProgress);
-
+            else 
+                resultContract = await profile.creatItem(baseToken, resultMetadata.medadata, handleProgress);
+            
             if(resultContract.success) {
                 result = {
                     success: true,

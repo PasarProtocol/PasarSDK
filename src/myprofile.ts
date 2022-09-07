@@ -405,10 +405,39 @@ export class MyProfile extends Profile {
      * @param progressHandler: The handler to deal with progress on minting a new NFT item
      * @returns The tokenId of the new NFT.
      */
-    public creatItem(baseToken: string,
+    public async creatItem(baseToken: string,
         tokenUri: string,
-        progressHandler: ProgressHandler): Promise<string> {
-        throw new Error("Method Not implemented");
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
+
+        const essentialsConnector = new EssentialsConnector();
+
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        progressHandler ? progressHandler(50) : null;
+
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler ? progressHandler(60) : null;
+        let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
+        try {
+            let collectionType:ItemType;
+
+            await this.getCallContext().mintFunctionOnCustomCollection(baseToken, accounts[0], tokenId, collectionType, tokenUri, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenId
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**

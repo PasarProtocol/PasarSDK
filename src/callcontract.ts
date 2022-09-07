@@ -6,9 +6,12 @@ import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
 import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
+import TOKEN_721_ABI from './contracts/abis/token721ABI';
+import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import { RoyaltyRate } from './RoyaltyRate';
+import { ItemType } from './itemtype';
 
 /**
  * This class is to call the contract functions
@@ -51,6 +54,52 @@ export class CallContract {
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
+
+    /**
+     * call the mint function on custom contract
+     *
+     * @param contractAbi abi file for calling
+     * @param contractAddress address of contract
+     * @param account my wallet address
+     * @param tokenId tokenId of being minted
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being minted the nft
+     */
+     public mintFunctionOnCustomCollection (
+        contractAddress: string,
+        account: string,
+        tokenId: string,
+        collectionType: ItemType,
+        metaData: string,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': LimitGas,
+                'value': 0
+            };
+    
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+    
+            let pasarContract = new walletConnectWeb3.eth.Contract(TOKEN_721_ABI, contractAddress);
+            let mintFunction = pasarContract.methods.mint(tokenId, metaData);
+
+            if(collectionType == ItemType.ERC1155) {
+                pasarContract = new walletConnectWeb3.eth.Contract(TOKEN_1155_ABI, contractAddress);
+                mintFunction = pasarContract.methods.mint(tokenId, 1, metaData);
+            } 
+
+            mintFunction.send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)

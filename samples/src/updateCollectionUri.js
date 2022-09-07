@@ -4,15 +4,12 @@ import { getCollectionCategories, updateCollectionInfo } from "@pasarprotocol/pa
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [symbol, setSymbol] = useState('');
     const [avatar, setAvatar] = useState();
     const [background, setBackground] = useState();
     const [collectionAddress, setCollectionAddress] = useState("");
     const [category, setCategory] = useState(getCollectionCategories()[0]);
     const [progress, setProgress] = useState(0);
-    useEffect(() => {
 
-    }, [])
     useEffect(() => {
         console.log(progress);
     }, [progress]);

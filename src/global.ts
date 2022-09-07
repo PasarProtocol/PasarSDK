@@ -1,4 +1,5 @@
 import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 /**
  * get new width and height of resizing image.
@@ -112,7 +113,15 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
     const signedData = await didAccess.signData(tokenId, { extraField: 0 }, "signature");
     console.log(signedData)
     return signedData
-  }
+}
+
+const checkCustomCollection = (address) => {
+    if(address == valuesOnMainNet.elastos.stickerContract || address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnMainNet.elastos.stickerContract || address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerV2Contract) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
 const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
@@ -126,4 +135,5 @@ export {
     getFilteredGasPrice,
     requestSigndataOnTokenID,
     StringIsNumber,
+    checkCustomCollection,
 }
