@@ -224,7 +224,7 @@ export class MyProfile extends Profile {
         name: string,
         collectionUri: string,
         progressHandler: any): Promise<ResultCallContract> {
-            let result: ResultCallContract;
+        let result: ResultCallContract;
         const essentialsConnector = new EssentialsConnector();
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
@@ -265,11 +265,41 @@ export class MyProfile extends Profile {
      *        on Pasar marketplace
      * The result of whether the NFT collection is updated or not.
      */
-    public updateCollectionRoyalties(tokenAddress: string,
+    public async updateCollectionRoyalties(
+        tokenAddress: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: ProgressHandler): Promise<boolean> {
+        progressHandler: any): Promise<ResultCallContract> {
+        let result: ResultCallContract;
+        const essentialsConnector = new EssentialsConnector();
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
-        throw new Error("Method not implemented");
+        let accounts = await walletConnectWeb3.eth.getAccounts();
+        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+
+        gasPrice = getFilteredGasPrice(gasPrice);
+        
+        try {
+            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, essentialsConnector);
+            if(collectionInfo.owner.toLowerCase() != accounts[0].toLowerCase()) {
+                return result = {
+                    success: false,
+                    data: "You can't update the royalties of this collection"
+                }
+            }
+            await this.getCallContext().updateCollectionRoyalties(accounts[0], tokenAddress, royaltyRates, essentialsConnector, gasPrice);
+            result = {
+                success: true,
+                data: tokenAddress
+            }
+            progressHandler ? progressHandler(100) : null;
+        } catch(err) {
+            result = {
+                success: false,
+                data: err
+            }
+        }
+
+        return result;
     }
 
     /**

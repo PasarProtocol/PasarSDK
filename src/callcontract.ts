@@ -643,6 +643,51 @@ export class CallContract {
     }
 
     /**
+     * Update the royalties of collection
+     *
+     * @param account my wallet address
+     * @param tokenAddress the address of collection
+     * @param royaltyRates new royalties of collection
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public updateCollectionRoyalties (
+        account: string,
+        tokenAddress: string,
+        royaltyRates: RoyaltyRate[],
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        return new Promise((resolve, reject) => {
+            const transactionParams: TransactionParams = {
+                'from': account,
+                'gasPrice': gasPrice,
+                'gas': LimitGas,
+                'value': 0
+            };
+
+            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            
+            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarRegisterContract : valuesOnMainNet.elastos.pasarRegisterContract;
+            let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
+
+            let owners = [], royalties = [];
+
+            for(var i = 0; i < royaltyRates.length; i++) {
+                owners.push(royaltyRates[i].address);
+                royalties.push(royaltyRates[i].rate*10000)
+            }
+
+            pasarRegister.methods.changeTokenRoyalty(tokenAddress, owners, royalties).send(transactionParams).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
+
+    /**
      * Get the name, symbol, owner of collection
      *
      * @param tokenAddress address of collection

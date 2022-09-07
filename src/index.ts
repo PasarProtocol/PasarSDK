@@ -480,6 +480,29 @@ const updateCollectionInfo = async (
     }
 }
 
+const updateCollectionRoyalties = async (
+    tokenAddress:string,
+    royalties: RoyaltyRate[],
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+        
+        let resultContract:ResultCallContract = await profile.updateCollectionRoyalties(tokenAddress, royalties, handleProgress);
+        return result = {
+            success: resultContract.success,
+            data: resultContract.data,
+        }
+        
+    } catch(err) {
+        return result = {
+            success: false,
+            data: err
+        }
+    }
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
@@ -545,4 +568,5 @@ export {
     getCollectionCategories,
     getAccountInfo,
     updateCollectionInfo,
+    updateCollectionRoyalties
 }
