@@ -444,6 +444,42 @@ const registerCollection = async (
     }
 }
 
+const updateCollectionInfo = async (
+    tokenAddress:string,
+    name: string,
+    description: string,
+    avatar: any,
+    background: any,
+    category: CollectionCategory,
+    socialMedias: any,
+    handleProgress: any = null
+) => {
+    let result: ResultApi;
+    try {
+        let profile = new MyProfile();
+
+        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        if(!resultIpfs.success) {
+            return result = {
+                success: false,
+                data: resultIpfs.result,
+            }
+        }
+        
+        let resultContract:ResultCallContract = await profile.updateCollectionURI(tokenAddress, name, resultIpfs.medadata, handleProgress);
+        return result = {
+            success: resultContract.success,
+            data: resultContract.data,
+        }
+        
+    } catch(err) {
+        return result = {
+            success: false,
+            data: err
+        }
+    }
+}
+
 const getCoinType = () => {
     let coinType = new CoinType();
     return coinType.getCoinTypeList();
@@ -508,4 +544,5 @@ export {
     getCollectionType,
     getCollectionCategories,
     getAccountInfo,
+    updateCollectionInfo,
 }
