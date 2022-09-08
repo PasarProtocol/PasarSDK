@@ -17,7 +17,6 @@ import { ItemType } from './itemtype';
  * This class is to call the contract functions
  */
 export class CallContract {
-
     /**
      * call the mint function on contract
      *
@@ -76,7 +75,7 @@ export class CallContract {
         contractAddress: string,
         account: string,
         tokenId: string,
-        collectionType: ItemType,
+        collectionType: string,
         metaData: string,
         essentialsConnector: any,
         gasPrice: string

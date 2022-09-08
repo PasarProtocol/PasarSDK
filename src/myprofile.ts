@@ -19,6 +19,8 @@ import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
+import { ChainType } from './chaintype';
+import { Collection } from './collection';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -422,8 +424,9 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collectionType:ItemType;
-
+            let collection:Collection = await this.getCallAssistService().getCallAssistService(baseToken, ChainType.ESC);
+            let collectionType = collection.getERCStandard();
+            
             await this.getCallContext().mintFunctionOnCustomCollection(baseToken, accounts[0], tokenId, collectionType, tokenUri, essentialsConnector, gasPrice);
             result = {
                 success: true,

@@ -3,10 +3,12 @@ import { Dispatcher } from "./dispatcher";
 import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 import { CallContract } from "./callcontract";
+import { CallAssistService } from "./callassistservice";
 
 export class Profile {
     private appContext: AppContext = new AppContext();
     private callContract: CallContract = new CallContract();
+    private callAssistService: CallAssistService = new CallAssistService();
     private walletAddr: string;
     private userDid: string;
 
@@ -20,6 +22,10 @@ export class Profile {
 
     protected getCallContext(): CallContract {
         return this.callContract
+    }
+
+    protected getCallAssistService(): any {
+        return this.callAssistService;
     }
 
     /**

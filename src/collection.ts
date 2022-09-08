@@ -10,13 +10,26 @@ class Collection {
     private ownerDid: string;
     private ownerAddr: string;
 
-    private socialLinks: { name: string, link: string };
+    private socialLinks: any;
     private avatar: string;
     private name: string;
     private symbol: string;
     private description: string;
     private itemType: ItemType;
     private category: CollectionCategory;
+
+    constructor(contractAddress: CollectionAddress, ownerDid: string, ownerAddr: string, avatar: string, name: string, description: string, symbol: string, itemType: ItemType, category: CollectionCategory, socialLink: any) {
+        this.contractAddr = contractAddress;
+        this.ownerDid = ownerDid;
+        this.ownerAddr = ownerAddr;
+        this.avatar = avatar;
+        this.name = name;
+        this.symbol = symbol;
+        this.description = description;
+        this.itemType = itemType;
+        this.category = category;
+        this.socialLinks = socialLink;
+    }
 
     public getContractAddress(): CollectionAddress {
         return this.contractAddr;

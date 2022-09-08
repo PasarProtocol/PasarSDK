@@ -1,4 +1,5 @@
 import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { ChainType } from "./chaintype";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 /**
@@ -128,6 +129,26 @@ const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toStr
 
 const StringIsNumber = value => isNaN(Number(value)) === true;
 
+const getChainTypeNumber = (chaintype:ChainType) => {
+    if(chaintype == ChainType.ESC) {
+        return 1;
+    } else if(chaintype == ChainType.ETH) {
+        return 2;
+    } else if(chaintype ==  ChainType.FSN) {
+        return 3;
+    }
+}
+
+const getChainTypeString = (chaintype: number) => {
+    if(chaintype == 1) {    
+        return ChainType.ESC;
+    } else if(chaintype == 2) {
+        return ChainType.ETH;
+    } else if(chaintype == 3) {
+        return ChainType.FSN;
+    }
+    
+}
 
 export {
     resizeImage,
@@ -136,4 +157,6 @@ export {
     requestSigndataOnTokenID,
     StringIsNumber,
     checkCustomCollection,
+    getChainTypeNumber,
+    getChainTypeString,
 }

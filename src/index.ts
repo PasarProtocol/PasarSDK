@@ -1,7 +1,6 @@
 
 'use strict';
 
-import { getNftsOnMarketPlace } from "./getNfts";
 import { signin, signout, checkSign } from "./signin";
 import { NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
@@ -546,7 +545,6 @@ const getAccountInfo = () => {
 
 export {
     initialize,
-    getNftsOnMarketPlace,
     mintNft,
     deleteNft,
     transferNft,
