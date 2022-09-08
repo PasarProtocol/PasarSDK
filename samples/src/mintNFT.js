@@ -4,7 +4,7 @@ import { mintNft } from "@pasarprotocol/pasar-sdk-development";
 const MintNFT = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [image, setImage] = useState(null);
+    const [collectionAddress, setCollectionAddress] = useState("");
     const [urlImage, setUrlImage] = useState('');
     const [progress, setProgress] = useState(0);
 
@@ -16,7 +16,7 @@ const MintNFT = () => {
         console.log(name);
         console.log(description);
         console.log(urlImage);
-        let result = await mintNft(name, description, urlImage, "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", 10, null, false, setProgress);
+        let result = await mintNft(name, description, urlImage, collectionAddress, 10, null, false, setProgress);
         console.log(result);
     }
 
@@ -29,6 +29,10 @@ const MintNFT = () => {
             <div>
                 <input type="file" onChange={e => handleChangeImage(e)}/>
 
+            </div>
+            <div>
+                <h3 className="sub_title">Collection Address</h3>
+                <input value={collectionAddress} onChange={(e) => setCollectionAddress(e.target.value)}/>
             </div>
             <div>
                 <h3 className="sub_title">Name</h3>

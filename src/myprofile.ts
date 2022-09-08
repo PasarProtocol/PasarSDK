@@ -348,7 +348,7 @@ export class MyProfile extends Profile {
 
             let thumbnail_add = image_add;
 
-            if(thumbnail.success === 0) {
+            if(thumbnail['success'] === 0) {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
 
@@ -424,9 +424,15 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection:Collection = await this.getCallAssistService().getCallAssistService(baseToken, ChainType.ESC);
+            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+            if(collection == null) {
+                return result = {
+                    success: false,
+                    data: "Failed to get the collection Information"
+                }
+            }
             let collectionType = collection.getERCStandard();
-            
+
             await this.getCallContext().mintFunctionOnCustomCollection(baseToken, accounts[0], tokenId, collectionType, tokenUri, essentialsConnector, gasPrice);
             result = {
                 success: true,

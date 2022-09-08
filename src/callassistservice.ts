@@ -46,22 +46,17 @@ export class CallAssistService {
             baseUrl = valuesOnMainNet.assistURL;
         }
 
-        console.log(chaintype);
         let chainNum = await getChainTypeNumber(chaintype);
-        console.log(chainNum);
         let result  = await fetch(`${baseUrl}/api/v2/sticker/getCollection/${address}?marketPlace=${chainNum}`);
-        console.log(result);
 
-        let jsonData = result.json();
+        let jsonData = await result.json();
         if(jsonData['code'] != 200) {
             return null
         }
-
         let dataInfo = jsonData['data'];
-        
         let collectionType = dataInfo['is721'] ? ItemType.ERC721 : ItemType.ERC1155;
         let collection: Collection =  new Collection(dataInfo['token'], dataInfo['creatorDid'], dataInfo['owner'], dataInfo['tokenJson']['data']['avatar'], dataInfo['name'], dataInfo['tokenJson']['data']['description'], dataInfo['symbol'], collectionType, dataInfo['tokenJson']['data']['category'], dataInfo['tokenJson']['data']['socials']);
-
+        
         return collection;
     }
 }
