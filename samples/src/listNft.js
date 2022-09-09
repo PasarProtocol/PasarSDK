@@ -12,6 +12,7 @@ const ListNFT = () => {
     const [progress, setProgress] = useState(0);
     const [listType, setListType] = useState([]);
     const [currentListType, setCurrentListType] = useState("");
+    const [addressCollection, setAddressCollection] = useState("");
 
     useEffect(() => {
         let listTokens = getCoinType();
@@ -38,9 +39,9 @@ const ListNFT = () => {
             let dateParts = dateTimeParts[0].split("-");
             let timeParts = dateTimeParts[1].split(":");
             let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
-            result = await listItemonAuction("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
+            result = await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
         } else {
-            result = await listItem("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, pricingToken, price, setProgress);
+            result = await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
         }
         console.log(result);
         
@@ -62,6 +63,10 @@ const ListNFT = () => {
                 })}
             </select>
 
+            <div>
+                <h3 className="sub_title">Collection Address</h3>
+                <input value={addressCollection} onChange={(e) => setAddressCollection(e.target.value)}/>
+            </div>
             <div>
                 <h3 className="sub_title">tokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>

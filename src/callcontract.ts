@@ -200,6 +200,7 @@ export class CallContract {
      */
      public approvalForAll (
         contractAbi: any,
+        baseToken: string,
         approvalAddress: any,
         account: string,
         essentialsConnector: any,
@@ -214,9 +215,8 @@ export class CallContract {
             };
             
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.stickerV2Contract : valuesOnMainNet.elastos.stickerV2Contract;
 
-            let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+            let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
             stickerContract.methods.setApprovalForAll(approvalAddress, true).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {

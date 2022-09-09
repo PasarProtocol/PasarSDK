@@ -569,7 +569,7 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(30) : null;
 
             try {
-                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, toAddr, accounts[0], essentialsConnector, gasPrice);
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, toAddr, accounts[0], essentialsConnector, gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
                 await this.getCallContext().transferNFT(PASAR_CONTRACT_ABI, accounts[0], toAddr, tokenId, baseToken, essentialsConnector, gasPrice);
@@ -625,7 +625,7 @@ export class MyProfile extends Profile {
             let priceValue = BigInt(price*1e18).toString();
             try {
                 let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
-                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
                 await this.getCallContext().createOrderForSale(accounts[0], tokenId, baseToken, priceValue, pricingToken, essentialsConnector, gasPrice);
@@ -773,7 +773,7 @@ export class MyProfile extends Profile {
 
         try {
             let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
-            await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+            await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
             progressHandler ? progressHandler(50) : null;
             await this.getCallContext().createOrderForAuction(accounts[0], baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, essentialsConnector, gasPrice);
             result = {
