@@ -8,6 +8,7 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { getChainTypeNumber } from "./global";
 import { ItemType } from "./itemtype";
 import { isTestnetNetwork } from "./networkType";
+import { NftItem } from "./nftitem";
 
 export class CallAssistService {
     /**
@@ -58,5 +59,47 @@ export class CallAssistService {
         let collection: Collection =  new Collection(dataInfo['token'], dataInfo['creatorDid'], dataInfo['owner'], dataInfo['tokenJson']['data']['avatar'], dataInfo['name'], dataInfo['tokenJson']['data']['description'], dataInfo['symbol'], collectionType, dataInfo['tokenJson']['data']['category'], dataInfo['tokenJson']['data']['socials']);
         
         return collection;
+    }
+
+    /**
+     * get the detailed collection information from address
+     *
+     * @param tokenId the id of nft
+     * @param baseToken the collection address of nft
+     */
+     public async getCollectibleByTokenId(tokenId:string, baseToken:string): Promise<NftItem> {
+        let baseUrl;
+
+        if(isTestnetNetwork()) {
+            baseUrl = valuesOnTestNet.assistURL;
+        } else {
+            baseUrl = valuesOnMainNet.assistURL;
+        }
+
+        let result  = await fetch(`${baseUrl}/api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
+
+        let jsonData = await result.json();
+        if(jsonData['code'] != 200) {
+            return null
+        }
+        let dataInfo = jsonData['data'];
+        let chainType;
+        switch(chainType) {
+            case 1:
+                chainType = ChainType.ESC;
+                break;
+            case 2:
+                chainType = ChainType.ETH;
+                break;
+            case 3:
+                chainType = ChainType.FSN;
+                break;
+            default:
+                chainType = ChainType.ESC;
+                break;
+        }
+        let itenNft: NftItem =  new NftItem(dataInfo['tokenId'], dataInfo['tokenIdHex'], dataInfo['name'], dataInfo['description'], dataInfo['thumbnail'], dataInfo['adult'], dataInfo['properties'], dataInfo['tokenJsonVersion'], chainType, dataInfo['holder'], dataInfo['royaltyOwner'], dataInfo['createTime'], parseInt(dataInfo['marketTime']), parseInt(dataInfo['endTime']), dataInfo['orderId'], dataInfo['quoteToken'], dataInfo['price'], dataInfo['buyoutPrice'], dataInfo['reservePrice'], dataInfo['minPrice'], dataInfo['orderState'], dataInfo['orderType']);
+        
+        return itenNft;
     }
 }

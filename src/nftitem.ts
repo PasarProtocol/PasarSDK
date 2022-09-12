@@ -54,4 +54,16 @@ export class NftItem {
         this.orderState = orderState;
         this.orderType = orderType;
     }
+
+    public getOrderId(): string {
+        return this.orderId.toString();
+    }
+
+    public getQuoteToken(): string {
+        return this.quoteToken.toString();
+    }
+
+    public getPrice(): string {
+        return this.price.toString();
+    }
 }

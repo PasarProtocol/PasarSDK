@@ -21,6 +21,7 @@ import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
 import { ChainType } from './chaintype';
 import { Collection } from './collection';
+import { NftItem } from './nftitem';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -694,13 +695,14 @@ export class MyProfile extends Profile {
      * Buy an item listed on marketplace
      * This function is used to buy the item with fixed price.
      *
-     * @param orderId The orderId of NFT item on maketplace
+     * @param tokenId The tokenId of NFT item on maketplace
+     * @param baseToken The collection address of NFT item
      * @param progressHandler The handler to deal with the progress on buying listed item
      * @returns The result of buying action.
      */
     public async buyItem(
-        orderId: string,
-        price: number,
+        tokenId: string,
+        baseToken: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -715,8 +717,19 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         let did = await this.getUserDid();
-        let buyoutPriceValue = Number(BigInt(price*1e18));
         try {
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            if(itemNft == null) {
+                return result = {
+                    success: false,
+                    data: "Failed to get the collection Information"
+                }
+            }
+
+            let orderId = itemNft.getOrderId();
+            let price = itemNft.getPrice();
+            let buyoutPriceValue = Number(BigInt(parseFloat(price)*1e18));
+
             await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, did, essentialsConnector, gasPrice);
             result = {
                 success: true,
