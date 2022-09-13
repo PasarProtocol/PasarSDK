@@ -66,4 +66,12 @@ export class NftItem {
     public getPrice(): string {
         return this.price.toString();
     }
+
+    public getOrderType(): string {
+        return this.orderType.toString();
+    }
+
+    public getOrderState(): string {
+        return this.orderState.toString();
+    }
 }

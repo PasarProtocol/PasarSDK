@@ -8,6 +8,7 @@ import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
 import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
+import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import { RoyaltyRate } from './RoyaltyRate';
@@ -759,5 +760,54 @@ export class CallContract {
             owner: owner
         };
         return collectionInfo;
+    }
+
+    /**
+     * buy the fixed listed nft
+     *
+     * @param account my wallet address
+     * @param price the price of allowanced the token
+     * @param quoteToken the token address of collection
+     * @param essentialsConnector essestial connector for creating web3
+     * @param gasPrice the value of gas process for calling the contract
+     * @returns result of being listed the nft
+     */
+     public async approveToken (
+        account: string,
+        price: string,
+        quoteToken: string,
+        essentialsConnector: any,
+        gasPrice: string
+    ): Promise<any> {
+        const transactionParams: TransactionParams = {
+            'from': account,
+            'gasPrice': gasPrice,
+            'gas': LimitGas,
+            'value': 0
+        };
+        console.log(price);
+        console.log(quoteToken);
+        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+        
+        let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+        let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);
+        let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress))
+        console.log(erc20BidderApproved);
+        console.log(BigInt(price));
+        if(erc20BidderApproved < BigInt(price)) {
+            let approveTxn = await erc20Contract.methods.approve(marketPlaceAddress, BigInt(price)).send(transactionParams);
+            console.log(11111111);
+            const erc20BidderApproveStatus = await approveTxn.wait();
+            if(!erc20BidderApproveStatus) {
+                return {
+                    success: false,
+                    message: `Approve Transaction Error!`
+                }
+            }
+        }
+        return {
+            success: true,
+            message: `Approve Transaction success!`
+        }
     }
 }

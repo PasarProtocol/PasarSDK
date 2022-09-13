@@ -9,7 +9,7 @@ import { Profile } from "./profile";
 import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
+import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID } from "./global";
 import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
@@ -17,6 +17,7 @@ import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
+import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
 import { ChainType } from './chaintype';
@@ -719,16 +720,27 @@ export class MyProfile extends Profile {
         let did = await this.getUserDid();
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
-            if(itemNft == null) {
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderType() != "1" || itemNft.getOrderState() != "1") {
                 return result = {
                     success: false,
-                    data: "Failed to get the collection Information"
+                    data: "You can't buy this nft"
                 }
             }
-
+            console.log(itemNft);
             let orderId = itemNft.getOrderId();
+            let quoteToken = itemNft.getQuoteToken();
             let price = itemNft.getPrice();
             let buyoutPriceValue = Number(BigInt(parseFloat(price)*1e18));
+            if(quoteToken != defaultAddress) {
+                let approveResult = await this.getCallContext().approveToken(accounts[0], price, quoteToken, essentialsConnector, gasPrice);
+                console.log(222222222);
+                if(!approveResult.success) {
+                    return result = {
+                        success: false,
+                        data: approveResult.message
+                    }
+                }
+            }
 
             await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, did, essentialsConnector, gasPrice);
             result = {

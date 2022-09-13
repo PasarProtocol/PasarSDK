@@ -83,6 +83,7 @@ export class CallAssistService {
             return null
         }
         let dataInfo = jsonData['data'];
+        console.log(dataInfo);
         let chainType;
         switch(chainType) {
             case 1:
