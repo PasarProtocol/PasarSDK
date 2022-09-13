@@ -720,6 +720,7 @@ export class MyProfile extends Profile {
         let did = await this.getUserDid();
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            console.log(itemNft);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderType() != "1" || itemNft.getOrderState() != "1") {
                 return result = {
                     success: false,
@@ -730,7 +731,7 @@ export class MyProfile extends Profile {
             let orderId = itemNft.getOrderId();
             let quoteToken = itemNft.getQuoteToken();
             let price = itemNft.getPrice();
-            let buyoutPriceValue = Number(BigInt(parseFloat(price)*1e18));
+            let buyoutPriceValue = Number(BigInt(parseFloat(price)));
             if(quoteToken != defaultAddress) {
                 let approveResult = await this.getCallContext().approveToken(accounts[0], price, quoteToken, essentialsConnector, gasPrice);
                 console.log(222222222);

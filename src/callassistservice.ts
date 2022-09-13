@@ -99,7 +99,7 @@ export class CallAssistService {
                 chainType = ChainType.ESC;
                 break;
         }
-        let itenNft: NftItem =  new NftItem(dataInfo['tokenId'], dataInfo['tokenIdHex'], dataInfo['name'], dataInfo['description'], dataInfo['thumbnail'], dataInfo['adult'], dataInfo['properties'], dataInfo['tokenJsonVersion'], chainType, dataInfo['holder'], dataInfo['royaltyOwner'], dataInfo['createTime'], parseInt(dataInfo['marketTime']), parseInt(dataInfo['endTime']), dataInfo['orderId'], dataInfo['quoteToken'], dataInfo['price'], dataInfo['buyoutPrice'], dataInfo['reservePrice'], dataInfo['minPrice'], dataInfo['orderState'], dataInfo['orderType']);
+        let itenNft: NftItem =  new NftItem(dataInfo['tokenId'], dataInfo['tokenIdHex'], dataInfo['name'], dataInfo['description'], dataInfo['thumbnail'], dataInfo['adult'], dataInfo['properties'], dataInfo['tokenJsonVersion'], chainType, dataInfo['holder'], dataInfo['royaltyOwner'], dataInfo['createTime'], parseInt(dataInfo['marketTime']), parseInt(dataInfo['endTime']), dataInfo['OrderId'], dataInfo['quoteToken'], dataInfo['Price'], dataInfo['buyoutPrice'], dataInfo['reservePrice'], dataInfo['minPrice'], dataInfo['orderState'], dataInfo['orderType']);
         
         return itenNft;
     }

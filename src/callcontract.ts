@@ -791,19 +791,13 @@ export class CallContract {
         
         let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
         let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);
-        let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress))
+        
+        let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress).call())
         console.log(erc20BidderApproved);
-        console.log(BigInt(price));
-        if(erc20BidderApproved < BigInt(price)) {
-            let approveTxn = await erc20Contract.methods.approve(marketPlaceAddress, BigInt(price)).send(transactionParams);
-            console.log(11111111);
-            const erc20BidderApproveStatus = await approveTxn.wait();
-            if(!erc20BidderApproveStatus) {
-                return {
-                    success: false,
-                    message: `Approve Transaction Error!`
-                }
-            }
+        console.log(parseInt(price));
+        let priceValue = Number(BigInt(parseFloat(price)));
+        if(erc20BidderApproved < priceValue) {
+            await erc20Contract.methods.approve(marketPlaceAddress, priceValue).send(transactionParams);
         }
         return {
             success: true,

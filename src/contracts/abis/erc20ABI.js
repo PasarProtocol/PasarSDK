@@ -1,4 +1,4 @@
-module.exports.ERC20_CONTRACT_ABI = [
+module.exports = [
     {
         type: 'function',
         stateMutability: 'view',
