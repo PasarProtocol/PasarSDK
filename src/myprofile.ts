@@ -721,20 +721,34 @@ export class MyProfile extends Profile {
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
             console.log(itemNft);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderType() != "1" || itemNft.getOrderState() != "1") {
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 return result = {
                     success: false,
                     data: "You can't buy this nft"
                 }
             }
-            console.log(itemNft);
+
             let orderId = itemNft.getOrderId();
             let quoteToken = itemNft.getQuoteToken();
-            let price = itemNft.getPrice();
-            let buyoutPriceValue = Number(BigInt(parseFloat(price)));
+
+            let buyoutPriceValue;
+            if(itemNft.getOrderType() != "1") {
+                let price = itemNft.getPrice();
+                buyoutPriceValue = Number(BigInt(parseFloat(price)));
+            } else if(itemNft.getOrderType() != "2") {
+                if(itemNft.getBuyoutPrice() == null) {
+                    return result = {
+                        success: false,
+                        data: "You can't buy this nft"
+                    }
+                } else {
+                    let price = itemNft.getBuyoutPrice();
+                    buyoutPriceValue = Number(BigInt(parseFloat(price)))
+                }
+            }
+
             if(quoteToken != defaultAddress) {
                 let approveResult = await this.getCallContext().approveToken(accounts[0], buyoutPriceValue, quoteToken, essentialsConnector, gasPrice);
-                console.log(222222222);
                 if(!approveResult.success) {
                     return result = {
                         success: false,

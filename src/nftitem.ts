@@ -74,4 +74,8 @@ export class NftItem {
     public getOrderState(): string {
         return this.orderState.toString();
     }
+
+    public getBuyoutPrice(): string {
+        return this.buyoutPrice ? this.buyoutPrice.toString() : null;
+    }
 }
