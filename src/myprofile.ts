@@ -733,7 +733,7 @@ export class MyProfile extends Profile {
             let price = itemNft.getPrice();
             let buyoutPriceValue = Number(BigInt(parseFloat(price)));
             if(quoteToken != defaultAddress) {
-                let approveResult = await this.getCallContext().approveToken(accounts[0], price, quoteToken, essentialsConnector, gasPrice);
+                let approveResult = await this.getCallContext().approveToken(accounts[0], buyoutPriceValue, quoteToken, essentialsConnector, gasPrice);
                 console.log(222222222);
                 if(!approveResult.success) {
                     return result = {
@@ -743,7 +743,7 @@ export class MyProfile extends Profile {
                 }
             }
 
-            await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, did, essentialsConnector, gasPrice);
+            await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, quoteToken, did, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId

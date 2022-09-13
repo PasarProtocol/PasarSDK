@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas } from "./constant";
+import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
 import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
@@ -411,6 +411,7 @@ export class CallContract {
         account: string,
         orderId: string,
         price: number,
+        quoteToken: string,
         did: string,
         essentialsConnector: any,
         gasPrice: string
@@ -420,7 +421,7 @@ export class CallContract {
                 'from': account,
                 'gasPrice': gasPrice,
                 'gas': LimitGas,
-                'value': price
+                'value': quoteToken == defaultAddress ? price : 0
             };
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -774,7 +775,7 @@ export class CallContract {
      */
      public async approveToken (
         account: string,
-        price: string,
+        price: number,
         quoteToken: string,
         essentialsConnector: any,
         gasPrice: string
@@ -794,10 +795,10 @@ export class CallContract {
         
         let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress).call())
         console.log(erc20BidderApproved);
-        console.log(parseInt(price));
-        let priceValue = Number(BigInt(parseFloat(price)));
-        if(erc20BidderApproved < priceValue) {
-            await erc20Contract.methods.approve(marketPlaceAddress, priceValue).send(transactionParams);
+        console.log(price);
+
+        if(erc20BidderApproved < price) {
+            await erc20Contract.methods.approve(marketPlaceAddress, price).send(transactionParams);
         }
         return {
             success: true,
