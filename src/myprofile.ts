@@ -732,10 +732,10 @@ export class MyProfile extends Profile {
             let quoteToken = itemNft.getQuoteToken();
 
             let buyoutPriceValue;
-            if(itemNft.getOrderType() != "1") {
+            if(itemNft.getOrderType() == "1") {
                 let price = itemNft.getPrice();
                 buyoutPriceValue = Number(BigInt(parseFloat(price)));
-            } else if(itemNft.getOrderType() != "2") {
+            } else if(itemNft.getOrderType() == "2") {
                 if(itemNft.getBuyoutPrice() == null) {
                     return result = {
                         success: false,
