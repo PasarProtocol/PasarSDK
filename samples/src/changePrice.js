@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { getCoinType, changePrice, changePriceOnAuction, getListType, isAuction } from "@pasarprotocol/pasar-sdk-development";
 
 const ChangePrice = () => {
-    const [orderId, setOrderId] = useState("");
+    const [tokenId, setTokenId] = useState("");
+    const [baseToken, setBaseToken] = useState("");
     const [price, setPrice] = useState("");
     const [reservePrice, setReservePrice] = useState("");
     const [buyoutPrice, setBuyoutPrice] = useState("");
@@ -31,9 +32,9 @@ const ChangePrice = () => {
         console.log(pricingToken);
         let result;
         if(isAuction(currentListType)) {
-            result = await changePriceOnAuction(orderId, price, reservePrice, buyoutPrice, pricingToken, setProgress);
+            result = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
         } else {
-            result = await changePrice(orderId, price, pricingToken, setProgress);
+            result = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
         }
         console.log(result);
         
@@ -48,8 +49,12 @@ const ChangePrice = () => {
             </select>
 
             <div>
-                <h3 className="sub_title">order</h3>
-                <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
+                <h3 className="sub_title">TokenId</h3>
+                <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
+            </div>
+            <div>
+                <h3 className="sub_title">Collection Address</h3>
+                <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
             </div>
             {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>
