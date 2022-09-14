@@ -937,7 +937,6 @@ export class MyProfile extends Profile {
                     }
                 }
             }
-
             await this.getCallContext().bidItemOnAuction(accounts[0], orderId, priceValue, quoteToken, essentialsConnector, gasPrice);
             result = {
                 success: true,

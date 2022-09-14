@@ -786,19 +786,15 @@ export class CallContract {
             'gas': LimitGas,
             'value': 0
         };
-        console.log(price);
-        console.log(quoteToken);
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
         
         let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
         let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);
         
         let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress).call())
-        console.log(erc20BidderApproved);
-        console.log(price);
 
         if(erc20BidderApproved < price) {
-            await erc20Contract.methods.approve(marketPlaceAddress, price).send(transactionParams);
+            await erc20Contract.methods.approve(marketPlaceAddress, price.toString()).send(transactionParams);
         }
         return {
             success: true,

@@ -120,7 +120,7 @@ const listItem = async (
     let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultContract:ResultCallContract = await profile.listItem(baseToken, tokenId, pricingToken, parseInt(price), handleProgress);
+        let resultContract:ResultCallContract = await profile.listItem(baseToken, tokenId, pricingToken, parseFloat(price), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -162,7 +162,7 @@ const listItemonAuction = async (
             }
         }
 
-        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseInt(minPrice), parseInt(reservePrice), parseInt(buyoutPrice), expirationTime, handleProgress);
+        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseFloat(minPrice), parseFloat(reservePrice), parseFloat(buyoutPrice), expirationTime, handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -193,7 +193,7 @@ const changePrice = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.changePrice(parseInt(orderId), pricingToken, parseInt(newPrice), handleProgress);
+        let resultContract:ResultCallContract = await profile.changePrice(parseInt(orderId), pricingToken, parseFloat(newPrice), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -226,7 +226,7 @@ const changePriceOnAuction = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.changePriceOnAuction(parseInt(orderId), pricingToken, parseInt(newMinPrice), parseInt(newReservedPrice), parseInt(newBuyoutPrice), handleProgress);
+        let resultContract:ResultCallContract = await profile.changePriceOnAuction(parseInt(orderId), pricingToken, parseFloat(newMinPrice), parseFloat(newReservedPrice), parseFloat(newBuyoutPrice), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
@@ -287,7 +287,7 @@ const bidItemOnAuction = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.bidItemOnAuction(tokenId, baseToken, parseInt(price), handleProgress);
+        let resultContract:ResultCallContract = await profile.bidItemOnAuction(tokenId, baseToken, parseFloat(price), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
