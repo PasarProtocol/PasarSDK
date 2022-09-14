@@ -451,17 +451,17 @@ export class CallContract {
         account: string,
         orderId: string,
         price: number,
+        quoteToken: string,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            let priceValue = Number(BigInt(price*1e18)).toString();
 
             const transactionParams: TransactionParams = {
                 'from': account,
                 'gasPrice': gasPrice,
                 'gas': LimitGas,
-                'value': price*1e18
+                'value': quoteToken == defaultAddress ? price : 0
             };
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -470,7 +470,7 @@ export class CallContract {
 
             let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.bidForOrder(orderId, priceValue, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+            pasarContract.methods.bidForOrder(orderId, price.toString(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)

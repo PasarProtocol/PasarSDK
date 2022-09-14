@@ -888,7 +888,8 @@ export class MyProfile extends Profile {
     /**
      * Offer a bidding price on list item that is being on auciton on marketplace.
      *
-     * @param orderId The orderId of NFT item on auction
+     * @param tokenId The tokenId of NFT item on auction
+     * @param baseToken the collectiona address of collection
      * @param value The price offered by bidder
      * @param bidderUri The uri of bidder information on IPFS storage
      * @param progressHandler The handler to deal with the progress on bidding for NFT item
@@ -896,7 +897,8 @@ export class MyProfile extends Profile {
      * @returns The result of bidding action.
      */
     public async bidItemOnAuction(
-        orderId: string,
+        tokenId: string,
+        baseToken: string,
         price: number,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
@@ -912,9 +914,31 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         
-
         try {
-            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, price, essentialsConnector, gasPrice);
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            console.log(itemNft);
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
+                return result = {
+                    success: false,
+                    data: "You can't bid to this nft"
+                }
+            }
+            let orderId = itemNft.getOrderId();
+            let quoteToken = itemNft.getQuoteToken();
+
+            let priceValue = Number(BigInt(price*1e18));
+
+            if(quoteToken != defaultAddress) {
+                let approveResult = await this.getCallContext().approveToken(accounts[0], priceValue, quoteToken, essentialsConnector, gasPrice);
+                if(!approveResult.success) {
+                    return result = {
+                        success: false,
+                        data: approveResult.message
+                    }
+                }
+            }
+
+            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, priceValue, quoteToken, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId

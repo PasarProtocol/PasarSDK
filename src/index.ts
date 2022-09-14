@@ -278,7 +278,8 @@ const buyItem = async (
 }
 
 const bidItemOnAuction = async (
-    orderId: string,
+    tokenId: string,
+    baseToken: string,
     price: string,
     handleProgress: any = null
 ) => {
@@ -286,11 +287,11 @@ const bidItemOnAuction = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.bidItemOnAuction(orderId, parseInt(price), handleProgress);
+        let resultContract:ResultCallContract = await profile.bidItemOnAuction(tokenId, baseToken, parseInt(price), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
-                data: orderId,
+                data: tokenId,
             }
         } else {
             result = {
