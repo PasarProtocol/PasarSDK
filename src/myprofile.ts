@@ -845,7 +845,9 @@ export class MyProfile extends Profile {
      *        specific auction item on marketplace
      * @returns The result of bidding action.
      */
-    public async changePriceOnAuction(orderId: number,
+    public async changePriceOnAuction(
+        tokenId: string,
+        baseToken: string,
         newPricingToken: string,
         newMinPrice: number,
         newReservedPrice: number,
@@ -869,7 +871,17 @@ export class MyProfile extends Profile {
         let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
         try {
-            await this.getCallContext().changePriceOnAuction(accounts[0], orderId, priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, essentialsConnector, gasPrice);
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            console.log(itemNft);
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
+                return result = {
+                    success: false,
+                    data: "You can't bid to this nft"
+                }
+            }
+            let orderId = itemNft.getOrderId();
+
+            await this.getCallContext().changePriceOnAuction(accounts[0], parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId
