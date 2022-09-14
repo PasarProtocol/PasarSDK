@@ -184,7 +184,8 @@ const listItemonAuction = async (
 }
 
 const changePrice = async (
-    orderId: string,
+    tokenId: string,
+    baseToken: string,
     newPrice: string,
     pricingToken: string,
     handleProgress: any = null
@@ -193,11 +194,11 @@ const changePrice = async (
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.changePrice(parseInt(orderId), pricingToken, parseFloat(newPrice), handleProgress);
+        let resultContract:ResultCallContract = await profile.changePrice(tokenId, baseToken, pricingToken, parseFloat(newPrice), handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
-                data: orderId,
+                data: tokenId,
             }
         } else {
             result = {
@@ -310,18 +311,19 @@ const bidItemOnAuction = async (
 }
 
 const settleAuction = async (
-    orderId: string,
+    tokenId: string,
+    baseToken: string,
     handleProgress: any = null
 ) => {
     let result: ResultApi;
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.settleAuction(orderId, handleProgress);
+        let resultContract:ResultCallContract = await profile.settleAuction(tokenId, baseToken, handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
-                data: orderId,
+                data: tokenId,
             }
         } else {
             result = {
@@ -339,18 +341,19 @@ const settleAuction = async (
 }
 
 const unlistItem = async (
-    orderId: string,
+    tokenId: string,
+    baseToken: string,
     handleProgress: any = null
 ) => {
     let result: ResultApi;
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.unlistItem(orderId, handleProgress);
+        let resultContract:ResultCallContract = await profile.unlistItem(tokenId, baseToken, handleProgress);
         if(resultContract.success) {
             result = {
                 success: true,
-                data: orderId,
+                data: tokenId,
             }
         } else {
             result = {

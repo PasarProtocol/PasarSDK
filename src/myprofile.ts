@@ -650,7 +650,8 @@ export class MyProfile extends Profile {
      * Change the listed price for NFT item on marketplace
      * This function would be used to change the price of listed item with fixed price.
      *
-     * @param orderId The orderId of NFT item on maketplace
+     * @param tokenId The tokenId of NFT item on maketplace
+     * @param baseToken The collection address of NFT item
      * @param newPricingToken The token address of new pricing token
      * @param newPrice The new listed price
      * @param progressHandler The handler to deal with the progress on changing price for
@@ -658,7 +659,8 @@ export class MyProfile extends Profile {
      * @returns The result of bidding action.
      */
     public async changePrice(
-        orderId: number,
+        tokenId: string,
+        baseToken: string,
         newPricingToken: string,
         newPrice: number,
         progressHandler: any): Promise<ResultCallContract> {
@@ -676,7 +678,16 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
         let priceValue = BigInt(newPrice*1e18).toString();
         try {
-            await this.getCallContext().changePrice(accounts[0], orderId, priceValue, newPricingToken, essentialsConnector, gasPrice);
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "1") {
+                return result = {
+                    success: false,
+                    data: "You can't change the price of this nft"
+                }
+            }
+            let orderId = itemNft.getOrderId();
+
+            await this.getCallContext().changePrice(accounts[0], parseInt(orderId), priceValue, newPricingToken, essentialsConnector, gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -876,7 +887,7 @@ export class MyProfile extends Profile {
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 return result = {
                     success: false,
-                    data: "You can't bid to this nft"
+                    data: "You can't change the price of this nft"
                 }
             }
             let orderId = itemNft.getOrderId();
@@ -968,11 +979,14 @@ export class MyProfile extends Profile {
     /**
      * Settle the listed NFT item on auction on marketplace
      *
-     * @param orderId The orderId of NFT item on auction
+     * @param tokenId The tokenId of NFT item on auction
+     * @param baseToken The collection address of NFT item
      * @param progressHandler The handler to deal with the progress on settling auction.
      * @returns The result of settling action.
      */
-    public async settleAuction(orderId: string,
+    public async settleAuction(
+        tokenId: string,
+        baseToken: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -987,6 +1001,16 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            console.log(itemNft);
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
+                return result = {
+                    success: false,
+                    data: "You can't settle auction to this nft"
+                }
+            }
+            let orderId = itemNft.getOrderId();
+
             await this.getCallContext().settleAuction(accounts[0], orderId, essentialsConnector, gasPrice);
             result = {
                 success: true,
@@ -1008,12 +1032,14 @@ export class MyProfile extends Profile {
      * When the item is on auction with bidding price, it would fail to call this function
      * to unlist NFT item.
      *
-     * @param orderId The orderId of NFT listed item on marketplace
+     * @param tokenId The tokenId of NFT listed item on marketplace
+     * @param baseToken The collection address of NFT iten
      * @param progressHandler The handler to deal with the progress on unlisting the NFT item.
      * @returns The result of unlisting action.
      */
     public async unlistItem(
-        orderId: string,
+        tokenId: string,
+        baseToken: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
@@ -1028,6 +1054,15 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
+            let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
+            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
+                return result = {
+                    success: false,
+                    data: "You can't unlist this nft on marketplace"
+                }
+            }
+            let orderId = itemNft.getOrderId();
+
             await this.getCallContext().unlistItem(accounts[0], orderId, essentialsConnector, gasPrice);
             result = {
                 success: true,
