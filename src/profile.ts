@@ -4,6 +4,7 @@ import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 import { CallContract } from "./callcontract";
 import { CallAssistService } from "./callassistservice";
+import { NftListInfo } from "./nftlistinfo";
 
 export class Profile {
     private appContext: AppContext = new AppContext();
@@ -32,8 +33,17 @@ export class Profile {
      * Query the listed NFTs owned by this profile.
      * @returns: A list of NFT items.
      */
-    public queryListedItems(): Promise<NftItem[]> {
-        throw new Error("Method not implemented");
+    public async queryListedItems(
+        collectionAddr:string = '',
+        pageNum: number = 1,
+        pageSize: number = 10,
+    ): Promise<NftListInfo> {
+        let result = await this.callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
+        if(result == null) {
+            throw new Error("Failed to get the listed nfts");
+        }
+        return result;
+        
     }
 
     /**
@@ -43,13 +53,13 @@ export class Profile {
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
     public queryAndDispatchListedItems(dispatcher: Dispatcher<NftItem>) {
-        return this.queryListedItems().then ( items => {
-            items.forEach(item => {
-                dispatcher.dispatch(item)
-            })
-        }).catch ( error => {
-            throw new Error(error)
-        })
+        // return this.queryListedItems().then ( items => {
+        //     items.forEach(item => {
+        //         dispatcher.dispatch(item)
+        //     })
+        // }).catch ( error => {
+        //     throw new Error(error)
+        // })
     }
 
     /**

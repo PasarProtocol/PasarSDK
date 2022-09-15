@@ -13,6 +13,7 @@ import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkCustomCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
+import { Profile } from "./profile";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -548,6 +549,20 @@ const getAccountInfo = () => {
     return getUserInfo();
 }
 
+const getListedItem = async (
+    collectionAddr = "",
+    pageNum = 1,
+    pageSize = 10,
+) => {
+    try {
+        let profile =  new Profile();
+        let info = await profile.queryListedItems(collectionAddr, pageNum, pageSize);
+        return info;
+    } catch(err) {
+        throw new Error(err);
+    }
+}
+
 export {
     initialize,
     mintNft,
@@ -573,5 +588,6 @@ export {
     getCollectionCategories,
     getAccountInfo,
     updateCollectionInfo,
-    updateCollectionRoyalties
+    updateCollectionRoyalties,
+    getListedItem
 }

@@ -9,6 +9,7 @@ import { getChainTypeNumber } from "./global";
 import { ItemType } from "./itemtype";
 import { isTestnetNetwork } from "./networkType";
 import { NftItem } from "./nftitem";
+import { NftListInfo } from "./nftlistinfo";
 
 export class CallAssistService {
     /**
@@ -18,7 +19,7 @@ export class CallAssistService {
      * @param pageNum the page number, default 1;
      * @param pageSize the count of nft per page, default value = 10;
      */
-    public async getNftsOnMarketPlace(collection = '', pageNum = 1, pageSize = 10) {
+    public async getNftsOnMarketPlace(collection = '', pageNum = 1, pageSize = 10): Promise<NftListInfo> {
         let baseUrl;
 
         if(isTestnetNetwork()) {
@@ -28,8 +29,37 @@ export class CallAssistService {
         }
 
         let result  = await fetch(`${baseUrl}/api/v2/sticker/getDetailedCollectibles?collectionType=${collection}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`);
+        let jsonData = await result.json();
+        if(jsonData['code'] != 200) {
+            return null
+        }
+        let dataInfo = jsonData['data'];
+        console.log(dataInfo);
+        let totalCount = dataInfo['total'];
+        let nftData = dataInfo['result'];
+        let listNftInfo: NftItem[] = [];
+        for(var i = 0; i < nftData.length; i++) {
+            let chainType;
+            switch(nftData[i]['marketPlace']) {
+                case 1:
+                    chainType = ChainType.ESC;
+                    break;
+                case 2:
+                    chainType = ChainType.ETH;
+                    break;
+                case 3:
+                    chainType = ChainType.FSN;
+                    break;
+                default:
+                    chainType = ChainType.ESC;
+                    break;
+            }
 
-        return result;
+            let itemNft: NftItem =  new NftItem(nftData[i]['tokenId'], nftData[i]['tokenIdHex'], nftData[i]['name'], nftData[i]['description'], nftData[i]['thumbnail'], nftData[i]['adult'], nftData[i]['properties'], nftData[i]['tokenJsonVersion'], chainType, nftData[i]['holder'], nftData[i]['royaltyOwner'], nftData[i]['createTime'], parseInt(nftData[i]['marketTime']), parseInt(nftData[i]['endTime']), nftData[i]['orderId'], nftData[i]['quoteToken'], nftData[i]['price'], nftData[i]['buyoutPrice'], nftData[i]['reservePrice'], nftData[i]['minPrice'], nftData[i]['orderState'], nftData[i]['orderType']);
+            listNftInfo.push(itemNft);
+        }
+        let listInfo = new NftListInfo(totalCount, listNftInfo);
+        return listInfo;
     }
 
     /**
@@ -85,7 +115,7 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         console.log(dataInfo);
         let chainType;
-        switch(chainType) {
+        switch(dataInfo['marketPlace']) {
             case 1:
                 chainType = ChainType.ESC;
                 break;
