@@ -1,6 +1,6 @@
 
-import React, {useState} from 'react'
-import { signin, signout, checkSign } from '@pasarprotocol/pasar-sdk-development';
+import React, {useEffect, useState} from 'react'
+import { signin, signout, checkSign, getListedItem } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
@@ -8,6 +8,11 @@ import {
 function SigninEE() {
   const navigate = useNavigate();
   const [login, setLogin] = useState(checkSign());
+
+  const getListItem = async () => {
+    let result = await getListedItem();
+    console.log(result);
+  }
 
   const handleSigninEE1 = async () => {
     let result = await signin();
@@ -28,6 +33,7 @@ function SigninEE() {
     <div>
         <button onClick={handleSigninEE1}>Sign in with EE</button>
         {/* <button onClick={handleSigninMM}>Sign in with MM</button> */}
+        <button onClick={getListItem}>Get Listed Nfts</button>
     </div> :
     <div>
         <button onClick={handleSignout}>Sign out</button>
@@ -44,6 +50,7 @@ function SigninEE() {
           <button onClick={()=> handleClickButton('/unlist')}>Unlist NFT</button>
           <button onClick={()=> handleClickButton('/createcollection')}>Create Collection</button>
           <button onClick={()=> handleClickButton('/updatecollectioninfo')}>Update Collection Info</button>
+          
         </div>
         
     </div>
