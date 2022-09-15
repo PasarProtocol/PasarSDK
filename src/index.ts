@@ -14,6 +14,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { checkCustomCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
+import { CallAssistService } from "./callassistservice";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -555,8 +556,8 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let profile =  new Profile();
-        let info = await profile.queryListedItems(collectionAddr, pageNum, pageSize);
+        let callAssistService =  new CallAssistService();
+        let info = await callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
         throw new Error(err);
@@ -569,6 +570,18 @@ const getOwnedCollection = async (
     try {
         let profile =  new Profile();
         let info = await profile.queryCollections(walletAddr);
+        return info;
+    } catch(err) {
+        throw new Error(err);
+    }
+}
+
+const getOwnedListedItem = async (
+    walletAddr: string
+) => {
+    try {
+        let profile =  new Profile();
+        let info = await profile.queryListedItems(walletAddr);
         return info;
     } catch(err) {
         throw new Error(err);
@@ -602,5 +615,6 @@ export {
     updateCollectionInfo,
     updateCollectionRoyalties,
     getListedItem,
-    getOwnedCollection
+    getOwnedCollection,
+    getOwnedListedItem
 }

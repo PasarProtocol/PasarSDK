@@ -34,16 +34,13 @@ export class Profile {
      * @returns: A list of NFT items.
      */
     public async queryListedItems(
-        collectionAddr:string = '',
-        pageNum: number = 1,
-        pageSize: number = 10,
-    ): Promise<NftListInfo> {
-        let result = await this.callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
+        walletAddr:string,
+    ): Promise<NftItem[]> {
+        let result = await this.callAssistService.getOwnedListedNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the listed nfts");
         }
         return result;
-        
     }
 
     /**

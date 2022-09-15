@@ -7,7 +7,7 @@ export class NftItem {
     private name: string;
     private description: string;
     private thumbnail: string;
-    private asset: string;
+    private image: string;
     private baseToken: string;
     private sensitive: boolean;
     private properties: any;
@@ -27,7 +27,7 @@ export class NftItem {
     private orderState: any;
     private orderType: any;
 
-    constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, sesitive: boolean, properties: any,
+    constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
         tokenVersion: number, marketPlace: ChainType, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
         orderId: any = null, quoteToken: any = null, price: any = null, buyoutPrice: any = null, reservePrice: any = null, minPrice: any = null, orderState: any = null, orderType: any = null) {
         
@@ -36,6 +36,7 @@ export class NftItem {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.image = image;
         this.sensitive = sesitive;
         this.properties = properties;
         this.tokenVersion = tokenVersion;
