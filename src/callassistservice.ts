@@ -133,4 +133,37 @@ export class CallAssistService {
         
         return itenNft;
     }
+
+    /**
+     * get owned collections
+     *
+     * @param walletAddr the address whom be owned the nft
+     * @return back the list of owned collection
+     */
+    public async getOwnedCollection(
+        walletAddr: string
+    ): Promise<Collection[]> {
+        let baseUrl;
+
+        if(isTestnetNetwork()) {
+            baseUrl = valuesOnTestNet.assistURL;
+        } else {
+            baseUrl = valuesOnMainNet.assistURL;
+        }
+
+        let result  = await fetch(`${baseUrl}/api/v2/sticker/getCollectionByOwner/${walletAddr}?marketPlace=1`);
+        let jsonData = await result.json();
+        if(jsonData['code'] != 200) {
+            return null
+        }
+        let dataInfo = jsonData['data'];
+        let listCollection: Collection[] = [];
+        for(var i = 0; i < dataInfo.length; i++) {
+            let collectionType = dataInfo[i]['is721'] ? ItemType.ERC721 : ItemType.ERC1155;
+            let collection: Collection =  new Collection(dataInfo[i]['token'], dataInfo[i]['creatorDid'], dataInfo[i]['owner'], dataInfo[i]['tokenJson']['data']['avatar'], dataInfo[i]['name'], dataInfo[i]['tokenJson']['data']['description'], dataInfo[i]['symbol'], collectionType, dataInfo[i]['tokenJson']['data']['category'], dataInfo[i]['tokenJson']['data']['socials']);
+            listCollection.push(collection);
+        }
+        
+        return listCollection;
+    }
 }

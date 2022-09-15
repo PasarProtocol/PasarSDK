@@ -156,10 +156,17 @@ export class Profile {
 
     /**
      * Fetch all the collection regsitered onto Pasar marketplace
+     * @param walletAddr the address whom be owned the nft
      * @returns: A list of NFT items.
      */
-     public queryCollections(): Promise<Collection[]> {
-        throw new Error("Method not implemented");
+     public async queryCollections(
+        walletAddr: string
+     ): Promise<Collection[]> {
+        let result = await this.callAssistService.getOwnedCollection(walletAddr);
+        if(result == null) {
+            throw new Error("Failed to get the listed nfts");
+        }
+        return result;
     }
 
     /**
@@ -168,12 +175,12 @@ export class Profile {
      * @param dispatcher The dispatcher routine to deal with the NFT item.
      */
      public fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
-        return this.queryCollections().then ( collections => {
-            collections.forEach(item => {
-                dispatcher.dispatch(item)
-            })
-        }).catch ( error => {
-            throw new Error(error)
-        })
+        // return this.queryCollections().then ( collections => {
+        //     collections.forEach(item => {
+        //         dispatcher.dispatch(item)
+        //     })
+        // }).catch ( error => {
+        //     throw new Error(error)
+        // })
     }
 }

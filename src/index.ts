@@ -563,6 +563,18 @@ const getListedItem = async (
     }
 }
 
+const getOwnedCollection = async (
+    walletAddr: string
+) => {
+    try {
+        let profile =  new Profile();
+        let info = await profile.queryCollections(walletAddr);
+        return info;
+    } catch(err) {
+        throw new Error(err);
+    }
+}
+
 export {
     initialize,
     mintNft,
@@ -589,5 +601,6 @@ export {
     getAccountInfo,
     updateCollectionInfo,
     updateCollectionRoyalties,
-    getListedItem
+    getListedItem,
+    getOwnedCollection
 }
