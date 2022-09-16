@@ -1,6 +1,6 @@
 
 import React, {useEffect, useState} from 'react'
-import { signin, signout, checkSign, getListedItem, getOwnedCollection, getOwnedListedItem, getOwnedItem, getCreatedItem, getBiddingItem } from '@pasarprotocol/pasar-sdk-development';
+import { signin, signout, checkSign, getListedItem, getOwnedCollection, getOwnedListedItem, getOwnedItem, getCreatedItem, getBiddingItem, getSoldItem } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
@@ -39,6 +39,11 @@ function SigninEE() {
     console.log(result);
   }
 
+  const handleGetSoldNft = async () => {
+    let result = await getSoldItem("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    console.log(result);
+  }
+
   const handleSigninEE1 = async () => {
     let result = await signin();
     setLogin(checkSign());
@@ -64,6 +69,7 @@ function SigninEE() {
         <button onClick={handleGetOwnedNft}>Get Owned Nft</button>
         <button onClick={handleGetCreatedNft}>Get Created Nft</button>
         <button onClick={handleGetBiddingNft}>Get Bidding Nft</button>
+        <button onClick={handleGetSoldNft}>Get Sold Nft</button>
     </div> :
     <div>
         <button onClick={handleSignout}>Sign out</button>
