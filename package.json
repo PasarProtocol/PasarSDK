@@ -1,6 +1,6 @@
 {
   "name": "@pasarprotocol/pasar-sdk-development",
-  "version": "0.0.93",
+  "version": "0.0.97",
   "description": "PasarProtocol NFT Marketplace SDK",
   "exports": {
     "node": "./dist/pasar-sdk.js",
@@ -21,6 +21,8 @@
     "build": "npm run build:release",
     "build:debug": "npm run clean && npm run types && rollup -c",
     "build:release": "npm run lint && npm run clean && npm run types && rollup -c --environment prodbuild",
+    "update": "npm publish && npm run reinstall",
+    "reinstall": "cd ./samples && npm uninstall @pasarprotocol/pasar-sdk-development && npm i @pasarprotocol/pasar-sdk-development",
     "dev": "rollup -c -w",
     "clean": "rm -rf ./dist ./typings ./generated",
     "types": "npm run clean && tsc --emitDeclarationOnly --outDir typings/ --project tsconfig.types.json",
