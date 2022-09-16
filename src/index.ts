@@ -612,6 +612,18 @@ const getCreatedItem = async (
     }
 }
 
+const getBiddingItem = async (
+    walletAddr: string
+) => {
+    try {
+        let profile =  new Profile();
+        let info = await profile.queryBiddingItems(walletAddr);
+        return info;
+    } catch(err) {
+        throw new Error(err);
+    }
+}
+
 export {
     initialize,
     mintNft,
@@ -642,5 +654,6 @@ export {
     getOwnedCollection,
     getOwnedListedItem,
     getOwnedItem,
-    getCreatedItem
+    getCreatedItem,
+    getBiddingItem,
 }
