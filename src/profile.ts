@@ -115,10 +115,15 @@ export class Profile {
 
     /**
      * Fetch the created NFTs by this profile.
+     * @param walletAddr the wallet address of user
      * @returns: A list of NFT items.
      */
-     public queryCreatedItems(): Promise<NftItem[]> {
-        throw new Error("Method not implemented");
+     public async queryCreatedItems(walletAddr: string): Promise<NftItem[]> {
+        let result = await this.callAssistService.getCreatedNft(walletAddr);
+        if(result == null) {
+            throw new Error("Failed to get the created nfts");
+        }
+        return result;
     }
 
     /**
@@ -127,13 +132,13 @@ export class Profile {
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
      public queryAndDispatchCreatedItems(dispatcher: Dispatcher<NftItem>) {
-        return this.queryCreatedItems().then ( items => {
-            items.forEach(item => {
-                dispatcher.dispatch(item)
-            })
-        }).catch ( error => {
-            throw new Error(error)
-        })
+        // return this.queryCreatedItems().then ( items => {
+        //     items.forEach(item => {
+        //         dispatcher.dispatch(item)
+        //     })
+        // }).catch ( error => {
+        //     throw new Error(error)
+        // })
     }
 
     /**
