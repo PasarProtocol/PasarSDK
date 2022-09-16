@@ -31,6 +31,7 @@ export class Profile {
 
     /**
      * Query the listed NFTs owned by this profile.
+     * @param walletAddr the wallet address of user
      * @returns: A list of NFT items.
      */
     public async queryListedItems(
@@ -61,10 +62,17 @@ export class Profile {
 
     /**
      * Fetch the owned NFTs by this profile.
+     * @param walletAddr the wallet address of user
      * @returns: A list of NFT items.
      */
-    public queryOwnedItems(): Promise<NftItem[]> {
-        throw new Error("Method not implemented");
+    public async queryOwnedItems(
+        walletAddr:string,
+    ): Promise<NftItem[]> {
+        let result = await this.callAssistService.getOwnedNft(walletAddr);
+        if(result == null) {
+            throw new Error("Failed to get the owned nfts");
+        }
+        return result;
     }
 
     /**
@@ -73,13 +81,13 @@ export class Profile {
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
      public queryAndDispatchOwnedItems(dispatcher: Dispatcher<NftItem>) {
-        return this.queryOwnedItems().then ( items => {
-            items.forEach(item => {
-                dispatcher.dispatch(item)
-            })
-        }).catch ( error => {
-            throw new Error(error)
-        })
+        // return this.queryOwnedItems().then ( items => {
+        //     items.forEach(item => {
+        //         dispatcher.dispatch(item)
+        //     })
+        // }).catch ( error => {
+        //     throw new Error(error)
+        // })
     }
 
     /**

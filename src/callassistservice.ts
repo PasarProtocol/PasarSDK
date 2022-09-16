@@ -220,4 +220,52 @@ export class CallAssistService {
         
         return listNftInfo;
     }
+
+    /**
+     * get owned nfts on Pasar marketplace.
+     *
+     * @param walletAddr the address of user
+     */
+     public async getOwnedNft(walletAddr: string): Promise<NftItem[]> {
+        let baseUrl;
+
+        if(isTestnetNetwork()) {
+            baseUrl = valuesOnTestNet.assistURL;
+        } else {
+            baseUrl = valuesOnMainNet.assistURL;
+        }
+
+        let result  = await fetch(`${baseUrl}/api/v2/sticker/getOwnCollectiblesByAddress/${walletAddr}?orderType=0`);
+        let jsonData = await result.json();
+        if(jsonData['code'] != 200) {
+            return null
+        }
+        let dataInfo = jsonData['data'];
+        let listNftInfo: NftItem[] = [];
+        for(var i = 0; i < dataInfo.length; i++) {
+            let chainType;
+            switch(dataInfo[i]['marketPlace']) {
+                case 1:
+                    chainType = ChainType.ESC;
+                    break;
+                case 2:
+                    chainType = ChainType.ETH;
+                    break;
+                case 3:
+                    chainType = ChainType.FSN;
+                    break;
+                default:
+                    chainType = ChainType.ESC;
+                    break;
+            }
+
+            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
+            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            listNftInfo.push(itemNft);
+        }
+        
+        return listNftInfo;
+    }
 }
