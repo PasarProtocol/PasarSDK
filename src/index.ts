@@ -11,7 +11,7 @@ import { ListType } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
-import { checkCustomCollection, StringIsNumber } from "./global";
+import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
 import { CallAssistService } from "./callassistservice";
@@ -37,7 +37,7 @@ const mintNft = async (
         let resultMetadata:ResultOnIpfs = await profile.createItemMetadata(itemName, itemDescription, itemImage, baseToken, properties, sensitive, handleProgress);
 
         if(resultMetadata.success == true) {
-            if(!checkCustomCollection(baseToken))
+            if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
                 resultContract = await profile.createItemWithRoyalties(baseToken, resultMetadata.medadata, royaltyFee, handleProgress);
             else 
                 resultContract = await profile.creatItem(baseToken, resultMetadata.medadata, handleProgress);

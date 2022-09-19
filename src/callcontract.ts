@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection } from "./global";
 import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
@@ -58,11 +58,22 @@ export class CallContract {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-            pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
-                resolve(receipt);
-            }).on('error', (error) => {
-                reject(error)
-            });
+            if(checkPasarCollection(contractAddress)) {
+                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
+                    resolve(receipt);
+                }).on('error', (error) => {
+                    reject(error)
+                });
+            } else if(checkFeedsCollection(contractAddress)) {
+                let jsonDid:UserInfo = getUserInfo();
+
+                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+                    resolve(receipt);
+                }).on('error', (error) => {
+                    reject(error)
+                });
+            }
+                
         })
     }
 

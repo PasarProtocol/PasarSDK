@@ -116,11 +116,19 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
     return signedData
 }
 
-const checkCustomCollection = (address) => {
-    if(address == valuesOnMainNet.elastos.stickerContract || address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnMainNet.elastos.stickerContract || address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerV2Contract) {
-        return false;
-    } else {
+const checkFeedsCollection = (address) => {
+    if(address == valuesOnMainNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerContract) {
         return true;
+    } else {
+        return false;
+    }
+}
+
+const checkPasarCollection = (address) => {
+    if(address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerV2Contract) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -156,7 +164,8 @@ export {
     getFilteredGasPrice,
     requestSigndataOnTokenID,
     StringIsNumber,
-    checkCustomCollection,
+    checkPasarCollection,
+    checkFeedsCollection,
     getChainTypeNumber,
     getChainTypeString,
 }

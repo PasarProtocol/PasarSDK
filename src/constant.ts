@@ -17,9 +17,9 @@ export namespace valuesOnTestNet {
 }
 
 export namespace valuesOnMainNet {
-    export var assistURL = "https://assist.pasarprotocol.io";
+    export const assistURL = "https://assist.pasarprotocol.io";
 
-    export var elastos: any = {
+    export const elastos: any = {
         pasarContract: '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0',
         stickerContract: '0x020c7303664bc88ae92cE3D380BF361E03B78B81',
         pasarMarketPlaceContract: '0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998',
@@ -30,7 +30,7 @@ export namespace valuesOnMainNet {
         chainType: 1,
     }
 
-    export var urlIPFS = "https://ipfs.pasarprotocol.io";
+    export const urlIPFS = "https://ipfs.pasarprotocol.io";
     export const didApplication = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY";
 }
 

@@ -9,11 +9,12 @@ import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection } from "./global";
 import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
+import FEED_CONTRACT_ABI from './contracts/abis/stickerABI';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_20_ABI from './contracts/abis/erc20ABI';
@@ -458,7 +459,11 @@ export class MyProfile extends Profile {
         handleProgress ? handleProgress(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            await this.getCallContext().mintFunction(PASAR_CONTRACT_ABI, baseToken, account, tokenId, 1, tokenUri, roylatyFee, this.getEssentialConnector(), gasPrice);
+            let abiFile = PASAR_CONTRACT_ABI;
+
+            if(checkFeedsCollection(baseToken))
+                abiFile = FEED_CONTRACT_ABI;
+            await this.getCallContext().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
