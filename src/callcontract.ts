@@ -18,6 +18,16 @@ import { ItemType } from './itemtype';
  * This class is to call the contract functions
  */
 export class CallContract {
+
+    private getTransactionParam(account: string, gasPrice: string, price: number = 0): TransactionParams {
+        const transactionParams: TransactionParams = {
+            'from': account,
+            'gasPrice': gasPrice,
+            'gas': LimitGas,
+            'value': price
+        };
+        return transactionParams;
+    }
     /**
      * call the mint function on contract
      *
@@ -43,12 +53,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
@@ -82,12 +87,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
@@ -130,12 +130,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
@@ -169,12 +164,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             let jsonDid:UserInfo = getUserInfo();
 
@@ -208,12 +198,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
             
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
@@ -245,12 +230,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
             
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
@@ -290,12 +270,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             let minPriceValue = BigInt(minPrice*1e18).toString();
             let reservePriceValue = BigInt(reservePrice*1e18).toString();
@@ -336,12 +311,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -379,12 +349,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -417,12 +382,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': quoteToken == defaultAddress ? price : 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -456,13 +416,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': quoteToken == defaultAddress ? price : 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -494,12 +448,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -531,12 +480,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -627,12 +571,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -672,12 +611,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -710,12 +644,7 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = {
-                'from': account,
-                'gasPrice': gasPrice,
-                'gas': LimitGas,
-                'value': 0
-            };
+            const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
@@ -780,12 +709,7 @@ export class CallContract {
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
-        const transactionParams: TransactionParams = {
-            'from': account,
-            'gasPrice': gasPrice,
-            'gas': LimitGas,
-            'value': 0
-        };
+        const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
         
         let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
