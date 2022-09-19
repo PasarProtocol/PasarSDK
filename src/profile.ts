@@ -4,17 +4,37 @@ import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 import { CallContract } from "./callcontract";
 import { CallAssistService } from "./callassistservice";
-import { NftListInfo } from "./nftlistinfo";
+import { isInAppBrowser} from "./global";
+import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
+import Web3 from "web3";
 
 export class Profile {
     private appContext: AppContext = new AppContext();
     private callContract: CallContract = new CallContract();
     private callAssistService: CallAssistService = new CallAssistService();
-    private walletAddr: string;
-    private userDid: string;
+    private essentialsConnector: EssentialsConnector;
+    private walletConnectWeb3: Web3;
 
     constructor() {
+        this.essentialsConnector = new EssentialsConnector();
+        this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider());
+    }
 
+    protected getEssentialConnector(): EssentialsConnector {
+        return this.essentialsConnector;
+    }
+
+    protected getWeb3Connector(): Web3 {
+        return this.walletConnectWeb3;
+    }
+
+    protected getWalletAddress(): Promise<string> {
+        let accounts = this.walletConnectWeb3.eth.getAccounts();
+        return accounts[0];
+    }
+
+    protected getGasPrice(): Promise<string> {
+        return this.walletConnectWeb3.eth.getGasPrice()
     }
 
     protected getAppContext(): AppContext {

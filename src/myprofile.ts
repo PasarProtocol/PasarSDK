@@ -2,7 +2,6 @@ import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import bs58 from 'bs58';
-import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
@@ -47,12 +46,9 @@ export class MyProfile extends Profile {
         itemType: ItemType,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
-        const essentialsConnector = new EssentialsConnector();
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         const tokenStandard = {
             "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
@@ -60,7 +56,7 @@ export class MyProfile extends Profile {
         }
         console.log(tokenStandard[itemType]);
         try {
-            let collectionAddress = await this.getCallContext().createCollection(accounts[0], name, symbol, collectionUri, tokenStandard[itemType], essentialsConnector, gasPrice);
+            let collectionAddress = await this.getCallContext().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: collectionAddress
@@ -182,23 +178,20 @@ export class MyProfile extends Profile {
         royaltyRates: RoyaltyRate[],
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
-        const essentialsConnector = new EssentialsConnector();
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, essentialsConnector);
-            if(collectionInfo.owner.toLowerCase() != accounts[0].toLowerCase()) {
+            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 return result = {
                     success: false,
                     data: "You can't register this collection"
                 }
             }
-            await this.getCallContext().registerCollection(accounts[0], tokenAddress, collectionInfo.name, collectionUri, royaltyRates, essentialsConnector, gasPrice);
+            await this.getCallContext().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenAddress
@@ -229,23 +222,20 @@ export class MyProfile extends Profile {
         collectionUri: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
-        const essentialsConnector = new EssentialsConnector();
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, essentialsConnector);
-            if(collectionInfo.owner.toLowerCase() != accounts[0].toLowerCase()) {
+            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 return result = {
                     success: false,
                     data: "You can't update the information of this collection"
                 }
             }
-            await this.getCallContext().updateCollection(accounts[0], tokenAddress, name, collectionUri, essentialsConnector, gasPrice);
+            await this.getCallContext().updateCollection(account, tokenAddress, name, collectionUri, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenAddress
@@ -274,23 +264,20 @@ export class MyProfile extends Profile {
         royaltyRates: RoyaltyRate[],
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
-        const essentialsConnector = new EssentialsConnector();
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, essentialsConnector);
-            if(collectionInfo.owner.toLowerCase() != accounts[0].toLowerCase()) {
+            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 return result = {
                     success: false,
                     data: "You can't update the royalties of this collection"
                 }
             }
-            await this.getCallContext().updateCollectionRoyalties(accounts[0], tokenAddress, royaltyRates, essentialsConnector, gasPrice);
+            await this.getCallContext().updateCollectionRoyalties(account, tokenAddress, royaltyRates, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenAddress
@@ -413,15 +400,9 @@ export class MyProfile extends Profile {
         tokenUri: string,
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const essentialsConnector = new EssentialsConnector();
-
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(50) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
@@ -435,7 +416,7 @@ export class MyProfile extends Profile {
             }
             let collectionType = collection.getERCStandard();
 
-            await this.getCallContext().mintFunctionOnCustomCollection(baseToken, accounts[0], tokenId, collectionType, tokenUri, essentialsConnector, gasPrice);
+            await this.getCallContext().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
@@ -470,20 +451,14 @@ export class MyProfile extends Profile {
         handleProgress:any = null
     ): Promise<ResultCallContract> {
         let result: ResultCallContract;
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const essentialsConnector = new EssentialsConnector();
-
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        handleProgress ? handleProgress(50) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            await this.getCallContext().mintFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, 1, tokenUri, roylatyFee, essentialsConnector, gasPrice);
+            await this.getCallContext().mintFunction(PASAR_CONTRACT_ABI, baseToken, account, tokenId, 1, tokenUri, roylatyFee, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
@@ -515,19 +490,13 @@ export class MyProfile extends Profile {
         totalSupply: number,
         handleProgress:any = null): Promise<ResultCallContract> {
         let result: ResultCallContract;
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const essentialsConnector = new EssentialsConnector();
-
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        handleProgress ? handleProgress(50) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            await this.getCallContext().deleteFunction(PASAR_CONTRACT_ABI, baseToken, accounts[0], tokenId, totalSupply, essentialsConnector, gasPrice);
+            await this.getCallContext().deleteFunction(PASAR_CONTRACT_ABI, baseToken, account, tokenId, totalSupply, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
@@ -559,22 +528,17 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<boolean> {
             let result: boolean;
 
-            const essentialsConnector = new EssentialsConnector();
+            let account = await this.getWalletAddress();
+            let gasPrice = await this.getGasPrice();
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-            let accounts = await walletConnectWeb3.eth.getAccounts();
-            progressHandler ? progressHandler(20) : null;
-
-            let gasPrice = await walletConnectWeb3.eth.getGasPrice();
             gasPrice = getFilteredGasPrice(gasPrice);
             progressHandler ? progressHandler(30) : null;
 
             try {
-                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, toAddr, accounts[0], essentialsConnector, gasPrice);
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, toAddr, account, this.getEssentialConnector(), gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await this.getCallContext().transferNFT(PASAR_CONTRACT_ABI, accounts[0], toAddr, tokenId, baseToken, essentialsConnector, gasPrice);
+                await this.getCallContext().transferNFT(PASAR_CONTRACT_ABI, account, toAddr, tokenId, baseToken, this.getEssentialConnector(), gasPrice);
                 result = true
                 progressHandler ? progressHandler(100) : null;
             } catch(err) {
@@ -614,23 +578,18 @@ export class MyProfile extends Profile {
         progressHandler: any=null): Promise<ResultCallContract> {
             let result: ResultCallContract;
 
-            const essentialsConnector = new EssentialsConnector();
+            let account = await this.getWalletAddress();
+            let gasPrice = await this.getGasPrice();
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-            let accounts = await walletConnectWeb3.eth.getAccounts();
-            progressHandler ? progressHandler(20) : null;
-
-            let gasPrice = await walletConnectWeb3.eth.getGasPrice();
             gasPrice = getFilteredGasPrice(gasPrice);
             progressHandler ? progressHandler(30) : null;
             let priceValue = BigInt(price*1e18).toString();
             try {
                 let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
-                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await this.getCallContext().createOrderForSale(accounts[0], tokenId, baseToken, priceValue, pricingToken, essentialsConnector, gasPrice);
+                await this.getCallContext().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, this.getEssentialConnector(), gasPrice);
                 result = {
                     success: true,
                     data: tokenId
@@ -666,14 +625,9 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         let priceValue = BigInt(newPrice*1e18).toString();
@@ -687,7 +641,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await this.getCallContext().changePrice(accounts[0], parseInt(orderId), priceValue, newPricingToken, essentialsConnector, gasPrice);
+            await this.getCallContext().changePrice(account, parseInt(orderId), priceValue, newPricingToken, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -718,14 +672,9 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         let did = await this.getUserDid();
@@ -759,7 +708,7 @@ export class MyProfile extends Profile {
             }
 
             if(quoteToken != defaultAddress) {
-                let approveResult = await this.getCallContext().approveToken(accounts[0], buyoutPriceValue, quoteToken, essentialsConnector, gasPrice);
+                let approveResult = await this.getCallContext().approveToken(account, buyoutPriceValue, quoteToken, this.getEssentialConnector(), gasPrice);
                 if(!approveResult.success) {
                     return result = {
                         success: false,
@@ -768,7 +717,7 @@ export class MyProfile extends Profile {
                 }
             }
 
-            await this.getCallContext().buyItem(accounts[0], orderId, buyoutPriceValue, quoteToken, did, essentialsConnector, gasPrice);
+            await this.getCallContext().buyItem(account, orderId, buyoutPriceValue, quoteToken, did, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -811,22 +760,17 @@ export class MyProfile extends Profile {
     ): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
 
         try {
             let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
-            await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, accounts[0], essentialsConnector, gasPrice);
+            await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(50) : null;
-            await this.getCallContext().createOrderForAuction(accounts[0], baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, essentialsConnector, gasPrice);
+            await this.getCallContext().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
@@ -867,14 +811,9 @@ export class MyProfile extends Profile {
 
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         let priceValue = BigInt(newMinPrice*1e18).toString();
@@ -892,7 +831,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await this.getCallContext().changePriceOnAuction(accounts[0], parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, essentialsConnector, gasPrice);
+            await this.getCallContext().changePriceOnAuction(account, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -926,14 +865,9 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         
@@ -952,7 +886,7 @@ export class MyProfile extends Profile {
             let priceValue = Number(BigInt(price*1e18));
 
             if(quoteToken != defaultAddress) {
-                let approveResult = await this.getCallContext().approveToken(accounts[0], priceValue, quoteToken, essentialsConnector, gasPrice);
+                let approveResult = await this.getCallContext().approveToken(account, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
                 if(!approveResult.success) {
                     return result = {
                         success: false,
@@ -960,7 +894,7 @@ export class MyProfile extends Profile {
                     }
                 }
             }
-            await this.getCallContext().bidItemOnAuction(accounts[0], orderId, priceValue, quoteToken, essentialsConnector, gasPrice);
+            await this.getCallContext().bidItemOnAuction(account, orderId, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -990,14 +924,9 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
@@ -1011,7 +940,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await this.getCallContext().settleAuction(accounts[0], orderId, essentialsConnector, gasPrice);
+            await this.getCallContext().settleAuction(account, orderId, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
@@ -1043,14 +972,9 @@ export class MyProfile extends Profile {
         progressHandler: any): Promise<ResultCallContract> {
         let result: ResultCallContract;
 
-        const essentialsConnector = new EssentialsConnector();
+        let account = await this.getWalletAddress();
+        let gasPrice = await this.getGasPrice();
 
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-
-        let accounts = await walletConnectWeb3.eth.getAccounts();
-        progressHandler ? progressHandler(20) : null;
-
-        let gasPrice = await walletConnectWeb3.eth.getGasPrice();
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
@@ -1063,7 +987,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await this.getCallContext().unlistItem(accounts[0], orderId, essentialsConnector, gasPrice);
+            await this.getCallContext().unlistItem(account, orderId, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: orderId
