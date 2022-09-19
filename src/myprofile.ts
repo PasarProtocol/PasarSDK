@@ -552,10 +552,20 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(30) : null;
 
             try {
-                await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, toAddr, account, this.getEssentialConnector(), gasPrice);
+                let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+                if(collection == null) {
+                    return false;
+                }
+                
+                let collectionType = collection.getERCStandard();
+                let abiFile = PASAR_CONTRACT_ABI;
+                if(collectionType == ItemType.ERC721) 
+                    abiFile = TOKEN_721_ABI;
+                    
+                await this.getCallContext().approvalForAll(abiFile, baseToken, toAddr, account, this.getEssentialConnector(), gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await this.getCallContext().transferNFT(PASAR_CONTRACT_ABI, account, toAddr, tokenId, baseToken, this.getEssentialConnector(), gasPrice);
+                await this.getCallContext().transferNFT(abiFile, account, toAddr, tokenId, baseToken, collectionType, this.getEssentialConnector(), gasPrice);
                 result = true
                 progressHandler ? progressHandler(100) : null;
             } catch(err) {

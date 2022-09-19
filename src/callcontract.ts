@@ -242,6 +242,7 @@ export class CallContract {
         toAddress: string,
         tokenId: string,
         baseToken: string,
+        collectionType: string,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
@@ -251,7 +252,11 @@ export class CallContract {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
             let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
-            stickerContract.methods.safeTransferFrom(account, toAddress, tokenId, 1).send(transactionParams).on('receipt', (receipt) => {
+            let transferFunction = stickerContract.methods.safeTransferFrom(account, toAddress, tokenId, 1);
+            if(collectionType == ItemType.ERC721)
+                transferFunction = stickerContract.methods.safeTransferFrom(account, toAddress, tokenId);
+                
+            transferFunction.send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
