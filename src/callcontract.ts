@@ -137,6 +137,7 @@ export class CallContract {
         account: string,
         tokenId: string,
         totalSupply: number,
+        collectionType: string,
         essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
@@ -146,7 +147,11 @@ export class CallContract {
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-            pasarContract.methods.burn(tokenId, totalSupply).send(transactionParams).on('receipt', (receipt) => {
+            let burnFunction = pasarContract.methods.burn(tokenId, totalSupply);
+            if(!checkFeedsCollection(contractAddress) && !checkPasarCollection(contractAddress) && collectionType == ItemType.ERC721) {
+                pasarContract.methods.burn(tokenId);
+            }
+            burnFunction.send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)

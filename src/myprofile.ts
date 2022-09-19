@@ -501,7 +501,19 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            await this.getCallContext().deleteFunction(PASAR_CONTRACT_ABI, baseToken, account, tokenId, totalSupply, this.getEssentialConnector(), gasPrice);
+            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+            if(collection == null) {
+                return result = {
+                    success: false,
+                    data: "Failed to get the collection Information"
+                }
+            }
+            
+            let collectionType = collection.getERCStandard();
+            let abiFile = PASAR_CONTRACT_ABI;
+            if(collectionType == ItemType.ERC721) 
+                abiFile = TOKEN_721_ABI;
+            await this.getCallContext().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,
                 data: tokenId
