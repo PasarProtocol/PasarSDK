@@ -415,7 +415,7 @@ export class MyProfile extends Profile {
                 }
             }
             let collectionType = collection.getERCStandard();
-
+            
             await this.getCallContext().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, this.getEssentialConnector(), gasPrice);
             result = {
                 success: true,

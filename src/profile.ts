@@ -12,12 +12,11 @@ export class Profile {
     private appContext: AppContext = new AppContext();
     private callContract: CallContract = new CallContract();
     private callAssistService: CallAssistService = new CallAssistService();
-    private essentialsConnector: EssentialsConnector;
-    private walletConnectWeb3: Web3;
+    private essentialsConnector: EssentialsConnector = new EssentialsConnector();;
+    private walletConnectWeb3: Web3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider());
 
     constructor() {
-        this.essentialsConnector = new EssentialsConnector();
-        this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider());
+
     }
 
     protected getEssentialConnector(): EssentialsConnector {
@@ -28,13 +27,13 @@ export class Profile {
         return this.walletConnectWeb3;
     }
 
-    protected getWalletAddress(): Promise<string> {
-        let accounts = this.walletConnectWeb3.eth.getAccounts();
+    protected async getWalletAddress(): Promise<string> {
+        let accounts = await this.walletConnectWeb3.eth.getAccounts();
         return accounts[0];
     }
 
-    protected getGasPrice(): Promise<string> {
-        return this.walletConnectWeb3.eth.getGasPrice()
+    protected async getGasPrice(): Promise<string> {
+        return await this.walletConnectWeb3.eth.getGasPrice()
     }
 
     protected getAppContext(): AppContext {
