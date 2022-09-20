@@ -1,4 +1,4 @@
-import { ListType } from './listtype';
+import { ListTypes } from './listtype';
 import { ChainType } from './chaintype';
 
 export class NftItem {
@@ -25,7 +25,7 @@ export class NftItem {
     private reservePrice: any;
     private minPrice: any;
     private orderState: any;
-    private orderType: any;
+    private orderType: String;
 
     constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
         tokenVersion: number, marketPlace: number, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
@@ -54,6 +54,14 @@ export class NftItem {
         this.orderState = orderState;
         this.orderType = orderType;
 
+        if(orderType == null || orderType == "") {
+            this.orderType = null;
+        } else if(parseInt(orderType) == 1) {
+            this.orderType = ListTypes.fixPrice;
+        } else if(parseInt(orderType) == 2) {
+            this.orderType = ListTypes.auction;
+        }
+
         switch(marketPlace) {
             case 1:
                 this.marketPlace = ChainType.ESC;
@@ -67,6 +75,14 @@ export class NftItem {
                 this.marketPlace = ChainType.ESC;
                 break;
         }
+    }
+
+    public getTokenId(): string {
+        return this.tokenId.toString();
+    }
+
+    public getCollectionAddress(): string {
+        return this.baseToken.toString();
     }
 
     public getOrderId(): string {
