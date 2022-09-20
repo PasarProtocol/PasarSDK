@@ -12,6 +12,21 @@ export namespace valuesOnTestNet {
         chainType: 1,
     }
 
+    export const ethereum: any = {
+        pasarMarketPlaceContract: '0x61EAE56bc110249648fB9eAe7eA4cfa185e0A498',
+        stickerV2Contract: '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961',
+        pasarRegisterContract: '0xC1d40312232ec4b308E69713A98c3A2b21c8F5E0',
+
+        chainType: 2,
+    }
+
+    export const fusion: any = {
+        pasarMarketPlaceContract: '0xa18279eBDfA5747e79DBFc23fa999b4Eaf2A9780',
+        pasarRegisterContract: '0x020c7303664bc88ae92cE3D380BF361E03B78B81',
+
+        chainType: 3,
+    }
+
     export const urlIPFS = "https://ipfs-test.pasarprotocol.io";
     export const didApplication = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB";
 }
@@ -28,6 +43,21 @@ export namespace valuesOnMainNet {
         diaTokenContract: '0x2C8010Ae4121212F836032973919E8AeC9AEaEE5',
 
         chainType: 1,
+    }
+
+    export const ethereum: any = {
+        pasarMarketPlaceContract: '0x940b857f2D5FA0cf9f0345B43C0e3308cD9E4A62',
+        stickerV2Contract: '0x020c7303664bc88ae92cE3D380BF361E03B78B81',
+        pasarRegisterContract: '0x24A7af00c8d03F2FeEb89045B2B93c1D7C3ffB08',
+
+        chainType: 2,
+    }
+
+    export const fusion: any = {
+        pasarMarketPlaceContract: '0xa18279eBDfA5747e79DBFc23fa999b4Eaf2A9780',
+        pasarRegisterContract: '0x020c7303664bc88ae92cE3D380BF361E03B78B81',
+
+        chainType: 3,
     }
 
     export const urlIPFS = "https://ipfs.pasarprotocol.io";
