@@ -39,25 +39,11 @@ export class CallAssistService {
         let nftData = dataInfo['result'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < nftData.length; i++) {
-            let chainType;
-            switch(nftData[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
+            
             let thumbnail = nftData[i]['data'] ? nftData[i]['data']['thumbnail'] : nftData[i]['thumbnail'];
             let image = nftData[i]['data'] ? nftData[i]['data']['image'] : nftData[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(nftData[i]['tokenId'], nftData[i]['tokenIdHex'], nftData[i]['name'], nftData[i]['description'], thumbnail, image, nftData[i]['adult'], nftData[i]['properties'], nftData[i]['tokenJsonVersion'], chainType, nftData[i]['holder'], nftData[i]['royaltyOwner'], nftData[i]['createTime'], parseInt(nftData[i]['marketTime']), parseInt(nftData[i]['endTime']), nftData[i]['orderId'], nftData[i]['quoteToken'], nftData[i]['price'], nftData[i]['buyoutPrice'], nftData[i]['reservePrice'], nftData[i]['minPrice'], nftData[i]['orderState'], nftData[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(nftData[i]['tokenId'], nftData[i]['tokenIdHex'], nftData[i]['name'], nftData[i]['description'], thumbnail, image, nftData[i]['adult'], nftData[i]['properties'], nftData[i]['tokenJsonVersion'], nftData[i]['marketPlace'], nftData[i]['holder'], nftData[i]['royaltyOwner'], nftData[i]['createTime'], parseInt(nftData[i]['marketTime']), parseInt(nftData[i]['endTime']), nftData[i]['orderId'], nftData[i]['quoteToken'], nftData[i]['price'], nftData[i]['buyoutPrice'], nftData[i]['reservePrice'], nftData[i]['minPrice'], nftData[i]['orderState'], nftData[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         let listInfo = new NftListInfo(totalCount, listNftInfo);
@@ -116,26 +102,11 @@ export class CallAssistService {
         }
         let dataInfo = jsonData['data'];
         console.log(dataInfo);
-        let chainType;
-        switch(dataInfo['marketPlace']) {
-            case 1:
-                chainType = ChainType.ESC;
-                break;
-            case 2:
-                chainType = ChainType.ETH;
-                break;
-            case 3:
-                chainType = ChainType.FSN;
-                break;
-            default:
-                chainType = ChainType.ESC;
-                break;
-        }
 
         let thumbnail = dataInfo['data'] ? dataInfo['data']['thumbnail'] : dataInfo['thumbnail'];
         let image = dataInfo['data'] ? dataInfo['data']['image'] : dataInfo['asset'];
 
-        let itemNft: NftItem =  new NftItem(dataInfo['tokenId'], dataInfo['tokenIdHex'], dataInfo['name'], dataInfo['description'], thumbnail, image, dataInfo['adult'], dataInfo['properties'], dataInfo['tokenJsonVersion'], chainType, dataInfo['holder'], dataInfo['royaltyOwner'], dataInfo['createTime'], parseInt(dataInfo['marketTime']), parseInt(dataInfo['endTime']), dataInfo['OrderId'], dataInfo['quoteToken'], dataInfo['Price'], dataInfo['buyoutPrice'], dataInfo['reservePrice'], dataInfo['minPrice'], dataInfo['orderState'], dataInfo['orderType']);
+        let itemNft: NftItem =  new NftItem(dataInfo['tokenId'], dataInfo['tokenIdHex'], dataInfo['name'], dataInfo['description'], thumbnail, image, dataInfo['adult'], dataInfo['properties'], dataInfo['tokenJsonVersion'], dataInfo['marketPlace'], dataInfo['holder'], dataInfo['royaltyOwner'], dataInfo['createTime'], parseInt(dataInfo['marketTime']), parseInt(dataInfo['endTime']), dataInfo['OrderId'], dataInfo['quoteToken'], dataInfo['Price'], dataInfo['buyoutPrice'], dataInfo['reservePrice'], dataInfo['minPrice'], dataInfo['orderState'], dataInfo['orderType']);
         
         return itemNft;
     }
@@ -195,26 +166,10 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < dataInfo.length; i++) {
-            let chainType;
-            switch(dataInfo[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
-
             let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
             let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         
@@ -243,26 +198,10 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < dataInfo.length; i++) {
-            let chainType;
-            switch(dataInfo[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
-
             let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
             let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         
@@ -291,26 +230,10 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < dataInfo.length; i++) {
-            let chainType;
-            switch(dataInfo[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
-
             let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
             let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         
@@ -339,26 +262,10 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < dataInfo.length; i++) {
-            let chainType;
-            switch(dataInfo[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
-
             let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
             let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         
@@ -387,26 +294,10 @@ export class CallAssistService {
         let dataInfo = jsonData['data'];
         let listNftInfo: NftItem[] = [];
         for(var i = 0; i < dataInfo.length; i++) {
-            let chainType;
-            switch(dataInfo[i]['marketPlace']) {
-                case 1:
-                    chainType = ChainType.ESC;
-                    break;
-                case 2:
-                    chainType = ChainType.ETH;
-                    break;
-                case 3:
-                    chainType = ChainType.FSN;
-                    break;
-                default:
-                    chainType = ChainType.ESC;
-                    break;
-            }
-
             let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
             let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], chainType, dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
+            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
             listNftInfo.push(itemNft);
         }
         

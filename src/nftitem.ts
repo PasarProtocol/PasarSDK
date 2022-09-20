@@ -28,7 +28,7 @@ export class NftItem {
     private orderType: any;
 
     constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
-        tokenVersion: number, marketPlace: ChainType, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
+        tokenVersion: number, marketPlace: number, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
         orderId: any = null, quoteToken: any = null, price: any = null, buyoutPrice: any = null, reservePrice: any = null, minPrice: any = null, orderState: any = null, orderType: any = null) {
         
         this.tokenId = id;
@@ -40,7 +40,6 @@ export class NftItem {
         this.sensitive = sesitive;
         this.properties = properties;
         this.tokenVersion = tokenVersion;
-        this.marketPlace = marketPlace;
         this.holder = holder;
         this.royaltyOwner = royaltyOwner;
         this.createTime = createTime;
@@ -54,6 +53,20 @@ export class NftItem {
         this.minPrice = minPrice;
         this.orderState = orderState;
         this.orderType = orderType;
+
+        switch(marketPlace) {
+            case 1:
+                this.marketPlace = ChainType.ESC;
+                break;
+            case 2:
+                this.marketPlace = ChainType.ETH;
+                break;
+            case 3:
+                this.marketPlace = ChainType.FSN;
+            default:
+                this.marketPlace = ChainType.ESC;
+                break;
+        }
     }
 
     public getOrderId(): string {
