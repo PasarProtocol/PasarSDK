@@ -318,26 +318,22 @@ export class MyProfile extends Profile {
         let result:ResultOnIpfs;
         try {
             let ipfsURL:string;
-            let version:number;
 
             if(isTestnetNetwork()) {
                 ipfsURL = valuesOnTestNet.urlIPFS;
-                version = baseToken == valuesOnTestNet.elastos.stickerContract ? 1 : 2;
             } else {
                 ipfsURL = valuesOnMainNet.urlIPFS;
-                version = baseToken == valuesOnMainNet.elastos.stickerContract ? 1 : 2;
             }
             const client = create({ url: ipfsURL });
             handleProgress ? handleProgress(10) : null;
 
             let image_add = await client.add(itemImage);
             handleProgress ? handleProgress(20) : null;
-
+            
             let thumbnail:any = await resizeImage(itemImage, 300, 300);
             handleProgress ? handleProgress(30) : null;
 
             let thumbnail_add = image_add;
-
             if(thumbnail['success'] === 0) {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
@@ -358,7 +354,7 @@ export class MyProfile extends Profile {
             }
 
             const metaObj: NFTDidInfo = {
-                "version": version,
+                "version": 2,
                 "type": 'image',
                 "name": itemName,
                 "description": itemDescription,
