@@ -9,7 +9,7 @@ import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType, getCurrentMarketAddress } from "./global";
 import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
@@ -614,7 +614,7 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(30) : null;
             let priceValue = BigInt(price*1e18).toString();
             try {
-                let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+                let marketPlaceAddress = getCurrentMarketAddress();
                 await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
                 progressHandler ? progressHandler(50) : null;
 

@@ -2,6 +2,7 @@ import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import { ChainType } from "./chaintype";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
+import { isTestnetNetwork } from "./networkType";
 
 /**
  * get new width and height of resizing image.
@@ -163,6 +164,30 @@ const getCurrentChainType = (chainId) => {
     return ''
 }
 
+const getCurrentMarketAddress = () => {
+    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
+    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    if(getCurrentChainType(chainId) == ChainType.ESC) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.elastos.pasarMarketPlaceContract;
+        } else {
+            return valuesOnMainNet.elastos.pasarMarketPlaceContract;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.ethereum.pasarMarketPlaceContract;
+        } else {
+            return valuesOnMainNet.ethereum.pasarMarketPlaceContract;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.fusion.pasarMarketPlaceContract;
+        } else {
+            return valuesOnMainNet.fusion.pasarMarketPlaceContract;
+        }
+    }   
+}
+
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
 const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
 
@@ -199,5 +224,6 @@ export {
     checkFeedsCollection,
     getChainTypeNumber,
     getChainTypeString,
-    getCurrentChainType
+    getCurrentChainType,
+    getCurrentMarketAddress
 }

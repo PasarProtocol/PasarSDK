@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress } from "./global";
 import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
@@ -186,7 +186,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
