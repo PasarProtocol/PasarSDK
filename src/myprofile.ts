@@ -796,7 +796,7 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
 
         try {
-            let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let marketPlaceAddress = getCurrentMarketAddress();
             await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(50) : null;
             await this.getCallContext().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, this.getEssentialConnector(), gasPrice);
