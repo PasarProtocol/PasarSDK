@@ -15,6 +15,7 @@ import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./gl
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
 import { CallAssistService } from "./callassistservice";
+import { ChainTypes } from "./chaintype";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -636,6 +637,11 @@ const getSoldItem = async (
     }
 }
 
+const getChainTypes = () => {
+    let chainTypes: ChainTypes = new ChainTypes();
+    return chainTypes.getChainTypes();
+}
+
 export {
     initialize,
     mintNft,
@@ -668,5 +674,6 @@ export {
     getOwnedItem,
     getCreatedItem,
     getBiddingItem,
-    getSoldItem
+    getSoldItem,
+    getChainTypes,
 }
