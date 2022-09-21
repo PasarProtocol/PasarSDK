@@ -329,7 +329,7 @@ export class MyProfile extends Profile {
 
             let image_add = await client.add(itemImage);
             handleProgress ? handleProgress(20) : null;
-            
+
             let thumbnail:any = await resizeImage(itemImage, 300, 300);
             handleProgress ? handleProgress(30) : null;
 
@@ -354,7 +354,7 @@ export class MyProfile extends Profile {
             }
 
             const metaObj: NFTDidInfo = {
-                "version": 2,
+                "version": "2",
                 "type": 'image',
                 "name": itemName,
                 "description": itemDescription,

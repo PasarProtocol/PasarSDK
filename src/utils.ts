@@ -12,7 +12,7 @@ export interface ImageDidInfo {
 }
 
 export interface NFTDidInfo {
-    "version": number,
+    "version": string,
     "type": string,
     "name": string,
     "description": string,
