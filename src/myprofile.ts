@@ -9,7 +9,7 @@ import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType } from "./global";
 import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
@@ -459,6 +459,8 @@ export class MyProfile extends Profile {
         handleProgress ? handleProgress(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
+            
+            let chainType = getCurrentChainType(this.getChainId());
             let abiFile = PASAR_CONTRACT_ABI;
 
             if(checkFeedsCollection(baseToken))

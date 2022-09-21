@@ -12,7 +12,7 @@ export class Profile {
     private appContext: AppContext = new AppContext();
     private callContract: CallContract = new CallContract();
     private callAssistService: CallAssistService = new CallAssistService();
-    private essentialsConnector: EssentialsConnector = new EssentialsConnector();;
+    private essentialsConnector: EssentialsConnector = new EssentialsConnector();
     private walletConnectWeb3: Web3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider());
 
     constructor() {
@@ -25,6 +25,10 @@ export class Profile {
 
     protected getWeb3Connector(): Web3 {
         return this.walletConnectWeb3;
+    }
+
+    protected getChainId():number {
+        return this.essentialsConnector.getWalletConnectProvider().wc.chainId;
     }
 
     protected async getWalletAddress(): Promise<string> {

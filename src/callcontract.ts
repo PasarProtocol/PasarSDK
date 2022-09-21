@@ -56,7 +56,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
-    
+            
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             if(checkPasarCollection(contractAddress)) {
                 pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {

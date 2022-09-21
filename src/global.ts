@@ -1,4 +1,5 @@
 import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import { ChainType } from "./chaintype";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
@@ -117,7 +118,10 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
 }
 
 const checkFeedsCollection = (address) => {
-    if(address == valuesOnMainNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerContract) {
+    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
+    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+
+    if(getCurrentChainType(chainId) == ChainType.ESC && (address == valuesOnMainNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerContract)) {
         return true;
     } else {
         return false;
@@ -125,11 +129,38 @@ const checkFeedsCollection = (address) => {
 }
 
 const checkPasarCollection = (address) => {
-    if(address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerV2Contract) {
-        return true;
-    } else {
-        return false;
+    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
+    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    if(getCurrentChainType(chainId) == ChainType.ESC) {
+        if(address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerV2Contract) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
+        if(address == valuesOnMainNet.ethereum.stickerV2Contract || address == valuesOnTestNet.ethereum.stickerV2Contract) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
+        if(address == valuesOnMainNet.fusion.stickerV2Contract || address == valuesOnTestNet.fusion.stickerV2Contract) {
+            return true;
+        } else {
+            return false;
+        }
     }
+    
+}
+
+const getCurrentChainType = (chainId) => {
+    if (chainId===20 || chainId===21)
+    return ChainType.ESC;
+    if (chainId===1 || chainId===3)
+        return ChainType.ETH;
+    if (chainId===32659 || chainId===46688)
+        return ChainType.FSN;
+    return ''
 }
 
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
@@ -168,4 +199,5 @@ export {
     checkFeedsCollection,
     getChainTypeNumber,
     getChainTypeString,
+    getCurrentChainType
 }
