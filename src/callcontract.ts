@@ -336,7 +336,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.changeSaleOrderPrice(orderId, newPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -374,7 +374,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -407,7 +407,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
 
             pasarContract.methods.buyOrder(orderId, did).send(transactionParams).on('receipt', (receipt) => {
@@ -443,7 +443,7 @@ export class CallContract {
             
             let jsonDid:UserInfo = getUserInfo();
 
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.bidForOrder(orderId, price.toString(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -473,7 +473,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.settleAuctionOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -505,7 +505,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+            let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.cancelOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -733,7 +733,7 @@ export class CallContract {
         const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
         const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
         
-        let marketPlaceAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarMarketPlaceContract : valuesOnMainNet.elastos.pasarMarketPlaceContract;
+        let marketPlaceAddress = getCurrentMarketAddress();
         let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);
         
         let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress).call())
