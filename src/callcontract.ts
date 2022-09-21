@@ -19,7 +19,7 @@ import { ItemType } from './itemtype';
  */
 export class CallContract {
 
-    private getTransactionParam(account: string, gasPrice: string, price: number = 0): TransactionParams {
+    private getTransactionParam(account: string, gasPrice: string, price = 0): TransactionParams {
         const transactionParams: TransactionParams = {
             'from': account,
             'gasPrice': gasPrice,

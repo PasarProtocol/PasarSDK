@@ -25,7 +25,7 @@ export class NftItem {
     private reservePrice: any;
     private minPrice: any;
     private orderState: any;
-    private orderType: String;
+    private orderType: string;
 
     constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
         tokenVersion: number, marketPlace: number, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
@@ -71,6 +71,7 @@ export class NftItem {
                 break;
             case 3:
                 this.marketPlace = ChainType.FSN;
+                break;
             default:
                 this.marketPlace = ChainType.ESC;
                 break;
