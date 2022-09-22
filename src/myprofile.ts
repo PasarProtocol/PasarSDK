@@ -404,7 +404,10 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+            let chainId = this.getChainId();
+            let chainType = getCurrentChainType(chainId);
+
+            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType);
             if(collection == null) {
                 return result = {
                     success: false,
@@ -499,7 +502,10 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+            let chainId = this.getChainId();
+            let chainType = getCurrentChainType(chainId);
+
+            let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 return result = {
                     success: false,
@@ -550,7 +556,9 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(30) : null;
 
             try {
-                let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+                let chainId = this.getChainId();
+                let chainType = getCurrentChainType(chainId);
+                let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
                 if(collection == null) {
                     return false;
                 }
