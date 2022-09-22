@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress } from "./global";
+import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
 import { NormalCollectionInfo, TransactionParams } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
@@ -596,7 +596,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarRegisterContract : valuesOnMainNet.elastos.pasarRegisterContract;
+            let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
             let owners = [], royalties = [];
 
@@ -636,7 +636,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarRegisterContract : valuesOnMainNet.elastos.pasarRegisterContract;
+            let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
 
             pasarRegister.methods.updateTokenInfo(tokenAddress, name, collectionUri).send(transactionParams).on('receipt', (receipt) => {
@@ -669,7 +669,7 @@ export class CallContract {
 
             const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
             
-            let contractAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.pasarRegisterContract : valuesOnMainNet.elastos.pasarRegisterContract;
+            let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
 
             let owners = [], royalties = [];

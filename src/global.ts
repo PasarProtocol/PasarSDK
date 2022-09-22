@@ -119,8 +119,7 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
 }
 
 const checkFeedsCollection = (address) => {
-    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
-    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    let chainId = getCurrentChainId();
 
     if(getCurrentChainType(chainId) == ChainType.ESC && (address == valuesOnMainNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerContract)) {
         return true;
@@ -130,8 +129,8 @@ const checkFeedsCollection = (address) => {
 }
 
 const checkPasarCollection = (address) => {
-    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
-    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    let chainId = getCurrentChainId();
+
     if(getCurrentChainType(chainId) == ChainType.ESC) {
         if(address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerV2Contract) {
             return true;
@@ -165,8 +164,8 @@ const getCurrentChainType = (chainId) => {
 }
 
 const getCurrentMarketAddress = () => {
-    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
-    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    let chainId = getCurrentChainId();
+
     if(getCurrentChainType(chainId) == ChainType.ESC) {
         if(isTestnetNetwork()) {
             return valuesOnTestNet.elastos.pasarMarketPlaceContract;
@@ -186,6 +185,34 @@ const getCurrentMarketAddress = () => {
             return valuesOnMainNet.fusion.pasarMarketPlaceContract;
         }
     }   
+}
+
+const getCurrentImportingContractAddress = () => {
+    let chainId = getCurrentChainId();
+    if(getCurrentChainType(chainId) == ChainType.ESC) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.elastos.pasarRegisterContract;
+        } else {
+            return valuesOnMainNet.elastos.pasarRegisterContract;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.ethereum.pasarRegisterContract;
+        } else {
+            return valuesOnMainNet.ethereum.pasarRegisterContract;
+        }
+    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
+        if(isTestnetNetwork()) {
+            return valuesOnTestNet.fusion.pasarRegisterContract;
+        } else {
+            return valuesOnMainNet.fusion.pasarRegisterContract;
+        }
+    }   
+}
+
+const getCurrentChainId = () => {
+    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
+    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
 }
 
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
@@ -225,5 +252,6 @@ export {
     getChainTypeNumber,
     getChainTypeString,
     getCurrentChainType,
-    getCurrentMarketAddress
+    getCurrentMarketAddress,
+    getCurrentImportingContractAddress,
 }
