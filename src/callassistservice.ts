@@ -34,7 +34,6 @@ export class CallAssistService {
             return null
         }
         let dataInfo = jsonData['data'];
-        console.log(dataInfo);
         let totalCount = dataInfo['total'];
         let nftData = dataInfo['result'];
         let listNftInfo: NftItem[] = [];
@@ -101,7 +100,6 @@ export class CallAssistService {
             return null
         }
         let dataInfo = jsonData['data'];
-        console.log(dataInfo);
 
         let thumbnail = dataInfo['data'] ? dataInfo['data']['thumbnail'] : dataInfo['thumbnail'];
         let image = dataInfo['data'] ? dataInfo['data']['image'] : dataInfo['asset'];

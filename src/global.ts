@@ -80,7 +80,6 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
                     
                     const canvas = document.createElement('canvas');
                     [canvas.width, canvas.height] = canvasSize;
-                    // console.log(canvas.width,"-",canvas.height)
   
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -114,7 +113,6 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
 const requestSigndataOnTokenID = async (tokenId:string) =>  {
     const didAccess = new ConnDID.DIDAccess();
     const signedData = await didAccess.signData(tokenId, { extraField: 0 }, "signature");
-    console.log(signedData)
     return signedData
 }
 

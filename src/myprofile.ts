@@ -55,7 +55,7 @@ export class MyProfile extends Profile {
             "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
             "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
         }
-        console.log(tokenStandard[itemType]);
+
         try {
             let collectionAddress = await this.getCallContext().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], this.getEssentialConnector(), gasPrice);
             result = {
@@ -156,7 +156,6 @@ export class MyProfile extends Profile {
             }
         }
 
-        console.log(result);
         return result;
     }
 
@@ -365,7 +364,6 @@ export class MyProfile extends Profile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-            console.log(metaData.path);
             handleProgress ? handleProgress(40) : null;
 
             return result = {
@@ -713,7 +711,7 @@ export class MyProfile extends Profile {
         let did = await this.getUserDid();
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
-            console.log(itemNft);
+            
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 return result = {
                     success: false,
@@ -855,7 +853,6 @@ export class MyProfile extends Profile {
 
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
-            console.log(itemNft);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 return result = {
                     success: false,
@@ -906,7 +903,6 @@ export class MyProfile extends Profile {
         
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
-            console.log(itemNft);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 return result = {
                     success: false,
@@ -964,7 +960,6 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
-            console.log(itemNft);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 return result = {
                     success: false,
