@@ -211,6 +211,7 @@ const getCurrentImportingContractAddress = () => {
 const getCurrentChainId = () => {
     let essentialsConnector: EssentialsConnector = new EssentialsConnector();
     let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
+    return chainId;
 }
 
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
