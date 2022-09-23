@@ -94,7 +94,7 @@ const signInWithEssentials = async () => {
             did: sDid,
             address: essentialAddress
         }
-
+        isSignin = true;
         setUserInfo(user);
         return true;
       }
@@ -114,7 +114,7 @@ const signin = async () => {
       await essentialsConnector.disconnectWalletConnect();
     }
     let result = await signInWithEssentials();
-    isSignin = true;
+    
     return result;
 }
 
