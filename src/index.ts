@@ -412,20 +412,9 @@ const registerCollection = async (
     try {
         let profile = new MyProfile();
 
-        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        if(!resultIpfs.success) {
-            return result = {
-                success: false,
-                data: resultIpfs.result,
-            }
-        }
-        
-        let resultContract:ResultCallContract = await profile.registerCollection(tokenAddress, resultIpfs.medadata, royalties, handleProgress);
-        return result = {
-            success: resultContract.success,
-            data: resultContract.data,
-        }
-        
+        let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        let resultContract:string = await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
+        return resultContract;
     } catch(err) {
         return result = {
             success: false,
@@ -448,15 +437,8 @@ const updateCollectionInfo = async (
     try {
         let profile = new MyProfile();
 
-        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        if(!resultIpfs.success) {
-            return result = {
-                success: false,
-                data: resultIpfs.result,
-            }
-        }
-        
-        let resultContract:ResultCallContract = await profile.updateCollectionURI(tokenAddress, name, resultIpfs.medadata, handleProgress);
+        let resultIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        let resultContract:ResultCallContract = await profile.updateCollectionURI(tokenAddress, name, resultIpfs, handleProgress);
         return result = {
             success: resultContract.success,
             data: resultContract.data,

@@ -83,7 +83,7 @@ export class MyProfile extends Profile {
         background: any,
         category: CollectionCategory,
         socialMedias: any,
-        handleProgress: any) : Promise<any> {
+        handleProgress: any) : Promise<string> {
         let ipfsURL:string;
         try {
             if(isTestnetNetwork()) {
@@ -135,7 +135,7 @@ export class MyProfile extends Profile {
 
             return `pasar:json:${metaData.path}`;
         } catch(err) {
-            return new Error(err);
+            throw new Error(err);
         }
     }
 
