@@ -61,7 +61,7 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(70) : null;
             return collectionAddress;
         } catch(err) {
-            new Error(err);
+            throw new Error(err);
         }
     }
 
@@ -85,7 +85,6 @@ export class MyProfile extends Profile {
         socialMedias: any,
         handleProgress: any) : Promise<any> {
         let ipfsURL:string;
-        
         try {
             if(isTestnetNetwork()) {
                 ipfsURL = valuesOnTestNet.urlIPFS;
@@ -157,7 +156,7 @@ export class MyProfile extends Profile {
         tokenAddress: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: any): Promise<any> {
+        progressHandler: any): Promise<string> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -166,7 +165,7 @@ export class MyProfile extends Profile {
         try {
             let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
-                return new Error("You can't register this collection");
+                throw new Error("You can't register this collection");
             }
             await this.getCallContext().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(100) : null;
