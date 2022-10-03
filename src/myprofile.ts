@@ -45,8 +45,8 @@ export class MyProfile extends Profile {
         symbol: string,
         collectionUri: string,
         itemType: ItemType,
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        progressHandler: any): Promise<string> {
+        // let result: ResultCallContract;
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -58,19 +58,11 @@ export class MyProfile extends Profile {
 
         try {
             let collectionAddress = await this.getCallContext().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: collectionAddress
-            }
             progressHandler ? progressHandler(70) : null;
+            return collectionAddress;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            new Error(err);
         }
-
-        return result;
     }
 
     /**
@@ -91,8 +83,7 @@ export class MyProfile extends Profile {
         background: any,
         category: CollectionCategory,
         socialMedias: any,
-        handleProgress: any) : Promise<ResultOnIpfs> {
-        let result:ResultOnIpfs;
+        handleProgress: any) : Promise<any> {
         let ipfsURL:string;
         
         try {
@@ -143,20 +134,10 @@ export class MyProfile extends Profile {
             let metaData = await client.add(JSON.stringify(metaObj));
             handleProgress ? handleProgress(50) : null;
 
-            result = {
-                success: true,
-                result: "success",
-                medadata: `pasar:json:${metaData.path}`,
-            }
+            return `pasar:json:${metaData.path}`;
         } catch(err) {
-            result = {
-                success: false,
-                result: err,
-                medadata: "",
-            }
+            return new Error(err);
         }
-
-        return result;
     }
 
     /**
@@ -176,8 +157,7 @@ export class MyProfile extends Profile {
         tokenAddress: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        progressHandler: any): Promise<any> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -186,25 +166,14 @@ export class MyProfile extends Profile {
         try {
             let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
-                return result = {
-                    success: false,
-                    data: "You can't register this collection"
-                }
+                return new Error("You can't register this collection");
             }
             await this.getCallContext().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenAddress
-            }
             progressHandler ? progressHandler(100) : null;
+            return tokenAddress;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**

@@ -385,35 +385,16 @@ const createCollection = async (
     royalties: RoyaltyRate[],
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
 
-        let resultIpfs:ResultOnIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        if(!resultIpfs.success) {
-            return result = {
-                success: false,
-                data: resultIpfs.result,
-            }
-        }
-        let resultContract:ResultCallContract = await profile.createCollection(name, symbol, resultIpfs.medadata, itemType, handleProgress);
-        if(!resultContract.success) {
-            return result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
-        resultContract = await profile.registerCollection(resultContract.data, resultIpfs.medadata, royalties, handleProgress);
-        return result = {
-            success: resultContract.success,
-            data: resultContract.data,
-        }
-        
+        let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
+        let collectionAddress:string = await profile.createCollection(name, symbol, resultIpfs, itemType, handleProgress);
+        let address = await profile.registerCollection(collectionAddress, resultIpfs, royalties, handleProgress);
+
+        return address;
     } catch(err) {
-        return result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
 }
 
