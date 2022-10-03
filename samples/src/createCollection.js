@@ -25,8 +25,12 @@ const CreateCollection = () => {
         console.log(collectionType);
         console.log(category);
         console.log(royalty);
-        let result = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, setProgress);
-        console.log(result);
+        try {
+            let result = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, setProgress);
+            console.log(result);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (
