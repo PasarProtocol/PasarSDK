@@ -81,28 +81,12 @@ const listItem = async (
     price: string,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultContract:ResultCallContract = await profile.listItem(baseToken, tokenId, pricingToken, parseFloat(price), handleProgress);
-        if(resultContract.success) {
-            result = {
-                success: true,
-                data: tokenId,
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
+        await profile.listItem(baseToken, tokenId, pricingToken, parseFloat(price), handleProgress);
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-    return result;
 }
 
 const listItemonAuction = async (
@@ -115,36 +99,17 @@ const listItemonAuction = async (
     expirationTime: number,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
         let current = new Date().getTime();
         if(expirationTime <= current) {
-            return {
-                success: false,
-                data: "The expiration time is wrong",
-            }
+            throw new Error("The expiration time is wrong");
         }
 
-        let resultContract:ResultCallContract = await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseFloat(minPrice), parseFloat(reservePrice), parseFloat(buyoutPrice), expirationTime, handleProgress);
-        if(resultContract.success) {
-            result = {
-                success: true,
-                data: tokenId,
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
+        await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseFloat(minPrice), parseFloat(reservePrice), parseFloat(buyoutPrice), expirationTime, handleProgress);
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-    return result;
 }
 
 const changePrice = async (

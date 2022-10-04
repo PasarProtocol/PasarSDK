@@ -523,9 +523,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         pricingToken: string,
         price: number,
-        progressHandler: any=null): Promise<ResultCallContract> {
-            let result: ResultCallContract;
-
+        progressHandler: any=null): Promise<string> {
             let account = await this.getWalletAddress();
             let gasPrice = await this.getGasPrice();
 
@@ -538,19 +536,12 @@ export class MyProfile extends Profile {
                 progressHandler ? progressHandler(50) : null;
 
                 await this.getCallContext().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, this.getEssentialConnector(), gasPrice);
-                result = {
-                    success: true,
-                    data: tokenId
-                }
+                
                 progressHandler ? progressHandler(100) : null;
+                return tokenId;
             } catch(err) {
-                result = {
-                    success: false,
-                    data: err
-                }
+                throw new Error(err);
             }
-
-            return result;
     }
 
     /**
@@ -705,9 +696,7 @@ export class MyProfile extends Profile {
         buyoutPrice: number,
         expirationTime: number,
         progressHandler: any
-    ): Promise<ResultCallContract> {
-        let result: ResultCallContract;
-
+    ): Promise<string> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -719,19 +708,10 @@ export class MyProfile extends Profile {
             await this.getCallContext().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(50) : null;
             await this.getCallContext().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenId
-            }
-            progressHandler ? progressHandler(100) : null;
+            return tokenId;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**
