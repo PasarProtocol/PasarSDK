@@ -460,15 +460,13 @@ export class MyProfile extends Profile {
      * @param tokenId The tokenId of NFT item
      * @param toAddr the target wallet address to recieve the NFT item
      * @param progressHandler The handler to deal with progress on transferring NFT item
-     * @returns The result of whether the NFT is transfered or not.
+     * @returns
      */
     public async transferItem(
         baseToken: string,
         tokenId: string,
         toAddr: string,
-        progressHandler: any): Promise<boolean> {
-            let result: boolean;
-
+        progressHandler: any): Promise<void> {
             let account = await this.getWalletAddress();
             let gasPrice = await this.getGasPrice();
 
@@ -480,7 +478,7 @@ export class MyProfile extends Profile {
                 let chainType = getCurrentChainType(chainId);
                 let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
                 if(collection == null) {
-                    return false;
+                    throw new Error("Can't find the this collection");
                 }
                 
                 let collectionType = collection.getERCStandard();
@@ -492,13 +490,10 @@ export class MyProfile extends Profile {
                 progressHandler ? progressHandler(50) : null;
 
                 await this.getCallContext().transferNFT(abiFile, account, toAddr, tokenId, baseToken, collectionType, this.getEssentialConnector(), gasPrice);
-                result = true
                 progressHandler ? progressHandler(100) : null;
             } catch(err) {
-                result = false
+                throw new Error(err);
             }
-
-            return result;
     }
 
     /**List

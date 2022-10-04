@@ -59,7 +59,6 @@ const deleteNft = async (
     }
 }
 
-
 const transferNft = async (
     baseToken: string,
     tokenId: string,
@@ -67,10 +66,13 @@ const transferNft = async (
     handleProgress: any = null
 ) => {
     let profile = new MyProfile();
-    let resultContract:boolean = await profile.transferItem(baseToken, tokenId, toAddr, handleProgress);
-    return resultContract;
+    try {
+        await profile.transferItem(baseToken, tokenId, toAddr, handleProgress);
+    } catch(err) {
+        throw new Error(err);
+    }
+    
 }
-
 
 const listItem = async (
     baseToken: string,
