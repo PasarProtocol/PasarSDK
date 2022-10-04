@@ -153,29 +153,14 @@ const buyItem = async (
     baseToken: string,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
         
-        let resultContract:ResultCallContract = await profile.buyItem(tokenId, baseToken, handleProgress);
-        if(resultContract.success) {
-            result = {
-                success: true,
-                data: tokenId,
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
+        let orderId = await profile.buyItem(tokenId, baseToken, handleProgress);
+        return orderId;
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-    return result;
 }
 
 const bidItemOnAuction = async (

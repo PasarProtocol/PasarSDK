@@ -741,9 +741,5 @@ export class CallContract {
         if(erc20BidderApproved < price) {
             await erc20Contract.methods.approve(marketPlaceAddress, price.toString()).send(transactionParams);
         }
-        return {
-            success: true,
-            message: `Approve Transaction success!`
-        }
     }
 }
