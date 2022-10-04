@@ -714,7 +714,7 @@ export class MyProfile extends Profile {
      *        buyout
      * @param progressHandler The handler to deal with the progress on chaning price for
      *        specific auction item on marketplace
-     * @returns The result of bidding action.
+     * @returns The orderId
      */
     public async changePriceOnAuction(
         tokenId: string,
@@ -723,9 +723,7 @@ export class MyProfile extends Profile {
         newMinPrice: number,
         newReservedPrice: number,
         newBuyoutPrice: number,
-        progressHandler: any): Promise<ResultCallContract> {
-
-        let result: ResultCallContract;
+        progressHandler: any): Promise<string> {
 
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
@@ -739,27 +737,18 @@ export class MyProfile extends Profile {
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
-                return result = {
-                    success: false,
-                    data: "You can't change the price of this nft"
-                }
+                throw new Error("You can't change the price of this nft");
             }
             let orderId = itemNft.getOrderId();
 
             await this.getCallContext().changePriceOnAuction(account, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: orderId
-            }
+            
             progressHandler ? progressHandler(100) : null;
-        } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
-        }
 
-        return result;
+            return orderId;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**
