@@ -51,28 +51,12 @@ const deleteNft = async (
     totalSupply = 1,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultContract:ResultCallContract = await profile.deleteItem(tokenId, baseToken, totalSupply, handleProgress);
-        if(resultContract.success) {
-            result = {
-                success: true,
-                data: tokenId,
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
+        await profile.deleteItem(tokenId, baseToken, totalSupply, handleProgress);
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-    return result;
 }
 
 

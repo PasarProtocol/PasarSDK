@@ -426,8 +426,7 @@ export class MyProfile extends Profile {
         baseToken: string,
         tokenId: string,
         totalSupply: number,
-        handleProgress:any = null): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        handleProgress:any = null): Promise<void> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -439,10 +438,7 @@ export class MyProfile extends Profile {
 
             let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
             if(collection == null) {
-                return result = {
-                    success: false,
-                    data: "Failed to get the collection Information"
-                }
+                throw new Error("Failed to get the collection Information");
             }
             
             let collectionType = collection.getERCStandard();
@@ -450,19 +446,11 @@ export class MyProfile extends Profile {
             if(collectionType == ItemType.ERC721) 
                 abiFile = TOKEN_721_ABI;
             await this.getCallContext().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenId
-            }
+            
             handleProgress ? handleProgress(100) : null;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**
