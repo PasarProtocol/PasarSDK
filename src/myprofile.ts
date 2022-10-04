@@ -10,7 +10,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType, getCurrentMarketAddress } from "./global";
-import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, ResultOnIpfs, UserDidInfo } from './utils';
+import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, ResultCallContract, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
@@ -271,18 +271,16 @@ export class MyProfile extends Profile {
      * @param properties properties of nft
      * @param sensitive Indicator whether the NFT item contains sensitive content or not.
      * @param handleProgress The function to set the progress value of being uploaded ipfs process
-     * @returns The result included tokenId, metadata, etc.
+     * @returns The result is the did information.
      */
     public async createItemMetadata(
         itemName: string,
         itemDescription: string,
         itemImage: any,
-        baseToken: string,
         properties: any = null,
         sensitive = false,
         handleProgress:any = null,
-    ): Promise<ResultOnIpfs> {
-        let result:ResultOnIpfs;
+    ): Promise<string> {
         try {
             let ipfsURL:string;
 
@@ -334,17 +332,9 @@ export class MyProfile extends Profile {
             let metaData = await client.add(JSON.stringify(metaObj));
             handleProgress ? handleProgress(40) : null;
 
-            return result = {
-                success: true,
-                result: "success",
-                medadata: `pasar:json:${metaData.path}`,
-            }
+            return `pasar:json:${metaData.path}`;
         } catch(err) {
-            return result = {
-                success: false,
-                result: err,
-                medadata: null,
-            }
+            throw new Error(err);
         }
     }
 
@@ -361,8 +351,7 @@ export class MyProfile extends Profile {
      */
     public async creatItem(baseToken: string,
         tokenUri: string,
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        progressHandler: any): Promise<string> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -370,32 +359,19 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let chainId = this.getChainId();
-            let chainType = getCurrentChainType(chainId);
-
             let collection:Collection = await this.getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType);
             if(collection == null) {
-                return result = {
-                    success: false,
-                    data: "Failed to get the collection Information"
-                }
+                throw new Error("Failed to get the collection Information");
             }
             let collectionType = collection.getERCStandard();
             
             await this.getCallContext().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenId
-            }
             progressHandler ? progressHandler(100) : null;
-        } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
-        }
 
-        return result;
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**
@@ -408,15 +384,14 @@ export class MyProfile extends Profile {
      * @param tokenUri The token uri to this new NFT item
      * @param roylatyFee:The royalty fee to the new NFT item
      * @param handleProgress: The handler to deal with progress on minting a new NFT item
-     * @returns The result of being minted the nft. if success = true, data is tokenId, else data is error infomation
+     * @returns The tokenId of being minted a nft
      */
     public async createItemWithRoyalties(
         baseToken: string,
         tokenUri: string,
         roylatyFee: number,
         handleProgress:any = null
-    ): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+    ): Promise<string> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -424,26 +399,17 @@ export class MyProfile extends Profile {
         handleProgress ? handleProgress(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            
-            let chainType = getCurrentChainType(this.getChainId());
             let abiFile = PASAR_CONTRACT_ABI;
 
             if(checkFeedsCollection(baseToken))
                 abiFile = FEED_CONTRACT_ABI;
             await this.getCallContext().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenId
-            }
             handleProgress ? handleProgress(100) : null;
-        } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
-        }
 
-        return result;
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**

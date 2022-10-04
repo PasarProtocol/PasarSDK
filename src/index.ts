@@ -4,7 +4,7 @@
 import { signin, signout, checkSign } from "./signin";
 import { NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
-import { ResultApi, ResultCallContract, ResultOnIpfs } from "./utils";
+import { ResultApi, ResultCallContract } from "./utils";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
@@ -30,44 +30,19 @@ const mintNft = async (
     sensitive = false,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
-        let resultContract:ResultCallContract;
-
-        let resultMetadata:ResultOnIpfs = await profile.createItemMetadata(itemName, itemDescription, itemImage, baseToken, properties, sensitive, handleProgress);
-
-        if(resultMetadata.success == true) {
-            if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
-                resultContract = await profile.createItemWithRoyalties(baseToken, resultMetadata.medadata, royaltyFee, handleProgress);
-            else 
-                resultContract = await profile.creatItem(baseToken, resultMetadata.medadata, handleProgress);
-            
-            if(resultContract.success) {
-                result = {
-                    success: true,
-                    data: resultContract.data,
-                }
-            } else {
-                result = {
-                    success: false,
-                    data: resultContract.data,
-                }
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultMetadata.result,
-            }
-        }
+        let tokenId:string;
+        let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
+        if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
+            tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
+        else 
+            tokenId = await profile.creatItem(baseToken, resultMetadata, handleProgress);
+        
+        return tokenId;
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-
-    return result;
 }
 
 const deleteNft = async (
