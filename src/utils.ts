@@ -35,16 +35,6 @@ export interface TransactionParams {
     'value': number
 }
 
-export interface ResultCallContract {
-    "success": boolean;
-    "data": any
-}
-
-export interface ResultApi {
-    "success": boolean,
-    "data": any
-}
-
 export interface NormalCollectionInfo {
     "name": string,
     "symbol": string,
