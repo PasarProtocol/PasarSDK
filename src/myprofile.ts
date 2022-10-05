@@ -188,8 +188,7 @@ export class MyProfile extends Profile {
     public async updateCollectionURI(tokenAddress: string,
         name: string,
         collectionUri: string,
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        progressHandler: any): Promise<void> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -198,25 +197,13 @@ export class MyProfile extends Profile {
         try {
             let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
-                return result = {
-                    success: false,
-                    data: "You can't update the information of this collection"
-                }
+                throw new Error("You can't update the information of this collection");
             }
             await this.getCallContext().updateCollection(account, tokenAddress, name, collectionUri, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenAddress
-            }
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**

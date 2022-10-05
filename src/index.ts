@@ -243,7 +243,6 @@ const registerCollection = async (
     royalties: RoyaltyRate[],
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
 
@@ -251,10 +250,7 @@ const registerCollection = async (
         let resultContract:string = await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
         return resultContract;
     } catch(err) {
-        return result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
 }
 
@@ -268,22 +264,13 @@ const updateCollectionInfo = async (
     socialMedias: any,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
 
         let resultIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        let resultContract:ResultCallContract = await profile.updateCollectionURI(tokenAddress, name, resultIpfs, handleProgress);
-        return result = {
-            success: resultContract.success,
-            data: resultContract.data,
-        }
-        
+        await profile.updateCollectionURI(tokenAddress, name, resultIpfs, handleProgress);
     } catch(err) {
-        return result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
 }
 
