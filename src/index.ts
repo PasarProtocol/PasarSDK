@@ -279,21 +279,12 @@ const updateCollectionRoyalties = async (
     royalties: RoyaltyRate[],
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
         
-        let resultContract:ResultCallContract = await profile.updateCollectionRoyalties(tokenAddress, royalties, handleProgress);
-        return result = {
-            success: resultContract.success,
-            data: resultContract.data,
-        }
-        
+        await profile.updateCollectionRoyalties(tokenAddress, royalties, handleProgress);
     } catch(err) {
-        return result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
 }
 

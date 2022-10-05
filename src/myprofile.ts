@@ -212,13 +212,12 @@ export class MyProfile extends Profile {
      * @param royaltyRates The roraylty rates for this NFT collection
      * @param progressHandler The handler to deal with the progress on updating this NFT collection
      *        on Pasar marketplace
-     * The result of whether the NFT collection is updated or not.
+     * @result 
      */
     public async updateCollectionRoyalties(
         tokenAddress: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
+        progressHandler: any): Promise<void> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -227,25 +226,13 @@ export class MyProfile extends Profile {
         try {
             let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
-                return result = {
-                    success: false,
-                    data: "You can't update the royalties of this collection"
-                }
+                throw new Error("You can't update the royalties of this collection");
             }
             await this.getCallContext().updateCollectionRoyalties(account, tokenAddress, royaltyRates, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: tokenAddress
-            }
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**
