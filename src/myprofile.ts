@@ -817,14 +817,12 @@ export class MyProfile extends Profile {
      * @param tokenId The tokenId of NFT listed item on marketplace
      * @param baseToken The collection address of NFT iten
      * @param progressHandler The handler to deal with the progress on unlisting the NFT item.
-     * @returns The result of unlisting action.
+     * @returns 
      */
     public async unlistItem(
         tokenId: string,
         baseToken: string,
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
-
+        progressHandler: any): Promise<void> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -833,27 +831,16 @@ export class MyProfile extends Profile {
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
-                return result = {
-                    success: false,
-                    data: "You can't unlist this nft on marketplace"
-                }
+                throw new Error("You can't unlist this nft on marketplace");
             }
             let orderId = itemNft.getOrderId();
 
             await this.getCallContext().unlistItem(account, orderId, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: orderId
-            }
+            
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
+            throw new Error(err);
         }
-
-        return result;
     }
 
     /**

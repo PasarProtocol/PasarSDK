@@ -199,29 +199,13 @@ const unlistItem = async (
     baseToken: string,
     handleProgress: any = null
 ) => {
-    let result: ResultApi;
     try {
         let profile = new MyProfile();
 
-        let resultContract:ResultCallContract = await profile.unlistItem(tokenId, baseToken, handleProgress);
-        if(resultContract.success) {
-            result = {
-                success: true,
-                data: tokenId,
-            }
-        } else {
-            result = {
-                success: false,
-                data: resultContract.data,
-            }
-        }
+        await profile.unlistItem(tokenId, baseToken, handleProgress);
     } catch(err) {
-        result = {
-            success: false,
-            data: err
-        }
+        throw new Error(err);
     }
-    return result;
 }
 
 const createCollection = async (
