@@ -747,9 +747,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         baseToken: string,
         price: number,
-        progressHandler: any): Promise<ResultCallContract> {
-        let result: ResultCallContract;
-
+        progressHandler: any): Promise<string> {
         let account = await this.getWalletAddress();
         let gasPrice = await this.getGasPrice();
 
@@ -759,10 +757,7 @@ export class MyProfile extends Profile {
         try {
             let itemNft:NftItem = await this.getCallAssistService().getCollectibleByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
-                return result = {
-                    success: false,
-                    data: "You can't bid to this nft"
-                }
+                throw new Error("You can't bid to this nft");
             }
             let orderId = itemNft.getOrderId();
             let quoteToken = itemNft.getQuoteToken();
@@ -770,28 +765,15 @@ export class MyProfile extends Profile {
             let priceValue = Number(BigInt(price*1e18));
 
             if(quoteToken != defaultAddress) {
-                let approveResult = await this.getCallContext().approveToken(account, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
-                if(!approveResult.success) {
-                    return result = {
-                        success: false,
-                        data: approveResult.message
-                    }
-                }
+                await this.getCallContext().approveToken(account, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
             }
             await this.getCallContext().bidItemOnAuction(account, orderId, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
-            result = {
-                success: true,
-                data: orderId
-            }
             progressHandler ? progressHandler(100) : null;
-        } catch(err) {
-            result = {
-                success: false,
-                data: err
-            }
-        }
 
-        return result;
+            return orderId;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**
