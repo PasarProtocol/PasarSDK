@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCollectionCategories, updateCollectionInfo } from "@pasarprotocol/pasar-sdk-development";
+import { getCollectionCategories, updateCollectionInfo, getCollectionSocialField } from "@pasarprotocol/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
@@ -9,7 +9,7 @@ const UpdateCollectionInfo = () => {
     const [collectionAddress, setCollectionAddress] = useState("");
     const [category, setCategory] = useState(getCollectionCategories()[0]);
     const [progress, setProgress] = useState(0);
-
+    const [socialInfo, setSocialInfo] = useState(getCollectionSocialField());
     useEffect(() => {
         console.log(progress);
     }, [progress]);
@@ -19,8 +19,7 @@ const UpdateCollectionInfo = () => {
             console.log(name);
             console.log(description);
             console.log(category);
-            await updateCollectionInfo(collectionAddress, name, description, avatar, background, category, null, setProgress);
-            console.log(result);
+            await updateCollectionInfo(collectionAddress, name, description, avatar, background, category, socialInfo, setProgress);
         } catch(err) {
             console.log(err);
         }
