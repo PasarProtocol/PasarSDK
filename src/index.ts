@@ -16,17 +16,27 @@ import { Profile } from "./profile";
 import { CallAssistService } from "./callassistservice";
 import { ChainTypes } from "./chaintype";
 import { CollectionSocialField } from "./utils";
-let profileInfo;
+
+let myProfileInfo, profileInfo;
+
+const getMyProfileInfo = () => {
+    if(!myProfileInfo) {
+        myProfileInfo = new MyProfile();
+    }
+
+    return myProfileInfo;
+}
 
 const getProfileInfo = () => {
     if(!profileInfo) {
-        profileInfo = new MyProfile();
+        profileInfo = new Profile();
     }
 
     return profileInfo;
 }
 
 const initialize = (testnet = true) => {
+    getMyProfileInfo();
     getProfileInfo();
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -42,7 +52,7 @@ const mintNft = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         let tokenId:string;
         let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
         if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
@@ -63,7 +73,7 @@ const deleteNft = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         await profile.deleteItem(tokenId, baseToken, totalSupply, handleProgress);
     } catch(err) {
         throw new Error(err);
@@ -76,7 +86,7 @@ const transferNft = async (
     toAddr: string,
     handleProgress: any = null
 ) => {
-    let profile = getProfileInfo();
+    let profile = getMyProfileInfo();
     try {
         await profile.transferItem(baseToken, tokenId, toAddr, handleProgress);
     } catch(err) {
@@ -93,7 +103,7 @@ const listItem = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         await profile.listItem(baseToken, tokenId, pricingToken, parseFloat(price), handleProgress);
     } catch(err) {
         throw new Error(err);
@@ -111,7 +121,7 @@ const listItemonAuction = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         let current = new Date().getTime();
         if(expirationTime <= current) {
             throw new Error("The expiration time is wrong");
@@ -131,7 +141,7 @@ const changePrice = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         let orderId: string = await profile.changePrice(tokenId, baseToken, pricingToken, parseFloat(newPrice), handleProgress);
         return orderId;
@@ -150,7 +160,7 @@ const changePriceOnAuction = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         let orderId = await profile.changePriceOnAuction(tokenId, baseToken, pricingToken, parseFloat(newMinPrice), parseFloat(newReservedPrice), parseFloat(newBuyoutPrice), handleProgress);
         return orderId;
     } catch(err) {
@@ -164,7 +174,7 @@ const buyItem = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         
         let orderId = await profile.buyItem(tokenId, baseToken, handleProgress);
         return orderId;
@@ -180,7 +190,7 @@ const bidItemOnAuction = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         let orderId = await profile.bidItemOnAuction(tokenId, baseToken, parseFloat(price), handleProgress);
         return orderId;
@@ -195,7 +205,7 @@ const settleAuction = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         let orderId = await profile.settleAuction(tokenId, baseToken, handleProgress);
         return orderId;
@@ -210,7 +220,7 @@ const unlistItem = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         await profile.unlistItem(tokenId, baseToken, handleProgress);
     } catch(err) {
@@ -231,7 +241,7 @@ const createCollection = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
         let collectionAddress:string = await profile.createCollection(name, symbol, resultIpfs, itemType, handleProgress);
@@ -254,7 +264,7 @@ const registerCollection = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
         let resultContract:string = await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
         return resultContract;
@@ -274,7 +284,7 @@ const updateCollectionInfo = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
 
         let resultIpfs = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
         await profile.updateCollectionURI(tokenAddress, name, resultIpfs, handleProgress);
@@ -289,7 +299,7 @@ const updateCollectionRoyalties = async (
     handleProgress: any = null
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         await profile.updateCollectionRoyalties(tokenAddress, royalties, handleProgress);
     } catch(err) {
         throw new Error(err);
@@ -353,7 +363,7 @@ const getOwnedCollection = async (
     walletAddr: string
 ) => {
     try {
-        let profile =  new Profile();
+        let profile = getProfileInfo();
         let info = await profile.queryCollections(walletAddr);
         return info;
     } catch(err) {
@@ -365,7 +375,7 @@ const getOwnedListedItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile = getProfileInfo();
+        let profile = getMyProfileInfo();
         let info = await profile.queryListedItems(walletAddr);
         return info;
     } catch(err) {
@@ -377,7 +387,7 @@ const getOwnedItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile =  new Profile();
+        let profile = getProfileInfo();
         let info = await profile.queryOwnedItems(walletAddr);
         return info;
     } catch(err) {
@@ -389,7 +399,7 @@ const getCreatedItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile =  new Profile();
+        let profile = getProfileInfo();
         let info = await profile.queryCreatedItems(walletAddr);
         return info;
     } catch(err) {
@@ -401,7 +411,7 @@ const getBiddingItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile =  new Profile();
+        let profile = getProfileInfo();
         let info = await profile.queryBiddingItems(walletAddr);
         return info;
     } catch(err) {
@@ -413,7 +423,7 @@ const getSoldItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile =  new Profile();
+        let profile = getProfileInfo();
         let info = await profile.querySoldItems(walletAddr);
         return info;
     } catch(err) {
