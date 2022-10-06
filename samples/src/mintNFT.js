@@ -13,11 +13,15 @@ const MintNFT = () => {
     }, [progress]);
 
     const handleMint = async () => {
-        console.log(name);
-        console.log(description);
-        console.log(urlImage);
-        let result = await mintNft(name, description, urlImage, collectionAddress, 10, null, false, setProgress);
-        console.log(result);
+        try {
+            console.log(name);
+            console.log(description);
+            console.log(urlImage);
+            let tokenId = await mintNft(name, description, urlImage, collectionAddress, 10, null, false, setProgress);
+            console.log(tokenId);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     const handleChangeImage = (e) => {

@@ -5,8 +5,11 @@ const BurnNFT = () => {
     const [tokenId, setTokenId] = useState("");
 
     const handleBurn = async () => {
-        let result = await deleteNft("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, 1);
-        console.log(result);
+        try {
+            await deleteNft("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, 1);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (

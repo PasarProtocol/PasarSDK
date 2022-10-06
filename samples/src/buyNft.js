@@ -13,9 +13,12 @@ const BuyNFT = () => {
     }, [progress]);
 
     const handleBuy = async () => {
-        let result;
-        result = await buyItem(tokenId, baseToken, setProgress);
-        console.log(result);
+        try {
+            let orderId = await buyItem(tokenId, baseToken, setProgress);
+            console.log(orderId);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (

@@ -13,9 +13,11 @@ const UnlistNFT = () => {
     }, [progress]);
 
     const handleSettle = async () => {
-        let result;
-        result = await unlistItem(tokenId, baseToken, setProgress);
-        console.log(result);
+        try {        
+            await unlistItem(tokenId, baseToken, setProgress);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (

@@ -14,9 +14,12 @@ const BidNFT = () => {
     }, [progress]);
 
     const handleList = async () => {
-        let result;
-        result = await bidItemOnAuction(tokenId, collectionAddr, price, setProgress);
-        console.log(result);
+        try {
+            let orderId = await bidItemOnAuction(tokenId, collectionAddr, price, setProgress);
+            console.log(orderId);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (

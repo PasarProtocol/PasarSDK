@@ -31,20 +31,20 @@ const ListNFT = () => {
     }, [progress]);
 
     const handleList = async () => {
-        console.log(pricingToken);
-        let result;
-        if(isAuction(currentListType)) {
-            console.log(exipirationTime);
-            let dateTimeParts = exipirationTime.split('T');
-            let dateParts = dateTimeParts[0].split("-");
-            let timeParts = dateTimeParts[1].split(":");
-            let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
-            result = await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
-        } else {
-            result = await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
+        try {
+            if(isAuction(currentListType)) {
+                console.log(exipirationTime);
+                let dateTimeParts = exipirationTime.split('T');
+                let dateParts = dateTimeParts[0].split("-");
+                let timeParts = dateTimeParts[1].split(":");
+                let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
+                await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
+            } else {
+                await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
+            }
+        } catch(err) {
+            console.log(err);
         }
-        console.log(result);
-        
     }
 
     function timestampToDatetimeInputString(timestamp) {

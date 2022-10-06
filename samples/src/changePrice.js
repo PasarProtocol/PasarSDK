@@ -29,15 +29,17 @@ const ChangePrice = () => {
     }, [progress]);
 
     const handleList = async () => {
-        console.log(pricingToken);
-        let result;
-        if(isAuction(currentListType)) {
-            result = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
-        } else {
-            result = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
+        try {
+            let orderId;
+            if(isAuction(currentListType)) {
+                orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
+            } else {
+                orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
+            }
+            console.log(orderId);
+        } catch(err) {
+            console.log(err);  
         }
-        console.log(result);
-        
     }
 
     return (

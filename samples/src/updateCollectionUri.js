@@ -15,11 +15,16 @@ const UpdateCollectionInfo = () => {
     }, [progress]);
 
     const handleMint = async () => {
-        console.log(name);
-        console.log(description);
-        console.log(category);
-        let result = await updateCollectionInfo(collectionAddress, name, description, avatar, background, category, null, setProgress);
-        console.log(result);
+        try {
+            console.log(name);
+            console.log(description);
+            console.log(category);
+            await updateCollectionInfo(collectionAddress, name, description, avatar, background, category, null, setProgress);
+            console.log(result);
+        } catch(err) {
+            console.log(err);
+        }
+        
     }
 
     return (

@@ -13,9 +13,13 @@ const SettleAuction = () => {
     }, [progress]);
 
     const handleSettle = async () => {
-        let result;
-        result = await settleAuction(tokenId, setProgress);
-        console.log(result);
+        try {
+            let orderId = await settleAuction(tokenId, setProgress);
+            console.log(orderId);
+        } catch(err) {
+            console.log(err);
+        }
+        
     }
 
     return (
