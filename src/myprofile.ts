@@ -10,7 +10,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType, getCurrentMarketAddress } from "./global";
-import { ImageDidInfo, NFTDidInfo, NormalCollectionInfo, UserDidInfo } from './utils';
+import { CollectionSocialField, ImageDidInfo, NFTDidInfo, NormalCollectionInfo, UserDidInfo } from './utils';
 import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
@@ -81,7 +81,7 @@ export class MyProfile extends Profile {
         avatar: any,
         background: any,
         category: CollectionCategory,
-        socialMedias: any,
+        socialMedias: CollectionSocialField,
         handleProgress: any) : Promise<string> {
         let ipfsURL:string;
         try {

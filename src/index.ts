@@ -15,6 +15,7 @@ import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
 import { CallAssistService } from "./callassistservice";
 import { ChainTypes } from "./chaintype";
+import { CollectionSocialField } from "./utils";
 const initialize = (testnet = true) => {
     setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
@@ -238,7 +239,7 @@ const registerCollection = async (
     avatar: any,
     background: any,
     category: CollectionCategory,
-    socialMedias: any,
+    socialMedias: CollectionSocialField,
     royalties: RoyaltyRate[],
     handleProgress: any = null
 ) => {
@@ -260,7 +261,7 @@ const updateCollectionInfo = async (
     avatar: any,
     background: any,
     category: CollectionCategory,
-    socialMedias: any,
+    socialMedias: CollectionSocialField,
     handleProgress: any = null
 ) => {
     try {
@@ -417,6 +418,20 @@ const getChainTypes = () => {
     return chainTypes.getChainTypes();
 }
 
+const getCollectionSocialField = () => {
+    let socials: CollectionSocialField = {
+        "website": "",
+        "profile": "",
+        "feeds": "",
+        "twitter": "",
+        "discord": "",
+        "telegram": "",
+        "medium": ""
+    }
+
+    return socials;
+}
+
 export {
     initialize,
     mintNft,
@@ -440,6 +455,7 @@ export {
     registerCollection,
     getCollectionType,
     getCollectionCategories,
+    getCollectionSocialField,
     getAccountInfo,
     updateCollectionInfo,
     updateCollectionRoyalties,

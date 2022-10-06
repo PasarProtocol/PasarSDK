@@ -40,3 +40,13 @@ export interface NormalCollectionInfo {
     "symbol": string,
     "owner": string
 }
+
+export interface CollectionSocialField {
+    "website": string,
+    "profile": string,
+    "feeds": string,
+    "twitter": string,
+    "discord": string,
+    "telegram": string,
+    "medium": string
+}
