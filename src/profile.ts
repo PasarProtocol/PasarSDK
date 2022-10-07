@@ -20,10 +20,6 @@ export class Profile {
         return accounts[0];
     }
 
-    protected async getGasPrice(): Promise<string> {
-        return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice()
-    }
-
     /**
      * Query the listed NFTs owned by this profile.
      * @param walletAddr the wallet address of user

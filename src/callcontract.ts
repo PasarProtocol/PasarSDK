@@ -519,7 +519,7 @@ export class CallContract {
             let deployArgs = [name, symbol, collectionUri, diaAddress, diaTokenValue];
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-
+            
             gasPrice = getFilteredGasPrice(gasPrice);
 
             let registerContract = new walletConnectWeb3.eth.Contract(contractData.abi);
