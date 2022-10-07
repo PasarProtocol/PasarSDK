@@ -4,7 +4,6 @@
 import { signin, signout, checkSign } from "./signin";
 import { NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
-import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";

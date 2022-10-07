@@ -5,7 +5,6 @@ import bs58 from 'bs58';
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
-import { ProgressHandler } from "./progresshandler";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";

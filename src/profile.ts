@@ -2,11 +2,6 @@ import { AppContext } from "./appcontext"
 import { Dispatcher } from "./dispatcher";
 import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
-import { CallContract } from "./callcontract";
-import { CallAssistService } from "./callassistservice";
-import { isInAppBrowser} from "./global";
-import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import Web3 from "web3";
 
 export class Profile {
     // private appContext: AppContext = new AppContext();
