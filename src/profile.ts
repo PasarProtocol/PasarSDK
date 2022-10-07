@@ -36,10 +36,6 @@ export class Profile {
         return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice()
     }
 
-    protected getCallContext(): CallContract {
-        return AppContext.getAppContext().getCallContract();
-    }
-
     protected getCallAssistService(): any {
         return AppContext.getAppContext().getCallAssistService();
     }
