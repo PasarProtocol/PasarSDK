@@ -57,7 +57,7 @@ export class MyProfile extends Profile {
         }
 
         try {
-            let collectionAddress = await AppContext.getAppContext().getCallContract().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], this.getEssentialConnector(), gasPrice);
+            let collectionAddress = await AppContext.getAppContext().getCallContract().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], gasPrice);
             progressHandler ? progressHandler(70) : null;
             return collectionAddress;
         } catch(err) {
@@ -163,11 +163,11 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 throw new Error("You can't register this collection");
             }
-            await AppContext.getAppContext().getCallContract().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
             progressHandler ? progressHandler(100) : null;
             return tokenAddress;
         } catch(err) {
@@ -195,11 +195,11 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 throw new Error("You can't update the information of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollection(account, tokenAddress, name, collectionUri, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().updateCollection(account, tokenAddress, name, collectionUri, gasPrice);
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
             throw new Error(err);
@@ -224,11 +224,11 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress,);
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 throw new Error("You can't update the royalties of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollectionRoyalties(account, tokenAddress, royaltyRates, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().updateCollectionRoyalties(account, tokenAddress, royaltyRates, gasPrice);
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
             throw new Error(err);
@@ -333,13 +333,13 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType);
+            let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
             let collectionType = collection.getERCStandard();
             
-            await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, gasPrice);
             progressHandler ? progressHandler(100) : null;
 
             return tokenId;
@@ -377,7 +377,7 @@ export class MyProfile extends Profile {
 
             if(checkFeedsCollection(baseToken))
                 abiFile = FEED_CONTRACT_ABI;
-            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, gasPrice);
             handleProgress ? handleProgress(100) : null;
 
             return tokenId;
@@ -419,7 +419,7 @@ export class MyProfile extends Profile {
             let abiFile = PASAR_CONTRACT_ABI;
             if(collectionType == ItemType.ERC721) 
                 abiFile = TOKEN_721_ABI;
-            await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, gasPrice);
             
             handleProgress ? handleProgress(100) : null;
         } catch(err) {
@@ -460,10 +460,10 @@ export class MyProfile extends Profile {
                 if(collectionType == ItemType.ERC721) 
                     abiFile = TOKEN_721_ABI;
                     
-                await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, account, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, account, gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await AppContext.getAppContext().getCallContract().transferNFT(abiFile, account, toAddr, tokenId, baseToken, collectionType, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().transferNFT(abiFile, account, toAddr, tokenId, baseToken, collectionType, gasPrice);
                 progressHandler ? progressHandler(100) : null;
             } catch(err) {
                 throw new Error(err);
@@ -506,10 +506,10 @@ export class MyProfile extends Profile {
             let priceValue = BigInt(price*1e18).toString();
             try {
                 let marketPlaceAddress = getCurrentMarketAddress();
-                await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await AppContext.getAppContext().getCallContract().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, gasPrice);
                 
                 progressHandler ? progressHandler(100) : null;
                 return tokenId;
@@ -549,7 +549,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePrice(account, parseInt(orderId), priceValue, newPricingToken, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().changePrice(account, parseInt(orderId), priceValue, newPricingToken, gasPrice);
             progressHandler ? progressHandler(100) : null;
 
             return orderId;
@@ -602,10 +602,10 @@ export class MyProfile extends Profile {
             }
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(account, buyoutPriceValue, quoteToken, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().approveToken(account, buyoutPriceValue, quoteToken, gasPrice);
             }
 
-            await AppContext.getAppContext().getCallContract().buyItem(account, orderId, buyoutPriceValue, quoteToken, did, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().buyItem(account, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
             
             progressHandler ? progressHandler(100) : null;
 
@@ -648,9 +648,9 @@ export class MyProfile extends Profile {
 
         try {
             let marketPlaceAddress = getCurrentMarketAddress();
-            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
             progressHandler ? progressHandler(50) : null;
-            await AppContext.getAppContext().getCallContract().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, gasPrice);
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -696,7 +696,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePriceOnAuction(account, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().changePriceOnAuction(account, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
             
             progressHandler ? progressHandler(100) : null;
 
@@ -739,9 +739,9 @@ export class MyProfile extends Profile {
             let priceValue = Number(BigInt(price*1e18));
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(account, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
+                await AppContext.getAppContext().getCallContract().approveToken(account, priceValue, quoteToken, gasPrice);
             }
-            await AppContext.getAppContext().getCallContract().bidItemOnAuction(account, orderId, priceValue, quoteToken, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().bidItemOnAuction(account, orderId, priceValue, quoteToken, gasPrice);
             progressHandler ? progressHandler(100) : null;
 
             return orderId;
@@ -774,7 +774,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().settleAuction(account, orderId, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().settleAuction(account, orderId, gasPrice);
             progressHandler ? progressHandler(100) : null;
 
             return orderId;
@@ -809,7 +809,7 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().unlistItem(account, orderId, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().unlistItem(account, orderId, gasPrice);
             
             progressHandler ? progressHandler(100) : null;
         } catch(err) {

@@ -95,10 +95,6 @@ export class AppContext {
         return this.chainNode
     }
 
-    public getWeb3Provider(): Web3 {
-        return null
-    }
-
     public getCallContract(): CallContract {
         if(!this.callContract) {
             this.callContract = new CallContract();

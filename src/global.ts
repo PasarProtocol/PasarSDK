@@ -219,7 +219,7 @@ const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toStr
 
 const StringIsNumber = value => isNaN(Number(value)) === true;
 
-const getChainTypeNumber = (chaintype:ChainType) => {
+const getChainTypeNumber = (chaintype:string) => {
     if(chaintype == ChainType.ESC) {
         return 1;
     } else if(chaintype == ChainType.ETH) {

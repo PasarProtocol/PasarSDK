@@ -13,6 +13,7 @@ import { getUserInfo } from './userinfo';
 import { UserInfo } from './userinfo';
 import { RoyaltyRate } from './RoyaltyRate';
 import { ItemType } from './itemtype';
+import { AppContext } from './appcontext';
 
 /**
  * This class is to call the contract functions
@@ -37,7 +38,6 @@ export class CallContract {
      * @param tokenId tokenId of being minted
      * @param totalSupply quantity of nft of being minted
      * @param royaltyFee royalty fee of nft
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being minted the nft
      */
@@ -49,13 +49,12 @@ export class CallContract {
         totalSupply: number,
         metaData: string,
         royaltyFee: number,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             if(checkPasarCollection(contractAddress)) {
@@ -84,7 +83,6 @@ export class CallContract {
      * @param contractAddress address of contract
      * @param account my wallet address
      * @param tokenId tokenId of being minted
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being minted the nft
      */
@@ -94,13 +92,12 @@ export class CallContract {
         tokenId: string,
         collectionType: string,
         metaData: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
     
             let pasarContract = new walletConnectWeb3.eth.Contract(TOKEN_721_ABI, contractAddress);
             let mintFunction = pasarContract.methods.mint(tokenId, metaData);
@@ -127,7 +124,6 @@ export class CallContract {
      * @param tokenId tokenId of being minted
      * @param totalSupply quantity of nft of being minted
      * @param royaltyFee royalty fee of nft
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being minted the nft
      */
@@ -138,13 +134,12 @@ export class CallContract {
         tokenId: string,
         totalSupply: number,
         collectionType: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
     
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
     
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             let burnFunction = pasarContract.methods.burn(tokenId, totalSupply);
@@ -166,7 +161,6 @@ export class CallContract {
      * @param tokenId tokenId of being minted
      * @param baseToken the collection address of nft
      * @param royaltyFee royalty fee of nft
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -176,7 +170,6 @@ export class CallContract {
         baseToken: string,
         price: string,
         quoteToken: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -184,7 +177,7 @@ export class CallContract {
     
             let jsonDid:UserInfo = getUserInfo();
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -210,13 +203,12 @@ export class CallContract {
         baseToken: string,
         approvalAddress: any,
         account: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
             
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
 
             let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
             stickerContract.methods.setApprovalForAll(approvalAddress, true).send(transactionParams).on('receipt', (receipt) => {
@@ -232,7 +224,6 @@ export class CallContract {
      *
      * @param contractAbi the abi file of collection
      * @param account my wallet address
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being been approval the nft
      */
@@ -243,13 +234,12 @@ export class CallContract {
         tokenId: string,
         baseToken: string,
         collectionType: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
             
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
 
             let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
             let transferFunction = stickerContract.methods.safeTransferFrom(account, toAddress, tokenId, 1);
@@ -274,7 +264,6 @@ export class CallContract {
      * @param reservePrice The minimum pricing that user
      * @param buyoutPrice The buyout price for the auction order, set to 0 to disable buyout
      * @param expirationTime: The time for ending the auction
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -287,7 +276,6 @@ export class CallContract {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -299,7 +287,7 @@ export class CallContract {
 
             let jsonDid:UserInfo = getUserInfo();
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -319,7 +307,6 @@ export class CallContract {
      * @param orderId The orderId of NFT item on maketplace
      * @param quoteToken The token address of new pricing token
      * @param newPrice The new listed price
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -328,13 +315,12 @@ export class CallContract {
         orderId: number,
         newPrice: string,
         quoteToken: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -355,7 +341,6 @@ export class CallContract {
      * @param newMinPrice The new minimum starting price for bidding on the auction
      * @param newReservedPrice The new minimum pricing that user
      * @param newBuyoutPrice The new buyout price for the auction order, set to 0 to disable buyout
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -366,13 +351,12 @@ export class CallContract {
         newReservedPrice: string,
         newBuyoutPrice: string,
         quoteToken: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -389,7 +373,6 @@ export class CallContract {
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -399,13 +382,12 @@ export class CallContract {
         price: number,
         quoteToken: string,
         did: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -424,7 +406,6 @@ export class CallContract {
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
      * @param price The price of bid
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -433,13 +414,12 @@ export class CallContract {
         orderId: string,
         price: number,
         quoteToken: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let jsonDid:UserInfo = getUserInfo();
 
@@ -458,20 +438,18 @@ export class CallContract {
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
      public settleAuction (
         account: string,
         orderId: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -490,20 +468,18 @@ export class CallContract {
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
      public unlistItem (
         account: string,
         orderId: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
@@ -533,7 +509,6 @@ export class CallContract {
         symbol: string,
         collectionUri: string,
         contractData: any,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -543,7 +518,7 @@ export class CallContract {
 
             let deployArgs = [name, symbol, collectionUri, diaAddress, diaTokenValue];
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
 
             gasPrice = getFilteredGasPrice(gasPrice);
 
@@ -578,7 +553,6 @@ export class CallContract {
      * @param name The name of NFT collection
      * @param collectionUri the uri of nft on ipfs
      * @param royaltyRates the list of owners and royalties
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -588,13 +562,12 @@ export class CallContract {
         name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
@@ -619,7 +592,6 @@ export class CallContract {
      * @param tokenAddress the address of collection
      * @param name The name of NFT collection
      * @param collectionUri the uri of nft on ipfs
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -628,13 +600,12 @@ export class CallContract {
         tokenAddress: string,
         name: string,
         collectionUri: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
@@ -653,7 +624,6 @@ export class CallContract {
      * @param account my wallet address
      * @param tokenAddress the address of collection
      * @param royaltyRates new royalties of collection
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -661,13 +631,12 @@ export class CallContract {
         account: string,
         tokenAddress: string,
         royaltyRates: RoyaltyRate[],
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
-            const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+            const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
@@ -691,14 +660,12 @@ export class CallContract {
      * Get the name, symbol, owner of collection
      *
      * @param tokenAddress address of collection
-     * @param essentialsConnector essestial connector for creating web3
      * @returns result of being listed the nft
      */
      public async getCollectionInfo (
         tokenAddress: string,
-        essentialsConnector: any,
     ): Promise<NormalCollectionInfo> {
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+        const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
         const tokenContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, tokenAddress);
 
         let name = await tokenContract.methods.name().call();
@@ -719,7 +686,6 @@ export class CallContract {
      * @param account my wallet address
      * @param price the price of allowanced the token
      * @param quoteToken the token address of collection
-     * @param essentialsConnector essestial connector for creating web3
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -727,11 +693,10 @@ export class CallContract {
         account: string,
         price: number,
         quoteToken: string,
-        essentialsConnector: any,
         gasPrice: string
     ): Promise<any> {
         const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-        const walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+        const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
         
         let marketPlaceAddress = getCurrentMarketAddress();
         let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);

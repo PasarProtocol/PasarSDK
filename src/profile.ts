@@ -15,14 +15,6 @@ export class Profile {
 
     }
 
-    protected getEssentialConnector(): EssentialsConnector {
-        return AppContext.getAppContext().getEssentialConnector();
-    }
-
-    protected getWeb3Connector(): Web3 {
-        return AppContext.getAppContext().getWeb3Connector();
-    }
-
     protected getChainId():number {
         return AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
     }

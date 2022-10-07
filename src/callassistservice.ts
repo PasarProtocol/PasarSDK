@@ -55,7 +55,7 @@ export class CallAssistService {
      * @param address address of collection
      * @param chaintype type of chain
      */
-    public async getDetailedCollectionInfo(address:string, chaintype:ChainType): Promise<Collection> {
+    public async getDetailedCollectionInfo(address:string, chaintype:string): Promise<Collection> {
         let baseUrl;
 
         if(isTestnetNetwork()) {
