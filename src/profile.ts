@@ -11,32 +11,29 @@ import Web3 from "web3";
 export class Profile {
     private appContext: AppContext = new AppContext();
     
-    private essentialsConnector: EssentialsConnector = new EssentialsConnector();
-    private walletConnectWeb3: Web3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider());
-
     constructor() {
 
     }
 
     protected getEssentialConnector(): EssentialsConnector {
-        return this.essentialsConnector;
+        return this.appContext.getEssentialConnector();
     }
 
     protected getWeb3Connector(): Web3 {
-        return this.walletConnectWeb3;
+        return this.appContext.getWeb3Connector();
     }
 
     protected getChainId():number {
-        return this.essentialsConnector.getWalletConnectProvider().wc.chainId;
+        return this.appContext.getEssentialConnector().getWalletConnectProvider().wc.chainId;
     }
 
     protected async getWalletAddress(): Promise<string> {
-        let accounts = await this.walletConnectWeb3.eth.getAccounts();
+        let accounts = await this.appContext.getWeb3Connector().eth.getAccounts();
         return accounts[0];
     }
 
     protected async getGasPrice(): Promise<string> {
-        return await this.walletConnectWeb3.eth.getGasPrice()
+        return await this.appContext.getWeb3Connector().eth.getGasPrice()
     }
 
     protected getAppContext(): AppContext {

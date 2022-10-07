@@ -5,6 +5,8 @@ import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import Web3 from "web3";
 import { CallContract } from "./callcontract";
 import { CallAssistService } from "./callassistservice";
+import { isInAppBrowser} from "./global";
+import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
 export class AppContext {
     private appDID: string;
@@ -16,7 +18,10 @@ export class AppContext {
 
     private suppoertedCollections: CollectionAddress[] = null;
     private callContract: CallContract;
-    private callAssistService: CallAssistService = new CallAssistService();
+    private callAssistService: CallAssistService;
+    private essentialsConnector: EssentialsConnector;
+    private walletConnectWeb3: Web3;
+
     /**
      * Set the collections that will be interacting with in this SDK.
      *
@@ -99,5 +104,19 @@ export class AppContext {
         }
         
         return this.callAssistService;
+    }
+
+    public getEssentialConnector(): EssentialsConnector {
+        if(!this.essentialsConnector) {
+            this.essentialsConnector = new EssentialsConnector();
+        }
+        return this.essentialsConnector;
+    }
+
+    public getWeb3Connector(): Web3 {
+        if(!this.walletConnectWeb3) {
+            this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider())
+        }
+        return this.walletConnectWeb3;
     }
 }
