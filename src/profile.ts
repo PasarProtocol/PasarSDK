@@ -36,10 +36,6 @@ export class Profile {
         return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice()
     }
 
-    protected getCallAssistService(): any {
-        return AppContext.getAppContext().getCallAssistService();
-    }
-
     /**
      * Query the listed NFTs owned by this profile.
      * @param walletAddr the wallet address of user
