@@ -22,6 +22,15 @@ export class AppContext {
     private essentialsConnector: EssentialsConnector;
     private walletConnectWeb3: Web3;
 
+    static appContext: AppContext;
+
+    static getAppContext(): AppContext {
+        if(!this.appContext) {
+            this.appContext = new AppContext();
+        }
+        return this.appContext;
+    }
+
     /**
      * Set the collections that will be interacting with in this SDK.
      *
@@ -115,7 +124,8 @@ export class AppContext {
 
     public getWeb3Connector(): Web3 {
         if(!this.walletConnectWeb3) {
-            this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : this.essentialsConnector.getWalletConnectProvider())
+            let essentialsConnector = this.getEssentialConnector();
+            this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider())
         }
         return this.walletConnectWeb3;
     }

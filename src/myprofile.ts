@@ -23,6 +23,7 @@ import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
 import { ChainType } from './chaintype';
 import { Collection } from './collection';
 import { NftItem } from './nftitem';
+import { AppContext } from './appcontext';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -162,11 +163,11 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         
         try {
-            let collectionInfo: NormalCollectionInfo = await this.getCallContext().getCollectionInfo(tokenAddress, this.getEssentialConnector());
+            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress, this.getEssentialConnector());
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 throw new Error("You can't register this collection");
             }
-            await this.getCallContext().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(100) : null;
             return tokenAddress;
         } catch(err) {
@@ -198,7 +199,7 @@ export class MyProfile extends Profile {
             if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
                 throw new Error("You can't update the information of this collection");
             }
-            await this.getCallContext().updateCollection(account, tokenAddress, name, collectionUri, this.getEssentialConnector(), gasPrice);
+            await AppContext.getAppContext().getCallContract().updateCollection(account, tokenAddress, name, collectionUri, this.getEssentialConnector(), gasPrice);
             progressHandler ? progressHandler(100) : null;
         } catch(err) {
             throw new Error(err);

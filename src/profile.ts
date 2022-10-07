@@ -9,43 +9,39 @@ import { EssentialsConnector } from '@elastosfoundation/essentials-connector-cli
 import Web3 from "web3";
 
 export class Profile {
-    private appContext: AppContext = new AppContext();
+    // private appContext: AppContext = new AppContext();
     
     constructor() {
 
     }
 
     protected getEssentialConnector(): EssentialsConnector {
-        return this.appContext.getEssentialConnector();
+        return AppContext.getAppContext().getEssentialConnector();
     }
 
     protected getWeb3Connector(): Web3 {
-        return this.appContext.getWeb3Connector();
+        return AppContext.getAppContext().getWeb3Connector();
     }
 
     protected getChainId():number {
-        return this.appContext.getEssentialConnector().getWalletConnectProvider().wc.chainId;
+        return AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
     }
 
     protected async getWalletAddress(): Promise<string> {
-        let accounts = await this.appContext.getWeb3Connector().eth.getAccounts();
+        let accounts = await AppContext.getAppContext().getWeb3Connector().eth.getAccounts();
         return accounts[0];
     }
 
     protected async getGasPrice(): Promise<string> {
-        return await this.appContext.getWeb3Connector().eth.getGasPrice()
-    }
-
-    protected getAppContext(): AppContext {
-        return this.appContext
+        return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice()
     }
 
     protected getCallContext(): CallContract {
-        return this.appContext.getCallContract();
+        return AppContext.getAppContext().getCallContract();
     }
 
     protected getCallAssistService(): any {
-        return this.appContext.getCallAssistService();
+        return AppContext.getAppContext().getCallAssistService();
     }
 
     /**
@@ -56,7 +52,7 @@ export class Profile {
     public async queryListedItems(
         walletAddr:string,
     ): Promise<NftItem[]> {
-        let result = await this.appContext.getCallAssistService().getOwnedListedNft(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getOwnedListedNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the listed nfts");
         }
@@ -87,7 +83,7 @@ export class Profile {
     public async queryOwnedItems(
         walletAddr:string,
     ): Promise<NftItem[]> {
-        let result = await this.appContext.getCallAssistService().getOwnedNft(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getOwnedNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the owned nfts");
         }
@@ -115,7 +111,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
     public async queryBiddingItems(walletAddr:string): Promise<NftItem[]> {
-        let result = await this.appContext.getCallAssistService().getBiddingNft(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getBiddingNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the created nfts");
         }
@@ -143,7 +139,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryCreatedItems(walletAddr: string): Promise<NftItem[]> {
-        let result = await this.appContext.getCallAssistService().getCreatedNft(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getCreatedNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the created nfts");
         }
@@ -171,7 +167,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async querySoldItems(walletAddr: string): Promise<NftItem[]> {
-        let result = await this.appContext.getCallAssistService().getSoldNft(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getSoldNft(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the created nfts");
         }
@@ -201,7 +197,7 @@ export class Profile {
      public async queryCollections(
         walletAddr: string
      ): Promise<Collection[]> {
-        let result = await this.appContext.getCallAssistService().getOwnedCollection(walletAddr);
+        let result = await AppContext.getAppContext().getCallAssistService().getOwnedCollection(walletAddr);
         if(result == null) {
             throw new Error("Failed to get the listed nfts");
         }
