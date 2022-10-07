@@ -3,6 +3,8 @@ import { ChainType } from "./chaintype";
 import { isTestnetNetwork, NetworkType } from "./networkType";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import Web3 from "web3";
+import { CallContract } from "./callcontract";
+import { CallAssistService } from "./callassistservice";
 
 export class AppContext {
     private appDID: string;
@@ -13,7 +15,8 @@ export class AppContext {
     private chainNode: string;
 
     private suppoertedCollections: CollectionAddress[] = null;
-
+    private callContract: CallContract;
+    private callAssistService: CallAssistService = new CallAssistService();
     /**
      * Set the collections that will be interacting with in this SDK.
      *
@@ -80,5 +83,21 @@ export class AppContext {
 
     public getWeb3Provider(): Web3 {
         return null
+    }
+
+    public getCallContract(): CallContract {
+        if(!this.callContract) {
+            this.callContract = new CallContract();
+        }
+
+        return this.callContract;
+    }
+
+    public getCallAssistService(): CallAssistService {
+        if(!this.callAssistService) {
+            this.callAssistService = new CallAssistService();
+        }
+        
+        return this.callAssistService;
     }
 }
