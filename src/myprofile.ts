@@ -407,7 +407,7 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         handleProgress ? handleProgress(60) : null;
         try {
-            let chainId = this.getChainId();
+            let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
             let chainType = getCurrentChainType(chainId);
 
             let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
@@ -448,7 +448,7 @@ export class MyProfile extends Profile {
             progressHandler ? progressHandler(30) : null;
 
             try {
-                let chainId = this.getChainId();
+                let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
                 let chainType = getCurrentChainType(chainId);
                 let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
                 if(collection == null) {

@@ -15,10 +15,6 @@ export class Profile {
 
     }
 
-    protected getChainId():number {
-        return AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-    }
-
     protected async getWalletAddress(): Promise<string> {
         let accounts = await AppContext.getAppContext().getWeb3Connector().eth.getAccounts();
         return accounts[0];
