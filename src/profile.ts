@@ -4,7 +4,7 @@ import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 
 export class Profile {
-    private appContext: AppContext = AppContext.getAppContext();
+    private appContext = AppContext.getAppContext();
     private userDid: string;
     private walletAddress: string;
 
@@ -17,9 +17,12 @@ export class Profile {
     constructor() {
     }
 
-    protected async getWalletAddress(): Promise<string> {
-        let accounts = await AppContext.getAppContext().getWeb3Connector().eth.getAccounts();
-        return accounts[0];
+    public getDid(): string {
+        return this.userDid;
+    }
+
+    public getWalletAddress(): string {
+        return this.walletAddress;
     }
 
     /**
@@ -27,7 +30,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryOwnedItems(): Promise<NftItem[]> {
-        return await AppContext.getAppContext().getCallAssistService().getOwnedNft(this.walletAddress).catch(error => {
+        return await this.appContext.getCallAssistService().getOwnedNft(this.walletAddress).catch(error => {
             throw new Error("Failed to get the owned nfts");
         })
     }

@@ -18,11 +18,16 @@ export class AppContext {
 
     private suppoertedCollections: CollectionAddress[] = null;
     private callContract: CallContract;
-    private callAssistService: CallAssistService;
+    private assistService: CallAssistService;
     private essentialsConnector: EssentialsConnector;
     private walletConnectWeb3: Web3;
 
     static appContext: AppContext;
+
+    private constructor() {
+        this.callContract = new CallContract();
+        this.assistService = new CallAssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+    }
 
     static getAppContext(): AppContext {
         if(!this.appContext) {
@@ -96,19 +101,11 @@ export class AppContext {
     }
 
     public getCallContract(): CallContract {
-        if(!this.callContract) {
-            this.callContract = new CallContract();
-        }
-
         return this.callContract;
     }
 
     public getCallAssistService(): CallAssistService {
-        if(!this.callAssistService) {
-            this.callAssistService = new CallAssistService();
-        }
-        
-        return this.callAssistService;
+        return this.assistService;
     }
 
     public getEssentialConnector(): EssentialsConnector {

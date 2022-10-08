@@ -2,7 +2,7 @@
 'use strict';
 
 import { signin, signout, checkSign } from "./signin";
-import { NetworkType, setNetworkType } from "./networkType";
+import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { CoinType } from "./cointype";
 import { ListType } from "./listtype";
@@ -15,6 +15,7 @@ import { Profile } from "./profile";
 import { CallAssistService } from "./callassistservice";
 import { ChainTypes } from "./chaintype";
 import { CollectionSocialField } from "./utils";
+import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 let myProfileInfo, profileInfo;
 
@@ -56,9 +57,9 @@ const mintNft = async (
         let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
         if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
             tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
-        else 
+        else
             tokenId = await profile.creatItem(baseToken, resultMetadata, handleProgress);
-        
+
         return tokenId;
     } catch(err) {
         throw new Error(err);
@@ -91,7 +92,7 @@ const transferNft = async (
     } catch(err) {
         throw new Error(err);
     }
-    
+
 }
 
 const listItem = async (
@@ -174,7 +175,7 @@ const buyItem = async (
 ) => {
     try {
         let profile = getMyProfileInfo();
-        
+
         let orderId = await profile.buyItem(tokenId, baseToken, handleProgress);
         return orderId;
     } catch(err) {
@@ -336,7 +337,7 @@ const getCollectionCategories = () => {
     Object.keys(CollectionCategory).filter(StringIsNumber).map((cell) => {
         collectionType.push(cell);
     })
-    
+
     return collectionType;
 }
 
@@ -350,7 +351,7 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let callAssistService =  new CallAssistService();
+        let callAssistService =  new CallAssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
         let info = await callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
