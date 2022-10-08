@@ -4,10 +4,17 @@ import { Collection } from "./collection";
 import { NftItem } from "./nftitem"
 
 export class Profile {
-    // private appContext: AppContext = new AppContext();
-    
-    constructor() {
+    private appContext: AppContext = AppContext.getAppContext();
+    private userDid: string;
+    private walletAddress: string;
 
+
+    /*constructor(userDid: string, walletAddress: string) {
+        this.userDid = userDid;
+        this.walletAddress = walletAddress;
+
+    }*/
+    constructor() {
     }
 
     protected async getWalletAddress(): Promise<string> {
@@ -16,18 +23,38 @@ export class Profile {
     }
 
     /**
-     * Query the listed NFTs owned by this profile.
-     * @param walletAddr the wallet address of user
+     * Fetch the owned NFTs by this profile.
      * @returns: A list of NFT items.
      */
-    public async queryListedItems(
-        walletAddr:string,
-    ): Promise<NftItem[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getOwnedListedNft(walletAddr);
-        if(result == null) {
+     public async queryOwnedItems(): Promise<NftItem[]> {
+        return await AppContext.getAppContext().getCallAssistService().getOwnedNft(this.walletAddress).catch(error => {
+            throw new Error("Failed to get the owned nfts");
+        })
+    }
+
+    /**
+     * Fetch and dispatch owned NFT items from remote assist service to dispatcher routine.
+     *
+     * @param dispatcher The dispatcher routine to deal with the NFT items.
+     */
+     public async queryAndDispatchOwnedItems(dispatcher: Dispatcher<NftItem>) {
+        return await this.queryOwnedItems().then ( items => {
+             items.forEach(item => {
+                 dispatcher.dispatch(item)
+             })
+        }).catch ( error => {
+             throw new Error(error)
+        })
+    }
+
+    /**
+     * Query the listed NFTs owned by this profile.
+     * @returns: A list of NFT items.
+     */
+    public async queryListedItems(): Promise<NftItem[]> {
+        return await this.appContext.getCallAssistService().getOwnedListedNft(this.walletAddress).catch((error) => {
             throw new Error("Failed to get the listed nfts");
-        }
-        return result;
+        })
     }
 
     /**
@@ -36,57 +63,24 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-    public queryAndDispatchListedItems(dispatcher: Dispatcher<NftItem>) {
-        // return this.queryListedItems().then ( items => {
-        //     items.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
+    public async queryAndDispatchListedItems(dispatcher: Dispatcher<NftItem>) {
+        return await this.queryListedItems().then ( items => {
+             items.forEach(item => {
+                 dispatcher.dispatch(item)
+             })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
-     * Fetch the owned NFTs by this profile.
-     * @param walletAddr the wallet address of user
+     * Fetch the bidding NFTs by this profile.
      * @returns: A list of NFT items.
      */
-    public async queryOwnedItems(
-        walletAddr:string,
-    ): Promise<NftItem[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getOwnedNft(walletAddr);
-        if(result == null) {
-            throw new Error("Failed to get the owned nfts");
-        }
-        return result;
-    }
-
-    /**
-     * Fetch and dispatch owned NFT items from remote assist service to dispatcher routine.
-     *
-     * @param dispatcher The dispatcher routine to deal with the NFT items.
-     */
-     public queryAndDispatchOwnedItems(dispatcher: Dispatcher<NftItem>) {
-        // return this.queryOwnedItems().then ( items => {
-        //     items.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
-    }
-
-    /**
-     * Fetch the bidding NFTs by this profile.  
-     * @param walletAddr the wallet address of user
-     * @returns: A list of NFT items.
-     */
-    public async queryBiddingItems(walletAddr:string): Promise<NftItem[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getBiddingNft(walletAddr);
-        if(result == null) {
-            throw new Error("Failed to get the created nfts");
-        }
-        return result;
+    public async queryBiddingItems(): Promise<NftItem[]> {
+        return await this.appContext.getCallAssistService().getBiddingNft(this.walletAddress).catch(error => {
+            throw new Error("Failed to get the bidding nfts");
+        });
     }
 
     /**
@@ -94,27 +88,24 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public queryAndDispatchBiddingItems(dispatcher: Dispatcher<NftItem>) {
-        // return this.queryBiddingItems().then ( items => {
-        //     items.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
+     public async queryAndDispatchBiddingItems(dispatcher: Dispatcher<NftItem>) {
+        return await this.queryBiddingItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the created NFTs by this profile.
-     * @param walletAddr the wallet address of user
      * @returns: A list of NFT items.
      */
-     public async queryCreatedItems(walletAddr: string): Promise<NftItem[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getCreatedNft(walletAddr);
-        if(result == null) {
+     public async queryCreatedItems(): Promise<NftItem[]> {
+        return await this.appContext.getCallAssistService().getCreatedNft(this.walletAddress).catch(error => {
             throw new Error("Failed to get the created nfts");
-        }
-        return result;
+        })
     }
 
     /**
@@ -122,27 +113,24 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public queryAndDispatchCreatedItems(dispatcher: Dispatcher<NftItem>) {
-        // return this.queryCreatedItems().then ( items => {
-        //     items.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
+     public async queryAndDispatchCreatedItems(dispatcher: Dispatcher<NftItem>) {
+        return await this.queryCreatedItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch the sold NFTs by this profile.
-     * @param walletAddr the wallet address of user
      * @returns: A list of NFT items.
      */
-     public async querySoldItems(walletAddr: string): Promise<NftItem[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getSoldNft(walletAddr);
-        if(result == null) {
-            throw new Error("Failed to get the created nfts");
-        }
-        return result;
+     public async querySoldItems(): Promise<NftItem[]> {
+        return await this.appContext.getCallAssistService().getSoldNft(this.walletAddress).catch (error => {
+            throw new Error("Failed to get the sold nfts");
+        })
     }
 
     /**
@@ -150,29 +138,24 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT items.
      */
-     public queryAndDispatchSoldItems(dispatcher: Dispatcher<NftItem>) {
-        // return this.querySoldItems().then ( items => {
-        //     items.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
+     public async queryAndDispatchSoldItems(dispatcher: Dispatcher<NftItem>) {
+        return await this.querySoldItems().then ( items => {
+            items.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 
     /**
      * Fetch all the collection regsitered onto Pasar marketplace
-     * @param walletAddr the address whom be owned the nft
      * @returns: A list of NFT items.
      */
-     public async queryCollections(
-        walletAddr: string
-     ): Promise<Collection[]> {
-        let result = await AppContext.getAppContext().getCallAssistService().getOwnedCollection(walletAddr);
-        if(result == null) {
-            throw new Error("Failed to get the listed nfts");
-        }
-        return result;
+     public async queryCollections(): Promise<Collection[]> {
+        return await this.appContext.getCallAssistService().getOwnedCollection(this.walletAddress).catch(error => {
+            throw new Error("Failed to get the created collections");
+        })
     }
 
     /**
@@ -180,13 +163,13 @@ export class Profile {
      *
      * @param dispatcher The dispatcher routine to deal with the NFT item.
      */
-     public fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
-        // return this.queryCollections().then ( collections => {
-        //     collections.forEach(item => {
-        //         dispatcher.dispatch(item)
-        //     })
-        // }).catch ( error => {
-        //     throw new Error(error)
-        // })
+     public async fetchAndDispatchCollections(dispatcher: Dispatcher<Collection>) {
+        return await this.queryCollections().then ( collections => {
+            collections.forEach(item => {
+                dispatcher.dispatch(item)
+            })
+        }).catch ( error => {
+            throw new Error(error)
+        })
     }
 }
