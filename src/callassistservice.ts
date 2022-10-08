@@ -54,18 +54,29 @@ export class CallAssistService {
      * @param chaintype type of chain
      */
     public async getDetailedCollectionInfo(address:string, chaintype:string): Promise<Collection> {
-        let chainNum = await getChainTypeNumber(chaintype);
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${address}?marketPlace=${chainNum}`);
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${address}?marketPlace=${getChainTypeNumber(chaintype)}`).then(async result => {
+            return await result.json();
+        }).then (data => {
+            if (data['code'] != 200) {
+                throw new Error("Call API to fetch collection info failed");
+            }
 
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let collectionType = dataInfo['is721'] ? ItemType.ERC721 : ItemType.ERC1155;
-        let collection: Collection =  new Collection(dataInfo['token'], dataInfo['creatorDid'], dataInfo['owner'], dataInfo['tokenJson']['data']['avatar'], dataInfo['name'], dataInfo['tokenJson']['data']['description'], dataInfo['symbol'], collectionType, dataInfo['tokenJson']['data']['category'], dataInfo['tokenJson']['data']['socials']);
-
-        return collection;
+            let dataInfo = data['data'];
+            return new Collection(
+                dataInfo['token'],
+                dataInfo['creatorDid'],
+                dataInfo['owner'],
+                dataInfo['tokenJson']['data']['avatar'],
+                dataInfo['name'],
+                dataInfo['tokenJson']['data']['description'],
+                dataInfo['symbol'],
+                dataInfo['is721'] ? ItemType.ERC721 : ItemType.ERC1155,
+                dataInfo['tokenJson']['data']['category'],
+                dataInfo['tokenJson']['data']['socials']
+            );
+        }).catch (error => {
+            throw new Error(`Failed to get Collection Info (erro: ${error}`);
+        })
     }
 
     /**
@@ -121,23 +132,52 @@ export class CallAssistService {
      *
      * @param walletAddr the address of user
      */
-     public async getOwnedListedNft(walletAddr: string): Promise<NftItem[]> {
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getListedCollectiblesByAddress/${walletAddr}?orderType=0`);
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let listNftInfo: NftItem[] = [];
-        for(var i = 0; i < dataInfo.length; i++) {
-            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
-            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+     public async getListedItems(walletAddr: string): Promise<NftItem[]> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getListedCollectiblesByAddress/${walletAddr}?orderType=0`).then(result => {
+            return result.json();
+        }).then(data => {
+            if (data['code'] != 2000) {
+                throw new Error("Call API to fetch bidding NFT failed");
+            }
+            let dataInfoArray = data['data'];
+            let items: NftItem[] = [];
+            for(var i = 0; i < dataInfoArray.length; i++) {
+                let itemInfo = dataInfoArray[i];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
-            listNftInfo.push(itemNft);
-        }
+                let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
+                let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
 
-        return listNftInfo;
+                let itemNft =  new NftItem(
+                    itemInfo['tokenId'],
+                    itemInfo['tokenIdHex'],
+                    itemInfo['name'],
+                    itemInfo['description'],
+                    thumbnail,
+                    image,
+                    itemInfo['adult'],
+                    itemInfo['properties'],
+                    itemInfo['tokenJsonVersion'],
+                    itemInfo['marketPlace'],
+                    itemInfo['holder'],
+                    itemInfo['royaltyOwner'],
+                    itemInfo['createTime'],
+                    parseInt(itemInfo['marketTime']),
+                    parseInt(itemInfo['endTime']),
+                    itemInfo['orderId'],
+                    itemInfo['quoteToken'],
+                    itemInfo['price'],
+                    itemInfo['buyoutPrice'],
+                    itemInfo['reservePrice'],
+                    itemInfo['minPrice'],
+                    itemInfo['orderState'],
+                    itemInfo['orderType']
+                );
+                items.push(itemNft);
+            }
+            return items;
+        }).catch (error => {
+            throw new Error(`Failed to get listed NFTs with error: ${error}`);
+        })
     }
 
     /**
@@ -145,23 +185,52 @@ export class CallAssistService {
      *
      * @param walletAddr the address of user
      */
-     public async getOwnedNft(walletAddr: string): Promise<NftItem[]> {
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getOwnCollectiblesByAddress/${walletAddr}?orderType=0`);
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let listNftInfo: NftItem[] = [];
-        for(var i = 0; i < dataInfo.length; i++) {
-            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
-            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+     public async getOwnedItems(walletAddr: string): Promise<NftItem[]> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getOwnCollectiblesByAddress/${walletAddr}?orderType=0`).then(result => {
+            return result.json();
+        }).then(data => {
+            if (data['code'] != 2000) {
+                throw new Error("Call API to fetch bidding NFT failed");
+            }
+            let dataInfoArray = data['data'];
+            let items: NftItem[] = [];
+            for(var i = 0; i < dataInfoArray.length; i++) {
+                let itemInfo = dataInfoArray[i];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
-            listNftInfo.push(itemNft);
-        }
+                let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
+                let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
 
-        return listNftInfo;
+                let itemNft =  new NftItem(
+                    itemInfo['tokenId'],
+                    itemInfo['tokenIdHex'],
+                    itemInfo['name'],
+                    itemInfo['description'],
+                    thumbnail,
+                    image,
+                    itemInfo['adult'],
+                    itemInfo['properties'],
+                    itemInfo['tokenJsonVersion'],
+                    itemInfo['marketPlace'],
+                    itemInfo['holder'],
+                    itemInfo['royaltyOwner'],
+                    itemInfo['createTime'],
+                    parseInt(itemInfo['marketTime']),
+                    parseInt(itemInfo['endTime']),
+                    itemInfo['orderId'],
+                    itemInfo['quoteToken'],
+                    itemInfo['price'],
+                    itemInfo['buyoutPrice'],
+                    itemInfo['reservePrice'],
+                    itemInfo['minPrice'],
+                    itemInfo['orderState'],
+                    itemInfo['orderType']
+                );
+                items.push(itemNft);
+            }
+            return items;
+        }).catch (error => {
+            throw new Error(`Failed to get owned NFTs with error: ${error}`);
+        })
     }
 
     /**
@@ -169,23 +238,52 @@ export class CallAssistService {
      *
      * @param walletAddr the address of user
      */
-     public async getCreatedNft(walletAddr: string): Promise<NftItem[]> {
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getCreatedCollectiblesByAddress/${walletAddr}?orderType=0`);
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let listNftInfo: NftItem[] = [];
-        for(var i = 0; i < dataInfo.length; i++) {
-            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
-            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+     public async getCreatedItems(walletAddr: string): Promise<NftItem[]> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getCreatedCollectiblesByAddress/${walletAddr}?orderType=0`).then(result => {
+            return result.json();
+        }).then(data => {
+            if (data['code'] != 2000) {
+                throw new Error("Call API to fetch bidding NFT failed");
+            }
+            let dataInfoArray = data['data'];
+            let items: NftItem[] = [];
+            for(var i = 0; i < dataInfoArray.length; i++) {
+                let itemInfo = dataInfoArray[i];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
-            listNftInfo.push(itemNft);
-        }
+                let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
+                let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
 
-        return listNftInfo;
+                let itemNft =  new NftItem(
+                    itemInfo['tokenId'],
+                    itemInfo['tokenIdHex'],
+                    itemInfo['name'],
+                    itemInfo['description'],
+                    thumbnail,
+                    image,
+                    itemInfo['adult'],
+                    itemInfo['properties'],
+                    itemInfo['tokenJsonVersion'],
+                    itemInfo['marketPlace'],
+                    itemInfo['holder'],
+                    itemInfo['royaltyOwner'],
+                    itemInfo['createTime'],
+                    parseInt(itemInfo['marketTime']),
+                    parseInt(itemInfo['endTime']),
+                    itemInfo['orderId'],
+                    itemInfo['quoteToken'],
+                    itemInfo['price'],
+                    itemInfo['buyoutPrice'],
+                    itemInfo['reservePrice'],
+                    itemInfo['minPrice'],
+                    itemInfo['orderState'],
+                    itemInfo['orderType']
+                );
+                items.push(itemNft);
+            }
+            return items;
+        }).catch (error => {
+            throw new Error(`Failed to get created NFTs with error: ${error}`);
+        })
     }
 
     /**
@@ -193,23 +291,52 @@ export class CallAssistService {
      *
      * @param walletAddr the address of user
      */
-     public async getBiddingNft(walletAddr: string): Promise<NftItem[]> {
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getBidCollectiblesByAddress/${walletAddr}?orderType=0`);
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let listNftInfo: NftItem[] = [];
-        for(var i = 0; i < dataInfo.length; i++) {
-            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
-            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+     public async getBiddingItems(walletAddr: string): Promise<NftItem[]> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getBidCollectiblesByAddress/${walletAddr}?orderType=0`).then(result => {
+            return result.json();
+        }).then(data => {
+            if (data['code'] != 2000) {
+                throw new Error("Call API to fetch bidding NFT failed");
+            }
+            let dataInfoArray = data['data'];
+            let items: NftItem[] = [];
+            for(var i = 0; i < dataInfoArray.length; i++) {
+                let itemInfo = dataInfoArray[i];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
-            listNftInfo.push(itemNft);
-        }
+                let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
+                let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
 
-        return listNftInfo;
+                let itemNft =  new NftItem(
+                    itemInfo['tokenId'],
+                    itemInfo['tokenIdHex'],
+                    itemInfo['name'],
+                    itemInfo['description'],
+                    thumbnail,
+                    image,
+                    itemInfo['adult'],
+                    itemInfo['properties'],
+                    itemInfo['tokenJsonVersion'],
+                    itemInfo['marketPlace'],
+                    itemInfo['holder'],
+                    itemInfo['royaltyOwner'],
+                    itemInfo['createTime'],
+                    parseInt(itemInfo['marketTime']),
+                    parseInt(itemInfo['endTime']),
+                    itemInfo['orderId'],
+                    itemInfo['quoteToken'],
+                    itemInfo['price'],
+                    itemInfo['buyoutPrice'],
+                    itemInfo['reservePrice'],
+                    itemInfo['minPrice'],
+                    itemInfo['orderState'],
+                    itemInfo['orderType']
+                );
+                items.push(itemNft);
+            }
+            return items;
+        }).catch (error => {
+            throw new Error(`Failed to get bidding NFTs with error: ${error}`);
+        })
     }
 
     /**
@@ -217,22 +344,51 @@ export class CallAssistService {
      *
      * @param walletAddr the address of user
      */
-     public async getSoldNft(walletAddr: string): Promise<NftItem[]> {
-        let result  = await fetch(`${this.baseUrl}/api/v2/sticker/getSoldCollectiblesByAddress/${walletAddr}?orderType=0`);
-        let jsonData = await result.json();
-        if(jsonData['code'] != 200) {
-            return null
-        }
-        let dataInfo = jsonData['data'];
-        let listNftInfo: NftItem[] = [];
-        for(var i = 0; i < dataInfo.length; i++) {
-            let thumbnail = dataInfo[i]['data'] ? dataInfo[i]['data']['thumbnail'] : dataInfo[i]['thumbnail'];
-            let image = dataInfo[i]['data'] ? dataInfo[i]['data']['image'] : dataInfo[i]['asset'];
+     public async getSoldItems(walletAddr: string): Promise<NftItem[]> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getSoldCollectiblesByAddress/${walletAddr}?orderType=0`).then(result => {
+            return result.json();
+        }).then(data => {
+            if (data['code'] != 2000) {
+                throw new Error("Call API to fetch bidding NFT failed");
+            }
+            let dataInfoArray = data['data'];
+            let items: NftItem[] = [];
+            for(var i = 0; i < dataInfoArray.length; i++) {
+                let itemInfo = dataInfoArray[i];
 
-            let itemNft: NftItem =  new NftItem(dataInfo[i]['tokenId'], dataInfo[i]['tokenIdHex'], dataInfo[i]['name'], dataInfo[i]['description'], thumbnail, image, dataInfo[i]['adult'], dataInfo[i]['properties'], dataInfo[i]['tokenJsonVersion'], dataInfo[i]['marketPlace'], dataInfo[i]['holder'], dataInfo[i]['royaltyOwner'], dataInfo[i]['createTime'], parseInt(dataInfo[i]['marketTime']), parseInt(dataInfo[i]['endTime']), dataInfo[i]['orderId'], dataInfo[i]['quoteToken'], dataInfo[i]['price'], dataInfo[i]['buyoutPrice'], dataInfo[i]['reservePrice'], dataInfo[i]['minPrice'], dataInfo[i]['orderState'], dataInfo[i]['orderType']);
-            listNftInfo.push(itemNft);
-        }
+                let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
+                let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
 
-        return listNftInfo;
+                let itemNft =  new NftItem(
+                    itemInfo['tokenId'],
+                    itemInfo['tokenIdHex'],
+                    itemInfo['name'],
+                    itemInfo['description'],
+                    thumbnail,
+                    image,
+                    itemInfo['adult'],
+                    itemInfo['properties'],
+                    itemInfo['tokenJsonVersion'],
+                    itemInfo['marketPlace'],
+                    itemInfo['holder'],
+                    itemInfo['royaltyOwner'],
+                    itemInfo['createTime'],
+                    parseInt(itemInfo['marketTime']),
+                    parseInt(itemInfo['endTime']),
+                    itemInfo['orderId'],
+                    itemInfo['quoteToken'],
+                    itemInfo['price'],
+                    itemInfo['buyoutPrice'],
+                    itemInfo['reservePrice'],
+                    itemInfo['minPrice'],
+                    itemInfo['orderState'],
+                    itemInfo['orderType']
+                );
+                items.push(itemNft);
+            }
+            return items;
+        }).catch (error => {
+            throw new Error(`Failed to get sold NFTs with error: ${error}`);
+        })
     }
 }
