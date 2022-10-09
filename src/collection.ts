@@ -1,73 +1,112 @@
 import { Category } from "./category";
 import { Filter } from "./filters/filter";
-import { CollectionAddress } from "./contractaddress";
 import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";
+import { ChainType } from "./chaintype";
 
-class Collection {
-    private contractAddr: CollectionAddress;
-    private ownerDid: string;
-    private ownerAddr: string;
+class CollectionInfo {
+    constractAddr: string;
+    network: ChainType;
+    createdDid: string;
+    createdAddr: string;
+    name: string;
+    symbol: string;
 
-    private socialLinks: any;
-    private avatar: string;
-    private name: string;
-    private symbol: string;
-    private description: string;
-    private itemType: ItemType;
-    private category: Category;
+    socialLinks: string[];
+    avatar: string;
+    description: string;
+    ercType: ItemType;
+    category: Category;
 
-    constructor(contractAddress: CollectionAddress, ownerDid: string, ownerAddr: string, avatar: string, name: string, description: string, symbol: string, itemType: ItemType, category: Category, socialLink: any) {
-        this.contractAddr = contractAddress;
-        this.ownerDid = ownerDid;
-        this.ownerAddr = ownerAddr;
-        this.avatar = avatar;
+    constructor(contractAddr: string, network: ChainType, creatorDid: string, creatorAddr: string, name: string, symbol: string) {
+        this.constractAddr = contractAddr;
+        this.network = network;
+        this.createdDid = creatorDid;
+        this.createdAddr = creatorAddr;
         this.name = name;
         this.symbol = symbol;
+    }
+
+    public appendSoicalLink(link: string): CollectionInfo {
+        this.socialLinks.push(link);
+        return this;
+    }
+
+    public setSocialLinks(links: string[]): CollectionInfo {
+        this.socialLinks = links;
+        return this;
+    }
+
+    public setAvatar(avatar: string): CollectionInfo {
+        this.avatar = avatar;
+        return this;
+    }
+
+    public setDescription(description: string): CollectionInfo {
         this.description = description;
-        this.itemType = itemType;
+        return this;
+    }
+
+    public setErcType(ercType: ItemType): CollectionInfo {
+        this.ercType = ercType;
+        return this;
+    }
+
+    public setCategory(category: Category): CollectionInfo {
         this.category = category;
-        this.socialLinks = socialLink;
+        return this;
+    }
+}
+
+class Collection {
+    private info: CollectionInfo;
+
+    constructor(collecionInfo: CollectionInfo) {
+        this.info = collecionInfo;
     }
 
-    public getContractAddress(): CollectionAddress {
-        return this.contractAddr;
+    public getContractAddress(): string {
+        return this.info.constractAddr;
     }
 
-    public getOwnerDid(): string {
-        return this.ownerDid;
+    public getNetwork(): string {
+        return this.info.network;
     }
 
-    public getOwnerAddress(): string {
-        return this.ownerAddr;
+    public getOwnerdDid(): string {
+        return this.info.createdDid;
     }
 
-    public getAvatar(): string {
-        return this.avatar;
+    public getOwnerAddr(): string {
+        return this.info.createdAddr;
     }
 
     public getName(): string {
-        return this.name;
+        return this.info.name;
     }
 
     public getSymbol(): string {
-        return this.symbol;
+        return this.info.symbol;
+    }
+
+    public getAvatar(): string {
+        return this.info.avatar;
     }
 
     public getDescritpion(): string {
-        return this.description;
+        return this.info.description;
     }
 
-    public getERCStandard(): string {
-        return this.itemType.toString();
+    public getErcType(): string {
+        return this.info.ercType;
     }
 
     public getCategory(): string {
-        return this.category.toString();
+        return this.info.category;
     }
 
-    public getSocialLinks(): any {
-        return this.socialLinks;
+    public getSocialLinks(): string[] {
+        return this.info.socialLinks;
     }
 
     public queryItemCount(): Promise<number> {
@@ -82,15 +121,12 @@ class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryOwnercount(): Promise<number> {
-        throw new Error("Method not implemented");
-    }
-
-    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter): Promise<NftItem[]> {
+    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter = null): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 }
 
 export {
     Collection,
+    CollectionInfo,
 }

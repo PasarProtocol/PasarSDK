@@ -1,5 +1,5 @@
 import { AppContext } from "./appcontext"
-import { Collection } from "./collection";
+import { Collection, CollectionInfo } from "./collection";
 import { NftItem } from "./nftitem"
 
 export class Profile {
@@ -80,7 +80,7 @@ export class Profile {
      * Query all the collection regsitered onto Pasar marketplace
      * @returns: A list of NFT items.
      */
-     public async queryCollections(): Promise<Collection[]> {
+     public async queryCollections(): Promise<CollectionInfo[]> {
         return await this.assistService.getOwnedCollections(this.walletAddress).catch(error => {
             throw new Error(error);
         })

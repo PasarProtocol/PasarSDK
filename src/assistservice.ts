@@ -2,7 +2,8 @@
  * This class get the nfts from pasar assist backend
  */
 
-import { Collection } from "./collection";
+import { ChainType } from "./chaintype";
+import { Collection, CollectionInfo } from "./collection";
 import { getChainTypeNumber } from "./global";
 import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";
@@ -77,27 +78,32 @@ export class AssistService {
      * @param address address of collection
      * @param chaintype type of chain
      */
-    public async getCollectionInfo(collectionAddr:string, chaintype:string): Promise<Collection> {
-        return await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainTypeNumber(chaintype)}`).then(async result => {
+    public async getCollectionInfo(collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainTypeNumber(chainType)}`).then(async result => {
             return await result.json();
-        }).then (data => {
-            if (data['code'] != 200) {
+        }).then (json => {
+            if (json['code'] != 200) {
                 throw new Error("Call API to fetch collection info failed");
             }
 
-            let dataInfo = data['data'];
-            return new Collection(
-                dataInfo['token'],
-                dataInfo['creatorDid'],
-                dataInfo['owner'],
-                dataInfo['tokenJson']['data']['avatar'],
-                dataInfo['name'],
-                dataInfo['tokenJson']['data']['description'],
-                dataInfo['symbol'],
-                dataInfo['is721'] ? ItemType.ERC721 : ItemType.ERC1155,
-                dataInfo['tokenJson']['data']['category'],
-                dataInfo['tokenJson']['data']['socials']
+            let body = json['data'];
+            let data = body['tokenJson']['data'];
+
+            let info = new CollectionInfo(
+                body['token'],
+                chainType,
+                body['creatorDid'],
+                body['owner'],
+                body['name'],
+                body['symbol']
             );
+
+            return info.setSocialLinks(data['socials'])
+                .setDescription(data['description'])
+                .setAvatar(data['avatar'])
+                .setDescription(data['description'])
+                .setCategory(data['category'])
+                .setErcType(body['is721'] ? ItemType.ERC721 : ItemType.ERC1155)
         }).catch (error => {
             throw new Error(`Failed to get Collection Info (erro: ${error}`);
         })
@@ -153,30 +159,37 @@ export class AssistService {
      * @param walletAddr the address whom be owned the nft
      * @return back the list of owned collection
      */
-    public async getOwnedCollections(walletAddr: string): Promise<Collection[]> {
+    public async getOwnedCollections(walletAddr: string): Promise<CollectionInfo[]> {
         return await fetch(`${this.baseUrl}/api/v2/sticker/getCollectionByOwner/${walletAddr}?marketPlace=1`).then(async result => {
             return await result.json();
-        }).then(data => {
-            if (data['code'] != 2000) {
+        }).then(json => {
+            if (json['code'] != 2000) {
                 throw new Error("Call API to fetch owned Collections failed");
             }
-            let collections: Collection[] = [];
-            let collectionArray = data['data'];
-            for (var i = 0; i < collectionArray.length; i++) {
-                let dataInfo = collectionArray[i];
-                let collection =  new Collection(
-                    dataInfo['token'],
-                    dataInfo['creatorDid'],
-                    dataInfo['owner'],
-                    dataInfo['tokenJson']['data']['avatar'],
-                    dataInfo['name'],
-                    dataInfo['tokenJson']['data']['description'],
-                    dataInfo['symbol'],
-                    dataInfo['is721'] ? ItemType.ERC721 : ItemType.ERC1155,
-                    dataInfo['tokenJson']['data']['category'],
-                    dataInfo['tokenJson']['data']['socials']
+            let collections: CollectionInfo[] = [];
+            let body = json['data'];
+
+            for (var i = 0; i < body.length; i++) {
+                let item = body[i];
+                let data = item['tokenJson']['data'];
+
+                let info = new CollectionInfo(
+                    item['token'],
+                    ChainType.ESC,
+                    item['creatorDid'],
+                    item['owner'],
+                    item['name'],
+                    item['symbol']
                 );
-                collections.push(collection);
+
+                info.setSocialLinks(data['socials'])
+                    .setDescription(data['description'])
+                    .setAvatar(data['avatar'])
+                    .setDescription(data['description'])
+                    .setCategory(data['category'])
+                    .setErcType(body['is721'] ? ItemType.ERC721 : ItemType.ERC1155)
+
+                collections.push(info);
             }
             return collections;
         }).catch (error => {

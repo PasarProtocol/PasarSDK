@@ -19,7 +19,7 @@ import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
-import { ChainType, getChainTypes } from './chaintype';
+import { ChainType, getChainTypeById, getChainTypes } from './chaintype';
 import { Collection } from './collection';
 import { NftItem } from './nftitem';
 import { AppContext } from './appcontext';
@@ -332,11 +332,12 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
+            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
-            let collectionType = collection.getERCStandard();
+            //let collectionType = collection.getERCStandard();
+            let collectionType = ChainType.ESC;
 
             await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, gasPrice);
             progressHandler ? progressHandler(100) : null;
@@ -407,14 +408,15 @@ export class MyProfile extends Profile {
         handleProgress ? handleProgress(60) : null;
         try {
             let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-            let chainType = getCurrentChainType(chainId);
+            let chainType = getChainTypeById(chainId);
 
-            let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
+            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
 
-            let collectionType = collection.getERCStandard();
+            //let collectionType = collection.getErcType();
+            let collectionType = ItemType.ERC721;
             let abiFile = PASAR_CONTRACT_ABI;
             if(collectionType == ItemType.ERC721)
                 abiFile = TOKEN_721_ABI;
@@ -448,13 +450,14 @@ export class MyProfile extends Profile {
 
             try {
                 let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-                let chainType = getCurrentChainType(chainId);
-                let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
+                let chainType = getChainTypeById(chainId);
+                let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
                 if(collection == null) {
                     throw new Error("Can't find the this collection");
                 }
 
-                let collectionType = collection.getERCStandard();
+                // let collectionType = collection.getErcType();
+                let collectionType = ItemType.ERC721;
                 let abiFile = PASAR_CONTRACT_ABI;
                 if(collectionType == ItemType.ERC721)
                     abiFile = TOKEN_721_ABI;
