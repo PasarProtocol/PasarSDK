@@ -4,7 +4,7 @@ import { isTestnetNetwork, NetworkType } from "./networkType";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import Web3 from "web3";
 import { CallContract } from "./callcontract";
-import { CallAssistService } from "./callassistservice";
+import { AssistService } from "./assistservice";
 import { isInAppBrowser} from "./global";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
@@ -18,7 +18,7 @@ export class AppContext {
 
     private suppoertedCollections: CollectionAddress[] = null;
     private callContract: CallContract;
-    private assistService: CallAssistService;
+    private assistService: AssistService;
     private essentialsConnector: EssentialsConnector;
     private walletConnectWeb3: Web3;
 
@@ -26,7 +26,7 @@ export class AppContext {
 
     private constructor() {
         this.callContract = new CallContract();
-        this.assistService = new CallAssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+        this.assistService = new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
     }
 
     static getAppContext(): AppContext {
@@ -104,7 +104,7 @@ export class AppContext {
         return this.callContract;
     }
 
-    public getCallAssistService(): CallAssistService {
+    public getAssistService(): AssistService {
         return this.assistService;
     }
 

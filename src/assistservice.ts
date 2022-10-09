@@ -8,7 +8,7 @@ import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";
 import { NftListInfo } from "./nftlistinfo";
 
-export class CallAssistService {
+export class AssistService {
     private baseUrl: string;
 
     constructor(baseUrl: string) {
@@ -16,14 +16,14 @@ export class CallAssistService {
     }
 
     /**
-     * get all nfts listed on Pasar marketplace.
+     * Query all listed NFT items on marketplace
      *
      * @param collection the address of collection, default is empty;
      * @param pageNum the page number, default 1;
      * @param pageSize the count of nft per page, default value = 10;
      */
-    public async getAllListedItems(collection = '', pageNum = 1, pageSize = 10): Promise<NftListInfo> {
-        return await fetch(`${this.baseUrl}/api/v2/sticker/getDetailedCollectibles?collectionType=${collection}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`).then(async result => {
+    public async getAllListedItems(collectionAddr = '', pageNum = 1, pageSize = 10): Promise<NftListInfo> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getDetailedCollectibles?collectionType=${collectionAddr}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`).then(async result => {
             return await result.json();
         }).then (data => {
             if (data['code'] != 200) {
@@ -77,8 +77,8 @@ export class CallAssistService {
      * @param address address of collection
      * @param chaintype type of chain
      */
-    public async getDetailedCollectionInfo(address:string, chaintype:string): Promise<Collection> {
-        return await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${address}?marketPlace=${getChainTypeNumber(chaintype)}`).then(async result => {
+    public async getCollectionInfo(collectionAddr:string, chaintype:string): Promise<Collection> {
+        return await fetch(`${this.baseUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainTypeNumber(chaintype)}`).then(async result => {
             return await result.json();
         }).then (data => {
             if (data['code'] != 200) {

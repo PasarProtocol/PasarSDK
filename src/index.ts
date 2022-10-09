@@ -12,7 +12,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
-import { CallAssistService } from "./callassistservice";
+import { AssistService } from "./assistservice";
 import { ChainTypes } from "./chaintype";
 import { CollectionSocialField } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
@@ -351,8 +351,8 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let callAssistService =  new CallAssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
-        let info = await callAssistService.getAllListedItems(collectionAddr, pageNum, pageSize);
+        let assistService =  new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+        let info = await assistService.getAllListedItems(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
         throw new Error(err);

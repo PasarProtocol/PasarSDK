@@ -332,7 +332,7 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(60) : null;
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, ChainType.ESC);
+            let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
@@ -409,7 +409,7 @@ export class MyProfile extends Profile {
             let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
             let chainType = getCurrentChainType(chainId);
 
-            let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
+            let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
@@ -449,7 +449,7 @@ export class MyProfile extends Profile {
             try {
                 let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
                 let chainType = getCurrentChainType(chainId);
-                let collection:Collection = await AppContext.getAppContext().getCallAssistService().getDetailedCollectionInfo(baseToken, chainType);
+                let collection:Collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
                 if(collection == null) {
                     throw new Error("Can't find the this collection");
                 }
@@ -542,7 +542,7 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
         let priceValue = BigInt(newPrice*1e18).toString();
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "1") {
                 throw new Error("You can't change the price of this nft");
             }
@@ -578,7 +578,7 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
         let did = await this.getUserDid();
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
 
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 throw new Error("You can't buy this nft");
@@ -689,7 +689,7 @@ export class MyProfile extends Profile {
         let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't change the price of this nft");
             }
@@ -728,7 +728,7 @@ export class MyProfile extends Profile {
         progressHandler ? progressHandler(30) : null;
 
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't bid to this nft");
             }
@@ -767,7 +767,7 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't settle auction to this nft");
             }
@@ -802,7 +802,7 @@ export class MyProfile extends Profile {
         gasPrice = getFilteredGasPrice(gasPrice);
         progressHandler ? progressHandler(30) : null;
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getCallAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 throw new Error("You can't unlist this nft on marketplace");
             }

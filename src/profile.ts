@@ -30,7 +30,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryOwnedItems(): Promise<NftItem[]> {
-        return await this.appContext.getCallAssistService().getOwnedItems(this.walletAddress).catch(error => {
+        return await this.appContext.getAssistService().getOwnedItems(this.walletAddress).catch(error => {
             throw new Error("Failed to get the owned nfts");
         })
     }
@@ -55,7 +55,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
     public async queryListedItems(): Promise<NftItem[]> {
-        return await this.appContext.getCallAssistService().getListedItems(this.walletAddress).catch((error) => {
+        return await this.appContext.getAssistService().getListedItems(this.walletAddress).catch((error) => {
             throw new Error("Failed to get the listed nfts");
         })
     }
@@ -81,7 +81,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
     public async queryBiddingItems(): Promise<NftItem[]> {
-        return await this.appContext.getCallAssistService().getBiddingItems(this.walletAddress).catch(error => {
+        return await this.appContext.getAssistService().getBiddingItems(this.walletAddress).catch(error => {
             throw new Error("Failed to get the bidding nfts");
         });
     }
@@ -106,7 +106,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryCreatedItems(): Promise<NftItem[]> {
-        return await this.appContext.getCallAssistService().getCreatedItems(this.walletAddress).catch(error => {
+        return await this.appContext.getAssistService().getCreatedItems(this.walletAddress).catch(error => {
             throw new Error("Failed to get the created nfts");
         })
     }
@@ -131,7 +131,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async querySoldItems(): Promise<NftItem[]> {
-        return await this.appContext.getCallAssistService().getSoldItems(this.walletAddress).catch (error => {
+        return await this.appContext.getAssistService().getSoldItems(this.walletAddress).catch (error => {
             throw new Error("Failed to get the sold nfts");
         })
     }
@@ -156,7 +156,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryCollections(): Promise<Collection[]> {
-        return await this.appContext.getCallAssistService().getOwnedCollections(this.walletAddress).catch(error => {
+        return await this.appContext.getAssistService().getOwnedCollections(this.walletAddress).catch(error => {
             throw new Error("Failed to get the created collections");
         })
     }
