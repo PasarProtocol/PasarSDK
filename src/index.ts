@@ -5,7 +5,7 @@ import { signin, signout, checkSign } from "./signin";
 import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { CoinType } from "./cointype";
-import { ListType } from "./listtype";
+import { getListTypes, isOnAuction } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
@@ -312,13 +312,11 @@ const getCoinType = () => {
 }
 
 const getListType = () => {
-    let listType = new ListType();
-    return listType.getListTypes();
+    return getListTypes();
 }
 
 const isAuction = (type:string) => {
-    let listType = new ListType();
-    return listType.isAuction(type);
+    return isOnAuction(type);
 }
 
 const getCollectionType = () => {

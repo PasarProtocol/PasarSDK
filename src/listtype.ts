@@ -1,24 +1,18 @@
-export enum ListTypes {
-    fixPrice = "FixPrice",
-    auction = "Auction"
+enum ListTypes {
+    fixedPrice = "FixedPrice",
+    onAuction = "OnAuction"
 }
 
-export class ListType {
-    
-    public getListTypes() {
-        var returnValue = [
-            ListTypes.fixPrice,
-            ListTypes.auction,
-        ]
+const getListTypes = (): ListTypes[] => {
+    return [ListTypes.fixedPrice, ListTypes.onAuction]
+}
 
-        return returnValue;
-    }
+const isOnAuction = (type:string): boolean => {
+    return ListTypes.onAuction == type;
+}
 
-    public isAuction(type: string) {
-        if(type == ListTypes.auction) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+export {
+    ListTypes,
+    getListTypes,
+    isOnAuction
 }
