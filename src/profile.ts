@@ -156,7 +156,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryCollections(): Promise<Collection[]> {
-        return await this.appContext.getCallAssistService().getOwnedCollection(this.walletAddress).catch(error => {
+        return await this.appContext.getCallAssistService().getOwnedCollections(this.walletAddress).catch(error => {
             throw new Error("Failed to get the created collections");
         })
     }

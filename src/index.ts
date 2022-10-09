@@ -352,7 +352,7 @@ const getListedItem = async (
 ) => {
     try {
         let callAssistService =  new CallAssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
-        let info = await callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
+        let info = await callAssistService.getAllListedItems(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
         throw new Error(err);
