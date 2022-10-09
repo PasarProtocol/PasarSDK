@@ -19,7 +19,7 @@ import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
-import { ChainType } from './chaintype';
+import { ChainType, getChainTypes } from './chaintype';
 import { Collection } from './collection';
 import { NftItem } from './nftitem';
 import { AppContext } from './appcontext';

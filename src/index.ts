@@ -13,7 +13,7 @@ import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./gl
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
 import { AssistService } from "./assistservice";
-import { ChainTypes } from "./chaintype";
+import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
@@ -430,8 +430,7 @@ const getSoldItem = async (
 }
 
 const getChainTypes = () => {
-    let chainTypes: ChainTypes = new ChainTypes();
-    return chainTypes.getChainTypes();
+    return _getChainTypes();
 }
 
 const getCollectionSocialField = () => {
