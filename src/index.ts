@@ -2,19 +2,19 @@
 'use strict';
 
 import { signin, signout, checkSign } from "./signin";
-import { NetworkType, setNetworkType } from "./networkType";
+import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
-import { CoinType } from "./cointype";
-import { ListType } from "./listtype";
-import { CollectionCategory } from "./collectioncategory";
+import { getListTypes, isOnAuction } from "./listtype";
+import { Category, getCategoryList } from "./category";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
-import { CallAssistService } from "./callassistservice";
-import { ChainTypes } from "./chaintype";
+import { AssistService } from "./assistservice";
+import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField } from "./utils";
+import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 let myProfileInfo, profileInfo;
 
@@ -56,9 +56,9 @@ const mintNft = async (
         let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
         if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
             tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
-        else 
+        else
             tokenId = await profile.creatItem(baseToken, resultMetadata, handleProgress);
-        
+
         return tokenId;
     } catch(err) {
         throw new Error(err);
@@ -91,7 +91,7 @@ const transferNft = async (
     } catch(err) {
         throw new Error(err);
     }
-    
+
 }
 
 const listItem = async (
@@ -174,7 +174,7 @@ const buyItem = async (
 ) => {
     try {
         let profile = getMyProfileInfo();
-        
+
         let orderId = await profile.buyItem(tokenId, baseToken, handleProgress);
         return orderId;
     } catch(err) {
@@ -234,7 +234,7 @@ const createCollection = async (
     avatar: any,
     background: any,
     itemType: ItemType,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: any,
     royalties: RoyaltyRate[],
     handleProgress: any = null
@@ -257,7 +257,7 @@ const registerCollection = async (
     description: string,
     avatar: any,
     background: any,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: CollectionSocialField,
     royalties: RoyaltyRate[],
     handleProgress: any = null
@@ -278,7 +278,7 @@ const updateCollectionInfo = async (
     description: string,
     avatar: any,
     background: any,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: CollectionSocialField,
     handleProgress: any = null
 ) => {
@@ -306,18 +306,16 @@ const updateCollectionRoyalties = async (
 }
 
 const getCoinType = () => {
-    let coinType = new CoinType();
-    return coinType.getCoinTypeList();
+    //let coinType = new CoinType();
+    //return coinType.getCoinTypeList();
 }
 
 const getListType = () => {
-    let listType = new ListType();
-    return listType.getListTypes();
+    return getListTypes();
 }
 
 const isAuction = (type:string) => {
-    let listType = new ListType();
-    return listType.isAuction(type);
+    return isOnAuction(type);
 }
 
 const getCollectionType = () => {
@@ -331,13 +329,7 @@ const getCollectionType = () => {
 }
 
 const getCollectionCategories = () => {
-    let collectionType = [];
-
-    Object.keys(CollectionCategory).filter(StringIsNumber).map((cell) => {
-        collectionType.push(cell);
-    })
-    
-    return collectionType;
+    return getCategoryList();
 }
 
 const getAccountInfo = () => {
@@ -350,8 +342,8 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let callAssistService =  new CallAssistService();
-        let info = await callAssistService.getNftsOnMarketPlace(collectionAddr, pageNum, pageSize);
+        let assistService =  new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+        let info = await assistService.getAllListedItems(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
         throw new Error(err);
@@ -431,8 +423,7 @@ const getSoldItem = async (
 }
 
 const getChainTypes = () => {
-    let chainTypes: ChainTypes = new ChainTypes();
-    return chainTypes.getChainTypes();
+    return _getChainTypes();
 }
 
 const getCollectionSocialField = () => {

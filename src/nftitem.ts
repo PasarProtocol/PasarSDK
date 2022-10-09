@@ -30,7 +30,7 @@ export class NftItem {
     constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
         tokenVersion: number, marketPlace: number, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
         orderId: any = null, quoteToken: any = null, price: any = null, buyoutPrice: any = null, reservePrice: any = null, minPrice: any = null, orderState: any = null, orderType: any = null) {
-        
+
         this.tokenId = id;
         this.tokenIdHex = tokenIdHex;
         this.name = name;
@@ -57,9 +57,9 @@ export class NftItem {
         if(orderType == null || orderType == "") {
             this.orderType = null;
         } else if(parseInt(orderType) == 1) {
-            this.orderType = ListTypes.fixPrice;
+            this.orderType = ListTypes.fixedPrice;
         } else if(parseInt(orderType) == 2) {
-            this.orderType = ListTypes.auction;
+            this.orderType = ListTypes.onAuction;
         }
 
         switch(marketPlace) {

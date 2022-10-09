@@ -1,5 +1,4 @@
 import { AppContext } from "./appcontext";
-import { Dispatcher } from "./dispatcher";
 import { Collection } from "./collection";
 import { Filter } from "./filters/filter";
 
@@ -15,8 +14,7 @@ class CollectionRegistry {
         throw new Error("Method not implemented");
     }
 
-    public queryCollection(earierThan: number, maximum: number, queryFilters: Filter,
-        disaptcher: Dispatcher<Collection>) {
+    public queryCollection(earierThan: number, maximum: number, queryFilters: Filter): Promise<Collection[]> {
         throw new Error("Method not implemented");
     }
 }
