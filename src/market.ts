@@ -1,6 +1,5 @@
 import { AppContext } from "./appcontext"
 import { Filter } from "./filters/filter";
-import { Dispatcher } from "./dispatcher";
 import { NftItem } from "./nftitem";
 
 /**
@@ -20,12 +19,9 @@ class Market {
 
     /**
      * Get the number of total listed NFT items from remote assist service.
-     *
-     * @param dispatcher: The dispatcher routine to deal with the total number of listed
-     *        NFT item.
      * @returns The promise object contain the total number of listed NFT items.
      */
-    public queryItemCount(dispatcher: Dispatcher<number>): Promise<number> {
+    public queryItemCount(): Promise<number> {
         throw new Error("Method not implemnted");
     }
 
@@ -35,8 +31,7 @@ class Market {
      * @param maximum
      * @param dispatcher
      */
-    public queryItems(earilerThan: number, maximum: number, filters: Filter,
-        dispatcher: Dispatcher<NftItem>): Promise<NftItem[]> {
+    public queryItems(earilerThan: number, maximum: number, filters: Filter): Promise<NftItem[]> {
 
         throw new Error("Method not implemented");
     }

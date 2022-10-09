@@ -1,7 +1,6 @@
 import { CollectionCategory } from "./collectioncategory";
 import { Filter } from "./filters/filter";
 import { CollectionAddress } from "./contractaddress";
-import { Dispatcher } from "./dispatcher";
 import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";
 
@@ -87,9 +86,7 @@ class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter,
-        dispatcher: Dispatcher<NftItem>): Promise<NftItem[]> {
-
+    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter): Promise<NftItem[]> {
         throw new Error("Method not implemented");
     }
 }

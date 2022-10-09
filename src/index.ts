@@ -4,7 +4,6 @@
 import { signin, signout, checkSign } from "./signin";
 import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
-import { CoinType } from "./cointype";
 import { getListTypes, isOnAuction } from "./listtype";
 import { CollectionCategory } from "./collectioncategory";
 import { ItemType } from "./itemtype";
@@ -307,8 +306,8 @@ const updateCollectionRoyalties = async (
 }
 
 const getCoinType = () => {
-    let coinType = new CoinType();
-    return coinType.getCoinTypeList();
+    //let coinType = new CoinType();
+    //return coinType.getCoinTypeList();
 }
 
 const getListType = () => {
