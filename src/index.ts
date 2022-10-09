@@ -5,7 +5,7 @@ import { signin, signout, checkSign } from "./signin";
 import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
-import { CollectionCategory } from "./collectioncategory";
+import { Category, getCategoryList } from "./category";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
@@ -234,7 +234,7 @@ const createCollection = async (
     avatar: any,
     background: any,
     itemType: ItemType,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: any,
     royalties: RoyaltyRate[],
     handleProgress: any = null
@@ -257,7 +257,7 @@ const registerCollection = async (
     description: string,
     avatar: any,
     background: any,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: CollectionSocialField,
     royalties: RoyaltyRate[],
     handleProgress: any = null
@@ -278,7 +278,7 @@ const updateCollectionInfo = async (
     description: string,
     avatar: any,
     background: any,
-    category: CollectionCategory,
+    category: Category,
     socialMedias: CollectionSocialField,
     handleProgress: any = null
 ) => {
@@ -329,13 +329,7 @@ const getCollectionType = () => {
 }
 
 const getCollectionCategories = () => {
-    let collectionType = [];
-
-    Object.keys(CollectionCategory).filter(StringIsNumber).map((cell) => {
-        collectionType.push(cell);
-    })
-
-    return collectionType;
+    return getCategoryList();
 }
 
 const getAccountInfo = () => {

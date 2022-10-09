@@ -1,4 +1,4 @@
-import { CollectionCategory } from "./collectioncategory";
+import { Category } from "./category";
 import { Filter } from "./filters/filter";
 import { CollectionAddress } from "./contractaddress";
 import { ItemType } from "./itemtype";
@@ -15,9 +15,9 @@ class Collection {
     private symbol: string;
     private description: string;
     private itemType: ItemType;
-    private category: CollectionCategory;
+    private category: Category;
 
-    constructor(contractAddress: CollectionAddress, ownerDid: string, ownerAddr: string, avatar: string, name: string, description: string, symbol: string, itemType: ItemType, category: CollectionCategory, socialLink: any) {
+    constructor(contractAddress: CollectionAddress, ownerDid: string, ownerAddr: string, avatar: string, name: string, description: string, symbol: string, itemType: ItemType, category: Category, socialLink: any) {
         this.contractAddr = contractAddress;
         this.ownerDid = ownerDid;
         this.ownerAddr = ownerAddr;

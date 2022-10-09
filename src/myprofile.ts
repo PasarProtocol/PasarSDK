@@ -2,7 +2,7 @@ import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import bs58 from 'bs58';
-import { CollectionCategory } from "./collectioncategory";
+import { Category } from "./category";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { RoyaltyRate } from "./RoyaltyRate";
@@ -80,7 +80,7 @@ export class MyProfile extends Profile {
         description: string,
         avatar: any,
         background: any,
-        category: CollectionCategory,
+        category: Category,
         socialMedias: CollectionSocialField,
         handleProgress: any) : Promise<string> {
         let ipfsURL:string;
