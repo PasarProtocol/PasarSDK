@@ -3,7 +3,7 @@
  */
 
 import { ChainType } from "./chaintype";
-import { Collection, CollectionInfo } from "./collection";
+import { CollectionInfo } from "./collection/collectioninfo";
 import { getChainTypeNumber } from "./global";
 import { ItemType } from "./itemtype";
 import { NftItem } from "./nftitem";

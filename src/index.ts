@@ -5,7 +5,7 @@ import { signin, signout, checkSign } from "./signin";
 import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
-import { Category, getCategoryList } from "./category";
+import { Category, getCategoryList } from "./collection/category";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";

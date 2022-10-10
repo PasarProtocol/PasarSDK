@@ -2,7 +2,7 @@ import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import bs58 from 'bs58';
-import { Category } from "./category";
+import { Category } from "./collection/category";
 import { ItemType } from "./itemtype";
 import { Profile } from "./profile";
 import { RoyaltyRate } from "./RoyaltyRate";
@@ -18,7 +18,7 @@ import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
 import { ChainType, getChainTypeById, getChainTypes } from './chaintype';
-import { Collection } from './collection';
+import { CollectionInfo } from './collection/collectioninfo';
 import { NftItem } from './nftitem';
 import { AppContext } from './appcontext';
 
