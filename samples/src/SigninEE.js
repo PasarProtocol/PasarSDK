@@ -1,6 +1,6 @@
 
 import React, {useEffect, useState} from 'react'
-import { signin, signout, checkSign, getListedItem, getOwnedCollection, getOwnedListedItem, getOwnedItem, getCreatedItem, getBiddingItem, getSoldItem } from '@pasarprotocol/pasar-sdk-development';
+import { signIn, singOut, checkSign, getListedItem, getOwnedCollection, getOwnedListedItem, getOwnedItem, getCreatedItem, getBiddingItem, getSoldItem } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
@@ -45,12 +45,12 @@ function SigninEE() {
   }
 
   const handleSigninEE1 = async () => {
-    let result = await signin();
+    let result = await signIn();
     setLogin(checkSign());
   }
 
   const handleSignout = async () => {
-    await signout();
+    await singOut();
     setLogin(checkSign());
   }
 
