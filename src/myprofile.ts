@@ -44,7 +44,7 @@ export class MyProfile extends Profile {
         collectionUri: string,
         itemType: ItemType,
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -154,7 +154,7 @@ export class MyProfile extends Profile {
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -186,7 +186,7 @@ export class MyProfile extends Profile {
         name: string,
         collectionUri: string,
         progressHandler: any): Promise<void> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -215,7 +215,7 @@ export class MyProfile extends Profile {
         tokenAddress: string,
         royaltyRates: RoyaltyRate[],
         progressHandler: any): Promise<void> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -323,7 +323,7 @@ export class MyProfile extends Profile {
     public async creatItem(baseToken: string,
         tokenUri: string,
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -364,7 +364,7 @@ export class MyProfile extends Profile {
         roylatyFee: number,
         handleProgress:any = null
     ): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -401,7 +401,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         totalSupply: number,
         handleProgress:any = null): Promise<void> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -442,7 +442,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         toAddr: string,
         progressHandler: any): Promise<void> {
-            let account = await this.getWalletAddress();
+            let account = await this.getUserInfo().address;
             let gasPrice = await AppContext.getAppContext().getGasPrice();
 
             gasPrice = getFilteredGasPrice(gasPrice);
@@ -500,7 +500,7 @@ export class MyProfile extends Profile {
         pricingToken: string,
         price: number,
         progressHandler: any=null): Promise<string> {
-            let account = await this.getWalletAddress();
+            let account = await this.getUserInfo().address;
             let gasPrice = await AppContext.getAppContext().getGasPrice();
 
             gasPrice = getFilteredGasPrice(gasPrice);
@@ -539,7 +539,7 @@ export class MyProfile extends Profile {
         newPricingToken: string,
         newPrice: number,
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -575,7 +575,7 @@ export class MyProfile extends Profile {
         baseToken: string,
         progressHandler: any): Promise<string> {
 
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -643,7 +643,7 @@ export class MyProfile extends Profile {
         expirationTime: number,
         progressHandler: any
     ): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -685,7 +685,7 @@ export class MyProfile extends Profile {
         newBuyoutPrice: number,
         progressHandler: any): Promise<string> {
 
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -727,7 +727,7 @@ export class MyProfile extends Profile {
         baseToken: string,
         price: number,
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -769,7 +769,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         baseToken: string,
         progressHandler: any): Promise<string> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
@@ -804,7 +804,7 @@ export class MyProfile extends Profile {
         tokenId: string,
         baseToken: string,
         progressHandler: any): Promise<void> {
-        let account = await this.getWalletAddress();
+        let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
 
         gasPrice = getFilteredGasPrice(gasPrice);
