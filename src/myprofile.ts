@@ -1,10 +1,8 @@
 import { create, IPFSHTTPClient } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
-import Web3 from 'web3';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
-import { Profile } from "./profile";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
@@ -21,11 +19,45 @@ import { ChainType, getChainTypeById, getChainTypes } from './chaintype';
 import { CollectionInfo } from './collection/collectioninfo';
 import { NftItem } from './nftitem';
 import { AppContext } from './appcontext';
+import { EmptyHandler, ProgressHandler } from './progresshandler';
+
+import {VerifiableCredential } from '@elastosfoundation/did-js-sdk';
 
 /**
  * This class represent the Profile of current signed-in user.
  */
-export class MyProfile extends Profile {
+export class MyProfile {
+    private appContext: AppContext;
+
+    private name: VerifiableCredential;
+    private bio: VerifiableCredential;
+    private did: string;
+    private walletAddress: string;
+
+    private userInfo: UserInfo;
+
+    constructor(name: VerifiableCredential, did: string, address: string) {
+        this.name = name;
+        this.did = did;
+        this.walletAddress = address;
+    }
+
+    public setBioCredential(bio: VerifiableCredential): MyProfile {
+        this.bio = bio;
+        return this;
+    }
+
+    private getGasPrice = async(): Promise<string> => {
+        return await this.appContext.getWeb3Connector().eth.getGasPrice();
+    }
+
+    private getFilteredGasPrice = (_gasPrice: any): string => {
+        return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+    }
+
+    public getUserInfo = ():UserInfo => {
+        return this.userInfo;
+    }
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
@@ -38,24 +70,21 @@ export class MyProfile extends Profile {
      *        NFT collection contract
      * @returns The deployed NFT collection contract address.
      */
-     public async createCollection(
-        name: string,
+     public async createCollection(name: string,
         symbol: string,
         collectionUri: string,
-        itemType: ERCType,
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
+        collectionType: ERCType,
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(await this.getGasPrice());
         const tokenStandard = {
             "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
             "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
         }
 
         try {
-            let collectionAddress = await AppContext.getAppContext().getCallContract().createCollection(account, name, symbol, collectionUri, tokenStandard[itemType], gasPrice);
-            progressHandler ? progressHandler(70) : null;
+            let collectionAddress = await AppContext.getAppContext().getCallContract().createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
+            progressHandler.onProgress(70);
             return collectionAddress;
         } catch(err) {
             throw new Error(err);
@@ -74,13 +103,13 @@ export class MyProfile extends Profile {
      * @param handleProgress The handler to deal with the progress
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    public async createCollectionMetadata(
-        description: string,
+    public async createCollectionMetadata(description: string,
         avatar: any,
         background: any,
         category: Category,
         socialMedias: CollectionSocialField,
-        handleProgress: any) : Promise<string> {
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ) : Promise<string> {
         let ipfsURL:string;
         try {
             if(isTestnetNetwork()) {
@@ -89,13 +118,13 @@ export class MyProfile extends Profile {
                 ipfsURL = valuesOnMainNet.urlIPFS;
             }
             const client = create({ url: ipfsURL });
-            handleProgress ? handleProgress(10) : null;
+            progressHandler.onProgress(10);
 
             let avatar_add = await client.add(avatar);
-            handleProgress ? handleProgress(20) : null;
+            progressHandler.onProgress(20);
 
             let background_add = await client.add(background);
-            handleProgress ? handleProgress(30) : null;
+            progressHandler.onProgress(30);
 
             let avatarsrc =  `pasar:image:${avatar_add.path}`;
             let backgroundsrc =  `pasar:image:${background_add.path}`;
@@ -113,7 +142,7 @@ export class MyProfile extends Profile {
             const plainText = bs58.encode(plainBuffer)
 
             const signature = await requestSigndataOnTokenID(plainText);
-            handleProgress ? handleProgress(40) : null;
+            progressHandler.onProgress(40);
             const creatorObject = {
                 did: jsonDid.did,
                 name: jsonDid.name || "",
@@ -128,7 +157,7 @@ export class MyProfile extends Profile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-            handleProgress ? handleProgress(50) : null;
+            progressHandler.onProgress(50);
 
             return `pasar:json:${metaData.path}`;
         } catch(err) {
@@ -153,19 +182,17 @@ export class MyProfile extends Profile {
         tokenAddress: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(await this.getGasPrice());
 
         try {
             let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
-            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
+            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't register this collection");
             }
-            await AppContext.getAppContext().getCallContract().registerCollection(account, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().registerCollection(this.walletAddress, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
+            progressHandler.onProgress(100);
             return tokenAddress;
         } catch(err) {
             throw new Error(err);
@@ -185,19 +212,17 @@ export class MyProfile extends Profile {
     public async updateCollectionURI(tokenAddress: string,
         name: string,
         collectionUri: string,
-        progressHandler: any): Promise<void> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<void> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
 
         try {
             let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
-            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
+            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't update the information of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollection(account, tokenAddress, name, collectionUri, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
+            progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
         }
@@ -211,22 +236,19 @@ export class MyProfile extends Profile {
      *        on Pasar marketplace
      * @result
      */
-    public async updateCollectionRoyalties(
-        tokenAddress: string,
+    public async updateCollectionRoyalties(tokenAddress: string,
         royaltyRates: RoyaltyRate[],
-        progressHandler: any): Promise<void> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<void> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
 
         try {
             let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress,);
-            if(collectionInfo.owner.toLowerCase() != account.toLowerCase()) {
+            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't update the royalties of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollectionRoyalties(account, tokenAddress, royaltyRates, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
+            progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
         }
@@ -250,7 +272,7 @@ export class MyProfile extends Profile {
         itemImage: any,
         properties: any = null,
         sensitive = false,
-        handleProgress:any = null,
+        progressHandler:ProgressHandler = new EmptyHandler(),
     ): Promise<string> {
         try {
             let ipfsURL:string;
@@ -261,13 +283,13 @@ export class MyProfile extends Profile {
                 ipfsURL = valuesOnMainNet.urlIPFS;
             }
             const client = create({ url: ipfsURL });
-            handleProgress ? handleProgress(10) : null;
+            progressHandler.onProgress(10);
 
             let image_add = await client.add(itemImage);
-            handleProgress ? handleProgress(20) : null;
+            progressHandler.onProgress(20);
 
             let thumbnail:any = await resizeImage(itemImage, 300, 300);
-            handleProgress ? handleProgress(30) : null;
+            progressHandler.onProgress(30);
 
             let thumbnail_add = image_add;
             if(thumbnail['success'] === 0) {
@@ -301,7 +323,7 @@ export class MyProfile extends Profile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-            handleProgress ? handleProgress(40) : null;
+            progressHandler.onProgress(60);
 
             return `pasar:json:${metaData.path}`;
         } catch(err) {
@@ -322,12 +344,10 @@ export class MyProfile extends Profile {
      */
     public async creatItem(baseToken: string,
         tokenUri: string,
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(60) : null;
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(20);
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
             let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
@@ -337,8 +357,8 @@ export class MyProfile extends Profile {
             //let collectionType = collection.getERCStandard();
             let collectionType = ChainType.ESC;
 
-            await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, account, tokenId, collectionType, tokenUri, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, this.walletAddress, tokenId, collectionType, tokenUri, gasPrice);
+            progressHandler.onProgress(60);
 
             return tokenId;
         } catch(err) {
@@ -362,13 +382,10 @@ export class MyProfile extends Profile {
         baseToken: string,
         tokenUri: string,
         roylatyFee: number,
-        handleProgress:any = null
+        handleProgress: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        handleProgress ? handleProgress(60) : null;
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        handleProgress.onProgress(60);
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
             let abiFile = PASAR_CONTRACT_ABI;
@@ -377,8 +394,8 @@ export class MyProfile extends Profile {
                 abiFile = FEED_CONTRACT_ABI;
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
-            handleProgress ? handleProgress(100) : null;
+            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
+            handleProgress.onProgress(100);
 
             return tokenId;
         } catch(err) {
@@ -400,12 +417,10 @@ export class MyProfile extends Profile {
         baseToken: string,
         tokenId: string,
         totalSupply: number,
-        handleProgress:any = null): Promise<void> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        handleProgress ? handleProgress(60) : null;
+        handleProgress: ProgressHandler = new EmptyHandler()
+    ): Promise<void> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        handleProgress.onProgress(60);
         try {
             let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
             let chainType = getChainTypeById(chainId);
@@ -420,9 +435,9 @@ export class MyProfile extends Profile {
             let abiFile = PASAR_CONTRACT_ABI;
             if(collectionType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
-            await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, gasPrice);
+            await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, collectionType, gasPrice);
 
-            handleProgress ? handleProgress(100) : null;
+            handleProgress.onProgress(100);
         } catch(err) {
             throw new Error(err);
         }
@@ -437,42 +452,39 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with progress on transferring NFT item
      * @returns
      */
-    public async transferItem(
-        baseToken: string,
+    public async transferItem(baseToken: string,
         tokenId: string,
         toAddr: string,
-        progressHandler: any): Promise<void> {
-            let account = await this.getUserInfo().address;
-            let gasPrice = await AppContext.getAppContext().getGasPrice();
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<void> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
 
-            gasPrice = getFilteredGasPrice(gasPrice);
-            progressHandler ? progressHandler(30) : null;
-
-            try {
-                let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-                let chainType = getChainTypeById(chainId);
-                let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
-                if(collection == null) {
-                    throw new Error("Can't find the this collection");
-                }
-
-                // let collectionType = collection.getErcType();
-                let collectionType = ERCType.ERC721;
-                let abiFile = PASAR_CONTRACT_ABI;
-                if(collectionType == ERCType.ERC721)
-                    abiFile = TOKEN_721_ABI;
-
-                await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, account, gasPrice);
-                progressHandler ? progressHandler(50) : null;
-
-                await AppContext.getAppContext().getCallContract().transferNFT(abiFile, account, toAddr, tokenId, baseToken, collectionType, gasPrice);
-                progressHandler ? progressHandler(100) : null;
-            } catch(err) {
-                throw new Error(err);
+        try {
+            let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
+            let chainType = getChainTypeById(chainId);
+            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
+            if(collection == null) {
+                throw new Error("Can't find the this collection");
             }
+
+            // let collectionType = collection.getErcType();
+            let collectionType = ERCType.ERC721;
+            let abiFile = PASAR_CONTRACT_ABI;
+            if(collectionType == ERCType.ERC721)
+                abiFile = TOKEN_721_ABI;
+
+            await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, this.walletAddress, gasPrice);
+            progressHandler.onProgress(50);
+
+            await AppContext.getAppContext().getCallContract().transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, collectionType, gasPrice);
+            progressHandler.onProgress(100);
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
-    /**List
+    /**
      * Create a metadata json file for trading either buyer or seller.
      *
      * @param progressHandler The handler to deal with the progress on uploading json
@@ -494,31 +506,28 @@ export class MyProfile extends Profile {
      *        Pasar marketplace
      * @returns The orderId of the NFT item listed on marketplace
      */
-    public async listItem(
-        baseToken: string,
+    public async listItem(baseToken: string,
         tokenId: string,
         pricingToken: string,
         price: number,
-        progressHandler: any=null): Promise<string> {
-            let account = await this.getUserInfo().address;
-            let gasPrice = await AppContext.getAppContext().getGasPrice();
+        progressHandler: ProgressHandler=new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
+        let priceValue = BigInt(price*1e18).toString();
+        try {
+            let marketPlaceAddress = getCurrentMarketAddress();
+            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
+            progressHandler.onProgress(50);
 
-            gasPrice = getFilteredGasPrice(gasPrice);
-            progressHandler ? progressHandler(30) : null;
-            let priceValue = BigInt(price*1e18).toString();
-            try {
-                let marketPlaceAddress = getCurrentMarketAddress();
-                await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
-                progressHandler ? progressHandler(50) : null;
+            let userInfo: UserInfo = this.getUserInfo();
+            await AppContext.getAppContext().getCallContract().createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
 
-                let userInfo: UserInfo = this.getUserInfo();
-                await AppContext.getAppContext().getCallContract().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
-
-                progressHandler ? progressHandler(100) : null;
-                return tokenId;
-            } catch(err) {
-                throw new Error(err);
-            }
+            progressHandler.onProgress(100);
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**
@@ -538,12 +547,11 @@ export class MyProfile extends Profile {
         baseToken: string,
         newPricingToken: string,
         newPrice: number,
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
 
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
         let priceValue = BigInt(newPrice*1e18).toString();
         try {
             let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
@@ -552,8 +560,8 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePrice(account, parseInt(orderId), priceValue, newPricingToken, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
+            progressHandler.onProgress(100);
 
             return orderId;
         } catch(err) {
@@ -573,13 +581,11 @@ export class MyProfile extends Profile {
     public async buyItem(
         tokenId: string,
         baseToken: string,
-        progressHandler: any): Promise<string> {
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
 
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
         let did = await this.getUserDid();
         try {
             let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
@@ -605,12 +611,12 @@ export class MyProfile extends Profile {
             }
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(account, buyoutPriceValue, quoteToken, gasPrice);
+                await AppContext.getAppContext().getCallContract().approveToken(this.walletAddress, buyoutPriceValue, quoteToken, gasPrice);
             }
 
-            await AppContext.getAppContext().getCallContract().buyItem(account, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
+            await AppContext.getAppContext().getCallContract().buyItem(this.walletAddress, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
 
-            progressHandler ? progressHandler(100) : null;
+            progressHandler.onProgress(100);
 
             return orderId;
         } catch(err) {
@@ -633,29 +639,25 @@ export class MyProfile extends Profile {
      *        marketplace.
      * @returns The orderId of the NFT item listed on marketplace
      */
-    public async listItemOnAuction(
-        baseToken: string,
+    public async listItemOnAuction(baseToken: string,
         tokenId: string,
         pricingToken: string,
         minPrice: number,
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        progressHandler: any
+        progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
 
         try {
             let marketPlaceAddress = getCurrentMarketAddress();
-            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
-            progressHandler ? progressHandler(50) : null;
+            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
+            progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
+            await AppContext.getAppContext().getCallContract().createOrderForAuction(this.walletAddress, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -676,20 +678,17 @@ export class MyProfile extends Profile {
      *        specific auction item on marketplace
      * @returns The orderId
      */
-    public async changePriceOnAuction(
-        tokenId: string,
+    public async changePriceOnAuction(tokenId: string,
         baseToken: string,
         newPricingToken: string,
         newMinPrice: number,
         newReservedPrice: number,
         newBuyoutPrice: number,
-        progressHandler: any): Promise<string> {
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
 
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
         let priceValue = BigInt(newMinPrice*1e18).toString();
         let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
         let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
@@ -701,9 +700,9 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePriceOnAuction(account, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
+            await AppContext.getAppContext().getCallContract().changePriceOnAuction(this.walletAddress, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
 
-            progressHandler ? progressHandler(100) : null;
+            progressHandler.onProgress(100);
 
             return orderId;
         } catch(err) {
@@ -722,16 +721,14 @@ export class MyProfile extends Profile {
      *        on marketplace
      * @returns The result of bidding action.
      */
-    public async bidItemOnAuction(
-        tokenId: string,
+    public async bidItemOnAuction(tokenId: string,
         baseToken: string,
         price: number,
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
 
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
 
         try {
             let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
@@ -744,12 +741,12 @@ export class MyProfile extends Profile {
             let priceValue = Number(BigInt(price*1e18));
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(account, priceValue, quoteToken, gasPrice);
+                await AppContext.getAppContext().getCallContract().approveToken(this.walletAddress, priceValue, quoteToken, gasPrice);
             }
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().bidItemOnAuction(account, orderId, priceValue, quoteToken, userInfo, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().bidItemOnAuction(this.walletAddress, orderId, priceValue, quoteToken, userInfo, gasPrice);
+            progressHandler.onProgress(100);
 
             return orderId;
         } catch(err) {
@@ -765,15 +762,12 @@ export class MyProfile extends Profile {
      * @param progressHandler The handler to deal with the progress on settling auction.
      * @returns orderId
      */
-    public async settleAuction(
-        tokenId: string,
+    public async settleAuction(tokenId: string,
         baseToken: string,
-        progressHandler: any): Promise<string> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<string> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
         try {
             let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
@@ -781,8 +775,8 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().settleAuction(account, orderId, gasPrice);
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().settleAuction(this.walletAddress, orderId, gasPrice);
+            progressHandler.onProgress(100);
 
             return orderId;
         } catch(err) {
@@ -803,12 +797,10 @@ export class MyProfile extends Profile {
     public async unlistItem(
         tokenId: string,
         baseToken: string,
-        progressHandler: any): Promise<void> {
-        let account = await this.getUserInfo().address;
-        let gasPrice = await AppContext.getAppContext().getGasPrice();
-
-        gasPrice = getFilteredGasPrice(gasPrice);
-        progressHandler ? progressHandler(30) : null;
+        progressHandler: ProgressHandler = new EmptyHandler()
+    ): Promise<void> {
+        let gasPrice = getFilteredGasPrice(this.getGasPrice());
+        progressHandler.onProgress(30);
         try {
             let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
@@ -816,9 +808,8 @@ export class MyProfile extends Profile {
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().unlistItem(account, orderId, gasPrice);
-
-            progressHandler ? progressHandler(100) : null;
+            await AppContext.getAppContext().getCallContract().unlistItem(this.walletAddress, orderId, gasPrice);
+            progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
         }

@@ -1,3 +1,11 @@
 export interface ProgressHandler {
-    onProgress(value: number): void;
+    onProgress(stage: number): void;
+}
+
+class EmptyHandler implements ProgressHandler {
+    onProgress(_stage: number): void {}
+}
+
+export {
+    EmptyHandler
 }
