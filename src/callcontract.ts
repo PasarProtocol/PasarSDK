@@ -18,14 +18,17 @@ import { AppContext } from './appcontext';
  */
 export class CallContract {
 
+    private getWeb3(): Web3 {
+        return AppContext.getAppContext().getWeb3Connector();
+    }
+
     private getTransactionParam(account: string, gasPrice: string, price = 0): TransactionParams {
-        const transactionParams: TransactionParams = {
+        return {
             'from': account,
             'gasPrice': gasPrice,
             'gas': LimitGas,
             'value': price
         };
-        return transactionParams;
     }
     /**
      * call the mint function on contract

@@ -122,10 +122,4 @@ export class AppContext {
         }
         return this.walletConnectWeb3;
     }
-
-    public async getGasPrice(): Promise<string> {
-        let walletConnectWeb3 = this.getWeb3Connector();
-        let gasPrice:string = await walletConnectWeb3.eth.getGasPrice();
-        return gasPrice;
-    }
 }

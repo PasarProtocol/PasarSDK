@@ -19,7 +19,7 @@ let myProfileInfo, profileInfo;
 
 const getMyProfileInfo = () => {
     if(!myProfileInfo) {
-        myProfileInfo = new MyProfile();
+        myProfileInfo = new MyProfile(null, '', '');
     }
 
     return myProfileInfo;
