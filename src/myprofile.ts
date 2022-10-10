@@ -22,12 +22,14 @@ import { AppContext } from './appcontext';
 import { EmptyHandler, ProgressHandler } from './progresshandler';
 
 import {VerifiableCredential } from '@elastosfoundation/did-js-sdk';
+import { CallContract } from './callcontract';
 
 /**
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile {
     private appContext: AppContext;
+    private callContract: CallContract;
 
     private name: VerifiableCredential;
     private bio: VerifiableCredential;
@@ -40,6 +42,7 @@ export class MyProfile {
         this.name = name;
         this.did = did;
         this.walletAddress = address;
+        this.callContract = new CallContract();
     }
 
     public setBioCredential(bio: VerifiableCredential): MyProfile {
@@ -73,7 +76,7 @@ export class MyProfile {
      public async createCollection(name: string,
         symbol: string,
         collectionUri: string,
-        collectionType: ERCType,
+        collectionType: ERCType = ERCType.ERC721,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
         let gasPrice = getFilteredGasPrice(await this.getGasPrice());
@@ -83,7 +86,7 @@ export class MyProfile {
         }
 
         try {
-            let collectionAddress = await AppContext.getAppContext().getCallContract().createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
+            let collectionAddress = await this.callContract.createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
             progressHandler.onProgress(70);
             return collectionAddress;
         } catch(err) {
@@ -187,11 +190,11 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(await this.getGasPrice());
 
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
+            let collectionInfo: NormalCollectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
             if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't register this collection");
             }
-            await AppContext.getAppContext().getCallContract().registerCollection(this.walletAddress, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
+            await this.callContract.registerCollection(this.walletAddress, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
             return tokenAddress;
         } catch(err) {
@@ -217,11 +220,11 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(this.getGasPrice());
 
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress);
+            let collectionInfo: NormalCollectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
             if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't update the information of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
+            await this.callContract.updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
             progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
@@ -243,11 +246,11 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(this.getGasPrice());
 
         try {
-            let collectionInfo: NormalCollectionInfo = await AppContext.getAppContext().getCallContract().getCollectionInfo(tokenAddress,);
+            let collectionInfo = await this.callContract.getCollectionInfo(tokenAddress,);
             if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
                 throw new Error("You can't update the royalties of this collection");
             }
-            await AppContext.getAppContext().getCallContract().updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
+            await this.callContract.updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
@@ -350,14 +353,14 @@ export class MyProfile {
         progressHandler.onProgress(20);
         let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
         try {
-            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
+            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
             //let collectionType = collection.getERCStandard();
             let collectionType = ChainType.ESC;
 
-            await AppContext.getAppContext().getCallContract().mintFunctionOnCustomCollection(baseToken, this.walletAddress, tokenId, collectionType, tokenUri, gasPrice);
+            await this.callContract.mintFunctionOnCustomCollection(baseToken, this.walletAddress, tokenId, collectionType, tokenUri, gasPrice);
             progressHandler.onProgress(60);
 
             return tokenId;
@@ -394,7 +397,7 @@ export class MyProfile {
                 abiFile = FEED_CONTRACT_ABI;
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
+            await this.callContract.mintFunction(abiFile, baseToken, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
             handleProgress.onProgress(100);
 
             return tokenId;
@@ -425,7 +428,7 @@ export class MyProfile {
             let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
             let chainType = getChainTypeById(chainId);
 
-            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
+            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 throw new Error("Failed to get the collection Information");
             }
@@ -435,7 +438,7 @@ export class MyProfile {
             let abiFile = PASAR_CONTRACT_ABI;
             if(collectionType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
-            await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, collectionType, gasPrice);
+            await this.callContract.deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, collectionType, gasPrice);
 
             handleProgress.onProgress(100);
         } catch(err) {
@@ -463,7 +466,7 @@ export class MyProfile {
         try {
             let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
             let chainType = getChainTypeById(chainId);
-            let collection = await AppContext.getAppContext().getAssistService().getCollectionInfo(baseToken, chainType);
+            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 throw new Error("Can't find the this collection");
             }
@@ -474,10 +477,10 @@ export class MyProfile {
             if(collectionType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
 
-            await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, this.walletAddress, gasPrice);
+            await this.callContract.approvalForAll(abiFile, baseToken, toAddr, this.walletAddress, gasPrice);
             progressHandler.onProgress(50);
 
-            await AppContext.getAppContext().getCallContract().transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, collectionType, gasPrice);
+            await this.callContract.transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, collectionType, gasPrice);
             progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);
@@ -517,11 +520,11 @@ export class MyProfile {
         let priceValue = BigInt(price*1e18).toString();
         try {
             let marketPlaceAddress = getCurrentMarketAddress();
-            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
+            await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
             progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
+            await this.callContract.createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
 
             progressHandler.onProgress(100);
             return tokenId;
@@ -554,13 +557,13 @@ export class MyProfile {
 
         let priceValue = BigInt(newPrice*1e18).toString();
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "1") {
                 throw new Error("You can't change the price of this nft");
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
+            await this.callContract.changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
             progressHandler.onProgress(100);
 
             return orderId;
@@ -588,7 +591,7 @@ export class MyProfile {
         progressHandler.onProgress(30);
         let did = await this.getUserDid();
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
 
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 throw new Error("You can't buy this nft");
@@ -611,10 +614,10 @@ export class MyProfile {
             }
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(this.walletAddress, buyoutPriceValue, quoteToken, gasPrice);
+                await this.callContract.approveToken(this.walletAddress, buyoutPriceValue, quoteToken, gasPrice);
             }
 
-            await AppContext.getAppContext().getCallContract().buyItem(this.walletAddress, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
+            await this.callContract.buyItem(this.walletAddress, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
 
             progressHandler.onProgress(100);
 
@@ -653,11 +656,11 @@ export class MyProfile {
 
         try {
             let marketPlaceAddress = getCurrentMarketAddress();
-            await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
+            await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
             progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().createOrderForAuction(this.walletAddress, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
+            await this.callContract.createOrderForAuction(this.walletAddress, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -694,13 +697,13 @@ export class MyProfile {
         let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't change the price of this nft");
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().changePriceOnAuction(this.walletAddress, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
+            await this.callContract.changePriceOnAuction(this.walletAddress, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
 
             progressHandler.onProgress(100);
 
@@ -731,7 +734,7 @@ export class MyProfile {
         progressHandler.onProgress(30);
 
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't bid to this nft");
             }
@@ -741,11 +744,11 @@ export class MyProfile {
             let priceValue = Number(BigInt(price*1e18));
 
             if(quoteToken != defaultAddress) {
-                await AppContext.getAppContext().getCallContract().approveToken(this.walletAddress, priceValue, quoteToken, gasPrice);
+                await this.callContract.approveToken(this.walletAddress, priceValue, quoteToken, gasPrice);
             }
 
             let userInfo: UserInfo = this.getUserInfo();
-            await AppContext.getAppContext().getCallContract().bidItemOnAuction(this.walletAddress, orderId, priceValue, quoteToken, userInfo, gasPrice);
+            await this.callContract.bidItemOnAuction(this.walletAddress, orderId, priceValue, quoteToken, userInfo, gasPrice);
             progressHandler.onProgress(100);
 
             return orderId;
@@ -769,13 +772,13 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(this.getGasPrice());
         progressHandler.onProgress(30);
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
                 throw new Error("You can't settle auction to this nft");
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().settleAuction(this.walletAddress, orderId, gasPrice);
+            await this.callContract.settleAuction(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
 
             return orderId;
@@ -802,13 +805,13 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(this.getGasPrice());
         progressHandler.onProgress(30);
         try {
-            let itemNft:NftItem = await AppContext.getAppContext().getAssistService().getItemByTokenId(tokenId, baseToken);
+            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
             if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
                 throw new Error("You can't unlist this nft on marketplace");
             }
             let orderId = itemNft.getOrderId();
 
-            await AppContext.getAppContext().getCallContract().unlistItem(this.walletAddress, orderId, gasPrice);
+            await this.callContract.unlistItem(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
         } catch(err) {
             throw new Error(err);

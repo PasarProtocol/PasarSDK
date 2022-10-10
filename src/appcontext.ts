@@ -17,7 +17,6 @@ export class AppContext {
     private chainNode: string;
 
     private suppoertedCollections: CollectionAddress[] = null;
-    private callContract: CallContract;
     private assistService: AssistService;
     private essentialsConnector: EssentialsConnector;
     private walletConnectWeb3: Web3;
@@ -25,7 +24,6 @@ export class AppContext {
     static appContext: AppContext;
 
     private constructor() {
-        this.callContract = new CallContract();
         this.assistService = new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
     }
 
@@ -98,10 +96,6 @@ export class AppContext {
 
     public getChainNode(): string {
         return this.chainNode
-    }
-
-    public getCallContract(): CallContract {
-        return this.callContract;
     }
 
     public getAssistService(): AssistService {
