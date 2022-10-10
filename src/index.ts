@@ -34,9 +34,9 @@ const getProfileInfo = () => {
 }
 
 const initialize = (testnet = true) => {
+    setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
     getMyProfileInfo();
     getProfileInfo();
-    setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
 }
 
 const mintNft = async (
@@ -365,7 +365,7 @@ const getOwnedListedItem = async (
     walletAddr: string
 ) => {
     try {
-        let profile = getMyProfileInfo();
+        let profile = getProfileInfo();
         let info = await profile.queryListedItems(walletAddr);
         return info;
     } catch(err) {

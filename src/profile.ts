@@ -35,60 +35,66 @@ export class Profile {
 
     /**
      * Query the NFTs owned by this profile.
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-     public async queryOwnedItems(): Promise<NftItem[]> {
-        return await this.assistService.getOwnedItems(this.userInfo.address).catch(error => {
+     public async queryOwnedItems(walletAddr: string): Promise<NftItem[]> {
+        return await this.assistService.getOwnedItems(walletAddr).catch(error => {
             throw new Error(error);
         })
     }
 
     /**
      * Query the NFTs listed by this profile onto marketplace.
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-    public async queryListedItems(): Promise<NftItem[]> {
-        return await this.assistService.getListedItems(this.userInfo.address).catch((error) => {
+    public async queryListedItems(walletAddr: string): Promise<NftItem[]> {
+        return await this.assistService.getListedItems(walletAddr).catch((error) => {
             throw new Error(error);
         })
     }
 
     /**
      * Query the NFTs made bidding by this profile on market
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-    public async queryBiddingItems(): Promise<NftItem[]> {
-        return await this.assistService.getBiddingItems(this.userInfo.address).catch(error => {
+    public async queryBiddingItems(walletAddr: string): Promise<NftItem[]> {
+        return await this.assistService.getBiddingItems(walletAddr).catch(error => {
             throw new Error(error);
         });
     }
 
     /**
      * Query the NFTs created by this profile.
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-     public async queryCreatedItems(): Promise<NftItem[]> {
-        return await this.assistService.getCreatedItems(this.userInfo.address).catch(error => {
+     public async queryCreatedItems(walletAddr: string): Promise<NftItem[]> {
+        return await this.assistService.getCreatedItems(walletAddr).catch(error => {
             throw new Error(error);
         })
     }
 
     /**
      * Query the NFTs sold by this profile
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-     public async querySoldItems(): Promise<NftItem[]> {
-        return await this.assistService.getSoldItems(this.userInfo.address).catch (error => {
+     public async querySoldItems(walletAddr: string): Promise<NftItem[]> {
+        return await this.assistService.getSoldItems(walletAddr).catch (error => {
             throw new Error(error);
         })
     }
 
     /**
      * Query all the collection regsitered onto Pasar marketplace
+     * @param walletAddr wallet address
      * @returns: A list of NFT items.
      */
-     public async queryCollections(): Promise<CollectionInfo[]> {
-        return await this.assistService.getOwnedCollections(this.userInfo.address).catch(error => {
+     public async queryCollections(walletAddr: string): Promise<CollectionInfo[]> {
+        return await this.assistService.getOwnedCollections(walletAddr).catch(error => {
             throw new Error(error);
         })
     }
