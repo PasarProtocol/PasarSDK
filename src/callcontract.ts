@@ -2,15 +2,13 @@ import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
-import { NormalCollectionInfo, TransactionParams } from './utils';
+import { NormalCollectionInfo, TransactionParams, UserInfo } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
 import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_20_ABI from './contracts/abis/erc20ABI';
-import { getUserInfo } from './userinfo';
-import { UserInfo } from './userinfo';
 import { RoyaltyRate } from './RoyaltyRate';
 import { ItemType } from './itemtype';
 import { AppContext } from './appcontext';
@@ -38,6 +36,7 @@ export class CallContract {
      * @param tokenId tokenId of being minted
      * @param totalSupply quantity of nft of being minted
      * @param royaltyFee royalty fee of nft
+     * @param userInfo the user information
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being minted the nft
      */
@@ -49,6 +48,7 @@ export class CallContract {
         totalSupply: number,
         metaData: string,
         royaltyFee: number,
+        userInfo: UserInfo,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -64,9 +64,7 @@ export class CallContract {
                     reject(error)
                 });
             } else if(checkFeedsCollection(contractAddress)) {
-                let jsonDid:UserInfo = getUserInfo();
-
-                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000, jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000, userInfo.did).send(transactionParams).on('receipt', (receipt) => {
                     resolve(receipt);
                 }).on('error', (error) => {
                     reject(error)
@@ -161,6 +159,7 @@ export class CallContract {
      * @param tokenId tokenId of being minted
      * @param baseToken the collection address of nft
      * @param royaltyFee royalty fee of nft
+     * @param userInfo user information
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -170,18 +169,16 @@ export class CallContract {
         baseToken: string,
         price: string,
         quoteToken: string,
+        userInfo: UserInfo,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-    
-            let jsonDid:UserInfo = getUserInfo();
-
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+            pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -276,6 +273,7 @@ export class CallContract {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
+        userInfo: UserInfo,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -285,14 +283,12 @@ export class CallContract {
             let reservePriceValue = BigInt(reservePrice*1e18).toString();
             let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
 
-            let jsonDid:UserInfo = getUserInfo();
-
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
 
-            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPriceValue, reservePriceValue, buyoutPriceValue, (new Date().getTime()/1000).toFixed(), (expirationTime/1000).toFixed(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPriceValue, reservePriceValue, buyoutPriceValue, (new Date().getTime()/1000).toFixed(), (expirationTime/1000).toFixed(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -405,7 +401,9 @@ export class CallContract {
      *
      * @param account my wallet address
      * @param orderId The orderId of NFT item on maketplace
-     * @param price The price of bid
+     * @param price The prie of bid
+     * @param quoteToken the token type of bidding
+     * @param userInfo user Information
      * @param gasPrice the value of gas process for calling the contract
      * @returns result of being listed the nft
      */
@@ -414,6 +412,7 @@ export class CallContract {
         orderId: string,
         price: number,
         quoteToken: string,
+        userInfo: UserInfo,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -421,11 +420,9 @@ export class CallContract {
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
             
-            let jsonDid:UserInfo = getUserInfo();
-
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.bidForOrder(orderId, price.toString(), jsonDid.did).send(transactionParams).on('receipt', (receipt) => {
+            pasarContract.methods.bidForOrder(orderId, price.toString(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)

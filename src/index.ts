@@ -9,7 +9,6 @@ import { Category, getCategoryList } from "./category";
 import { ItemType } from "./itemtype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
-import { getUserInfo } from "./userinfo";
 import { Profile } from "./profile";
 import { AssistService } from "./assistservice";
 import { getChainTypes as _getChainTypes} from "./chaintype";
@@ -333,7 +332,7 @@ const getCollectionCategories = () => {
 }
 
 const getAccountInfo = () => {
-    return getUserInfo();
+    return getProfileInfo().getUserInfo();
 }
 
 const getListedItem = async (
@@ -440,13 +439,23 @@ const getCollectionSocialField = () => {
     return socials;
 }
 
+const signIn = async() => {
+    let userInfo = await signin();
+    getProfileInfo().setUserInfo(userInfo);
+}
+
+const singOut = async() => {
+    await signout();
+    getProfileInfo().deleteUserInfo();
+}
+
 export {
     initialize,
     mintNft,
     deleteNft,
     transferNft,
-    signin,
-    signout,
+    signIn,
+    singOut,
     checkSign,
     getCoinType,
     listItem,

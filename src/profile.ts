@@ -1,11 +1,13 @@
 import { AppContext } from "./appcontext"
 import { Collection, CollectionInfo } from "./collection";
 import { NftItem } from "./nftitem"
+import { UserInfo } from "./utils";
 
 export class Profile {
     private appContext = AppContext.getAppContext();
     private userDid: string;
     private walletAddress: string;
+    private userInfo: UserInfo;
 
     private assistService = this.appContext.getAssistService();
 
@@ -16,6 +18,21 @@ export class Profile {
 
     }*/
     constructor() {
+    }
+
+    public setUserInfo = (info: UserInfo) => {
+        this.userInfo = info;
+    }
+
+    public getUserInfo = ():UserInfo => {
+        return this.userInfo;
+    }
+
+    public deleteUserInfo = () => {
+        this.userInfo.name = null;
+        this.userInfo.bio = null;
+        this.userInfo.did = null;
+        this.userInfo.address = null;
     }
 
     public getDid(): string {

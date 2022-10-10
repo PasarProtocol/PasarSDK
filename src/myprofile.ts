@@ -9,9 +9,7 @@ import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType, getCurrentMarketAddress } from "./global";
-import { CollectionSocialField, ImageDidInfo, NFTDidInfo, NormalCollectionInfo, UserDidInfo } from './utils';
-import { getUserInfo } from './userinfo';
-import { UserInfo } from './userinfo';
+import { CollectionSocialField, ImageDidInfo, NFTDidInfo, NormalCollectionInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import FEED_CONTRACT_ABI from './contracts/abis/stickerABI';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
@@ -102,7 +100,7 @@ export class MyProfile extends Profile {
             let avatarsrc =  `pasar:image:${avatar_add.path}`;
             let backgroundsrc =  `pasar:image:${background_add.path}`;
 
-            let jsonDid:UserInfo = getUserInfo();
+            let jsonDid:UserInfo = this.getUserInfo();
 
             const dataObj = {
                 avatar: avatarsrc,
@@ -276,7 +274,7 @@ export class MyProfile extends Profile {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
 
-            let jsonDid:UserInfo = getUserInfo();
+            let jsonDid:UserInfo = this.getUserInfo();
 
             const creatorObject: UserDidInfo = {
                 "did": jsonDid.did,
@@ -377,7 +375,9 @@ export class MyProfile extends Profile {
 
             if(checkFeedsCollection(baseToken))
                 abiFile = FEED_CONTRACT_ABI;
-            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, gasPrice);
+
+            let userInfo: UserInfo = this.getUserInfo();
+            await AppContext.getAppContext().getCallContract().mintFunction(abiFile, baseToken, account, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
             handleProgress ? handleProgress(100) : null;
 
             return tokenId;
@@ -511,7 +511,8 @@ export class MyProfile extends Profile {
                 await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
                 progressHandler ? progressHandler(50) : null;
 
-                await AppContext.getAppContext().getCallContract().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, gasPrice);
+                let userInfo: UserInfo = this.getUserInfo();
+                await AppContext.getAppContext().getCallContract().createOrderForSale(account, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
 
                 progressHandler ? progressHandler(100) : null;
                 return tokenId;
@@ -652,7 +653,9 @@ export class MyProfile extends Profile {
             let marketPlaceAddress = getCurrentMarketAddress();
             await AppContext.getAppContext().getCallContract().approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, account, gasPrice);
             progressHandler ? progressHandler(50) : null;
-            await AppContext.getAppContext().getCallContract().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, gasPrice);
+
+            let userInfo: UserInfo = this.getUserInfo();
+            await AppContext.getAppContext().getCallContract().createOrderForAuction(account, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -743,7 +746,9 @@ export class MyProfile extends Profile {
             if(quoteToken != defaultAddress) {
                 await AppContext.getAppContext().getCallContract().approveToken(account, priceValue, quoteToken, gasPrice);
             }
-            await AppContext.getAppContext().getCallContract().bidItemOnAuction(account, orderId, priceValue, quoteToken, gasPrice);
+
+            let userInfo: UserInfo = this.getUserInfo();
+            await AppContext.getAppContext().getCallContract().bidItemOnAuction(account, orderId, priceValue, quoteToken, userInfo, gasPrice);
             progressHandler ? progressHandler(100) : null;
 
             return orderId;
@@ -835,7 +840,7 @@ export class MyProfile extends Profile {
 
         const client = create({ url: ipfsURL });
 
-        let jsonDid:UserInfo = getUserInfo();
+        let jsonDid:UserInfo = this.getUserInfo();
 
         const creatorObject: UserDidInfo = {
             "did": jsonDid.did,

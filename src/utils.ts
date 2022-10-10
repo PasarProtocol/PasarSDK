@@ -50,3 +50,10 @@ export interface CollectionSocialField {
     "telegram": string,
     "medium": string
 }
+
+export interface UserInfo {
+    name:string,
+    bio:string,
+    did:string,
+    address:string,
+}
