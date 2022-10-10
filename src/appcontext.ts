@@ -116,4 +116,8 @@ export class AppContext {
         }
         return this.walletConnectWeb3;
     }
+
+    public getChainId() {
+        return this.getEssentialConnector().getWalletConnectProvider().wc.chainId;
+    }
 }

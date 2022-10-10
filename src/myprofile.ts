@@ -425,8 +425,7 @@ export class MyProfile {
         let gasPrice = getFilteredGasPrice(this.getGasPrice());
         handleProgress.onProgress(60);
         try {
-            let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-            let chainType = getChainTypeById(chainId);
+            let chainType = getChainTypeById(this.appContext.getChainId());
 
             let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
@@ -464,8 +463,7 @@ export class MyProfile {
         progressHandler.onProgress(30);
 
         try {
-            let chainId = AppContext.getAppContext().getEssentialConnector().getWalletConnectProvider().wc.chainId;
-            let chainType = getChainTypeById(chainId);
+            let chainType = getChainTypeById(this.appContext.getChainId());
             let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
             if(collection == null) {
                 throw new Error("Can't find the this collection");
