@@ -79,19 +79,20 @@ export class MyProfile {
         collectionType: ERCType = ERCType.ERC721,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(await this.getGasPrice());
-        const tokenStandard = {
-            "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
-            "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
-        }
+        return await this.getGasPrice().then (gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            const tokenStandard = {
+                "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
+                "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
+            }
 
-        try {
-            let collectionAddress = await this.callContract.createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
+            let address = await this.callContract.createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
             progressHandler.onProgress(70);
-            return collectionAddress;
-        } catch(err) {
-            throw new Error(err);
-        }
+            return address;
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -217,18 +218,15 @@ export class MyProfile {
         collectionUri: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-
-        try {
-            let collectionInfo: NormalCollectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
-            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
-                throw new Error("You can't update the information of this collection");
-            }
+        return await this.getGasPrice().then(gasPrice => {
+            progressHandler.onProgress(20);
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
             await this.callContract.updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
             progressHandler.onProgress(100);
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch(error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -243,18 +241,15 @@ export class MyProfile {
         royaltyRates: RoyaltyRate[],
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-
-        try {
-            let collectionInfo = await this.callContract.getCollectionInfo(tokenAddress,);
-            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
-                throw new Error("You can't update the royalties of this collection");
-            }
+        return await this.getGasPrice().then(gasPrice => {
+            progressHandler.onProgress(20);
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
             await this.callContract.updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch(error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -340,33 +335,26 @@ export class MyProfile {
      * on tokenURI string of metadata json file on IPFS sotrage.
      * Notice: This function should be used for minting NFTs from dedicated collection.
      *
-     * @param baseToken The collection contract where NFT items would be minted
+     * @param collection The collection contract where NFT items would be minted
      * @param tokenUri The token uri to this new NFT item
      * @param progressHandler: The handler to deal with progress on minting a new NFT item
      * @returns The tokenId of the new NFT.
      */
-    public async creatItem(baseToken: string,
+    public async creatItem(collection: string,
         tokenUri: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(20);
-        let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
-        try {
-            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, ChainType.ESC);
-            if(collection == null) {
-                throw new Error("Failed to get the collection Information");
-            }
-            //let collectionType = collection.getERCStandard();
-            let collectionType = ChainType.ESC;
-
-            await this.callContract.mintFunctionOnCustomCollection(baseToken, this.walletAddress, tokenId, collectionType, tokenUri, gasPrice);
+        return await this.getGasPrice().then(gasPrice => {
+            progressHandler.onProgress(20);
+            return getFilteredGasPrice(gasPrice)
+        }).then (async gasPrice => {
+            let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
+            await this.callContract.mintFunctionOnCustomCollection(collection, this.walletAddress, tokenId, ChainType.ESC, tokenUri, gasPrice);
             progressHandler.onProgress(60);
-
             return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -382,28 +370,24 @@ export class MyProfile {
      * @returns The tokenId of being minted a nft
      */
     public async createItemWithRoyalties(
-        baseToken: string,
+        collection: string,
         tokenUri: string,
         roylatyFee: number,
         handleProgress: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        handleProgress.onProgress(60);
-        let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
-        try {
-            let abiFile = PASAR_CONTRACT_ABI;
-
-            if(checkFeedsCollection(baseToken))
-                abiFile = FEED_CONTRACT_ABI;
-
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            handleProgress.onProgress(60);
+            let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.mintFunction(abiFile, baseToken, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
+            let abiFile = FEED_CONTRACT_ABI;
+            await this.callContract.mintFunction(abiFile, collection, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
             handleProgress.onProgress(100);
-
             return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -419,30 +403,25 @@ export class MyProfile {
     public async deleteItem(
         baseToken: string,
         tokenId: string,
-        totalSupply: number,
+        ercType: ERCType,
+        totalSupply = 1,
         handleProgress: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        handleProgress.onProgress(60);
-        try {
-            let chainType = getChainTypeById(this.appContext.getChainId());
+        return await this.getGasPrice().then (gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            handleProgress.onProgress(30);
 
-            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
-            if(collection == null) {
-                throw new Error("Failed to get the collection Information");
-            }
-
-            //let collectionType = collection.getErcType();
-            let collectionType = ERCType.ERC721;
             let abiFile = PASAR_CONTRACT_ABI;
-            if(collectionType == ERCType.ERC721)
+            if (ercType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
-            await this.callContract.deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, collectionType, gasPrice);
+
+            await this.callContract.deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, ercType, gasPrice);
 
             handleProgress.onProgress(100);
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -457,32 +436,26 @@ export class MyProfile {
     public async transferItem(baseToken: string,
         tokenId: string,
         toAddr: string,
+        ercType: ERCType,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
+            progressHandler.onProgress(30);
 
-        try {
-            let chainType = getChainTypeById(this.appContext.getChainId());
-            let collection = await this.appContext.getAssistService().getCollectionInfo(baseToken, chainType);
-            if(collection == null) {
-                throw new Error("Can't find the this collection");
-            }
-
-            // let collectionType = collection.getErcType();
-            let collectionType = ERCType.ERC721;
             let abiFile = PASAR_CONTRACT_ABI;
-            if(collectionType == ERCType.ERC721)
+            if (ercType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
 
             await this.callContract.approvalForAll(abiFile, baseToken, toAddr, this.walletAddress, gasPrice);
             progressHandler.onProgress(50);
 
-            await this.callContract.transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, collectionType, gasPrice);
+            await this.callContract.transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, ercType, gasPrice);
             progressHandler.onProgress(100);
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -505,124 +478,82 @@ export class MyProfile {
      * @param price The price value to sell
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        Pasar marketplace
-     * @returns The orderId of the NFT item listed on marketplace
      */
     public async listItem(baseToken: string,
         tokenId: string,
         pricingToken: string,
         price: number,
         progressHandler: ProgressHandler=new EmptyHandler()
-    ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-        let priceValue = BigInt(price*1e18).toString();
-        try {
-            let marketPlaceAddress = getCurrentMarketAddress();
-            await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
-            progressHandler.onProgress(50);
-
+    ): Promise<void> {
+        return await this.getGasPrice().then (gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
+            progressHandler.onProgress(30);
+            let priceValue = BigInt(price*1e18).toString();
             let userInfo: UserInfo = this.getUserInfo();
             await this.callContract.createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
 
             progressHandler.onProgress(100);
-            return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
      * Change the listed price for NFT item on marketplace
      * This function would be used to change the price of listed item with fixed price.
      *
-     * @param tokenId The tokenId of NFT item on maketplace
-     * @param baseToken The collection address of NFT item
+     * @param orderId The orderId of NFT item on maketplace
      * @param newPricingToken The token address of new pricing token
      * @param newPrice The new listed price
      * @param progressHandler The handler to deal with the progress on changing price for
      *        specific listed item on marketplace
      * @returns The result of bidding action.
      */
-    public async changePrice(
-        tokenId: string,
-        baseToken: string,
+    public async changePrice(orderId: string,
         newPricingToken: string,
         newPrice: number,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-
-        let priceValue = BigInt(newPrice*1e18).toString();
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "1") {
-                throw new Error("You can't change the price of this nft");
-            }
-            let orderId = itemNft.getOrderId();
-
+    ): Promise<void> {
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            progressHandler.onProgress(30);
+            let priceValue = BigInt(newPrice*1e18).toString();
             await this.callContract.changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
             progressHandler.onProgress(100);
-
-            return orderId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
      * Buy an item listed on marketplace
      * This function is used to buy the item with fixed price.
      *
-     * @param tokenId The tokenId of NFT item on maketplace
-     * @param baseToken The collection address of NFT item
+     * @param orderId The orderId of NFT item on maketplace
      * @param progressHandler The handler to deal with the progress on buying listed item
      * @returns The orderId of buying the order
      */
-    public async buyItem(
-        tokenId: string,
-        baseToken: string,
+    public async buyItem(orderId: string,
+        buyingPrice: number,
+        quoteToken: string,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-        let did = await this.getUserDid();
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
-                throw new Error("You can't buy this nft");
-            }
-
-            let orderId = itemNft.getOrderId();
-            let quoteToken = itemNft.getQuoteToken();
-
-            let buyoutPriceValue;
-            if(itemNft.getOrderType() == "1") {
-                let price = itemNft.getPrice();
-                buyoutPriceValue = Number(BigInt(parseFloat(price)));
-            } else if(itemNft.getOrderType() == "2") {
-                if(itemNft.getBuyoutPrice() == null) {
-                    throw new Error("You can't buy this nft");
-                } else {
-                    let price = itemNft.getBuyoutPrice();
-                    buyoutPriceValue = Number(BigInt(parseFloat(price)))
-                }
-            }
-
+    ): Promise<void> {
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            progressHandler.onProgress(30);
+            let did = await this.getUserDid();
             if(quoteToken != defaultAddress) {
-                await this.callContract.approveToken(this.walletAddress, buyoutPriceValue, quoteToken, gasPrice);
+                await this.callContract.approveToken(this.walletAddress, buyingPrice, quoteToken, gasPrice);
             }
-
-            await this.callContract.buyItem(this.walletAddress, orderId, buyoutPriceValue, quoteToken, did, gasPrice);
+            await this.callContract.buyItem(this.walletAddress, orderId, buyingPrice, quoteToken, did, gasPrice);
 
             progressHandler.onProgress(100);
-
-            return orderId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch(error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -679,68 +610,49 @@ export class MyProfile {
      *        specific auction item on marketplace
      * @returns The orderId
      */
-    public async changePriceOnAuction(tokenId: string,
-        baseToken: string,
+    public async changePriceOnAuction(orderId: string,
         newPricingToken: string,
         newMinPrice: number,
         newReservedPrice: number,
         newBuyoutPrice: number,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-        let priceValue = BigInt(newMinPrice*1e18).toString();
-        let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
-        let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
-
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
-                throw new Error("You can't change the price of this nft");
-            }
-            let orderId = itemNft.getOrderId();
+    ): Promise<void> {
+        return await this.getGasPrice().then (gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            progressHandler.onProgress(30);
+            let priceValue = BigInt(newMinPrice*1e18).toString();
+            let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
+            let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
             await this.callContract.changePriceOnAuction(this.walletAddress, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
-
             progressHandler.onProgress(100);
-
-            return orderId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
      * Offer a bidding price on list item that is being on auciton on marketplace.
      *
-     * @param tokenId The tokenId of NFT item on auction
-     * @param baseToken the collectiona address of collection
-     * @param value The price offered by bidder
+     * @param orderId The orderId of NFT item listed on auciton.
+     * @param price The price offered by bidder
      * @param bidderUri The uri of bidder information on IPFS storage
      * @param progressHandler The handler to deal with the progress on bidding for NFT item
      *        on marketplace
      * @returns The result of bidding action.
      */
-    public async bidItemOnAuction(tokenId: string,
-        baseToken: string,
+    public async bidItemOnAuction(orderId: string,
+        quoteToken: string,
         price: number,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
-                throw new Error("You can't bid to this nft");
-            }
-            let orderId = itemNft.getOrderId();
-            let quoteToken = itemNft.getQuoteToken();
+    ): Promise<void> {
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then (async gasPrice => {
+            progressHandler.onProgress(30);
 
             let priceValue = Number(BigInt(price*1e18));
-
             if(quoteToken != defaultAddress) {
                 await this.callContract.approveToken(this.walletAddress, priceValue, quoteToken, gasPrice);
             }
@@ -748,41 +660,29 @@ export class MyProfile {
             let userInfo: UserInfo = this.getUserInfo();
             await this.callContract.bidItemOnAuction(this.walletAddress, orderId, priceValue, quoteToken, userInfo, gasPrice);
             progressHandler.onProgress(100);
-
-            return orderId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
      * Settle the listed NFT item on auction on marketplace
      *
-     * @param tokenId The tokenId of NFT item on auction
-     * @param baseToken The collection address of NFT item
+     * @param orderId The orderId of NFT item listed on auciton.
      * @param progressHandler The handler to deal with the progress on settling auction.
-     * @returns orderId
      */
-    public async settleAuction(tokenId: string,
-        baseToken: string,
+    public async settleAuction(orderId: string,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1" || itemNft.getOrderType() != "2") {
-                throw new Error("You can't settle auction to this nft");
-            }
-            let orderId = itemNft.getOrderId();
-
+    ): Promise<void> {
+        return await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
+            progressHandler.onProgress(30);
             await this.callContract.settleAuction(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
-
-            return orderId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -790,30 +690,23 @@ export class MyProfile {
      * When the item is on auction with bidding price, it would fail to call this function
      * to unlist NFT item.
      *
-     * @param tokenId The tokenId of NFT listed item on marketplace
-     * @param baseToken The collection address of NFT iten
+     * @param orderId The orderId of NFT item listed on marketplace
      * @param progressHandler The handler to deal with the progress on unlisting the NFT item.
      * @returns
      */
     public async unlistItem(
-        tokenId: string,
-        baseToken: string,
+        orderId: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-        try {
-            let itemNft:NftItem = await this.appContext.getAssistService().getItemByTokenId(tokenId, baseToken);
-            if(itemNft == null || itemNft.getOrderId() == null || itemNft.getOrderState() != "1") {
-                throw new Error("You can't unlist this nft on marketplace");
-            }
-            let orderId = itemNft.getOrderId();
-
+        await this.getGasPrice().then(gasPrice => {
+            return getFilteredGasPrice(gasPrice);
+        }).then(async gasPrice => {
+            progressHandler.onProgress(30);
             await this.callContract.unlistItem(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
