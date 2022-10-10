@@ -3,9 +3,9 @@
  */
 
 import { ChainType } from "./chaintype";
-import { Collection, CollectionInfo } from "./collection";
+import { CollectionInfo } from "./collection/collectioninfo";
 import { getChainTypeNumber } from "./global";
-import { ItemType } from "./itemtype";
+import { ERCType } from "./erctype";
 import { NftItem } from "./nftitem";
 import { NftListInfo } from "./nftlistinfo";
 
@@ -103,7 +103,7 @@ export class AssistService {
                 .setAvatar(data['avatar'])
                 .setDescription(data['description'])
                 .setCategory(data['category'])
-                .setErcType(body['is721'] ? ItemType.ERC721 : ItemType.ERC1155)
+                .setErcType(body['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
         }).catch (error => {
             throw new Error(`Failed to get Collection Info (erro: ${error}`);
         })
@@ -187,7 +187,7 @@ export class AssistService {
                     .setAvatar(data['avatar'])
                     .setDescription(data['description'])
                     .setCategory(data['category'])
-                    .setErcType(body['is721'] ? ItemType.ERC721 : ItemType.ERC1155)
+                    .setErcType(body['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
 
                 collections.push(info);
             }

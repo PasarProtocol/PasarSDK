@@ -7,15 +7,6 @@ import { NftItem } from "./nftitem";
  */
 class Market {
     private appContext: AppContext;
-    private numberOfItems: number;
-
-    /**
-     * Get the number of total listed NFT item on local storage
-     * @returns The number of listed NFT item
-     */
-    public getItemCount(): number {
-        return this.numberOfItems;
-    }
 
     /**
      * Get the number of total listed NFT items from remote assist service.

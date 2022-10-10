@@ -5,8 +5,8 @@ import { signin, signout, checkSign } from "./signin";
 import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
-import { Category, getCategoryList } from "./category";
-import { ItemType } from "./itemtype";
+import { Category, getCategoryList } from "./collection/category";
+import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { Profile } from "./profile";
@@ -232,7 +232,7 @@ const createCollection = async (
     symbol: string,
     avatar: any,
     background: any,
-    itemType: ItemType,
+    itemType: ERCType,
     category: Category,
     socialMedias: any,
     royalties: RoyaltyRate[],
@@ -320,7 +320,7 @@ const isAuction = (type:string) => {
 const getCollectionType = () => {
     let collectionType = [];
 
-    Object.keys(ItemType).filter(StringIsNumber).map((cell) => {
+    Object.keys(ERCType).filter(StringIsNumber).map((cell) => {
         collectionType.push(cell);
     })
 

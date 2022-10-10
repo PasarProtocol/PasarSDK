@@ -1,8 +1,8 @@
-import { ItemType } from "../itemtype";
+import { ERCType } from "../erctype";
 import { Filter, FilterType } from "./filter";
 
 class ItemsFilter extends Filter {
-    public constructor(types: ItemType[]) {
+    public constructor(types: ERCType[]) {
         super(FilterType.ItemTypes, types)
     }
 }

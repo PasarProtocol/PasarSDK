@@ -1,5 +1,5 @@
 import { AppContext } from "./appcontext"
-import { Collection, CollectionInfo } from "./collection";
+import { CollectionInfo } from "./collection/collectioninfo";
 import { NftItem } from "./nftitem"
 import { UserInfo } from "./utils";
 
