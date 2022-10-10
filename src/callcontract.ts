@@ -10,7 +10,7 @@ import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import { RoyaltyRate } from './RoyaltyRate';
-import { ItemType } from './itemtype';
+import { ERCType } from './erctype';
 import { AppContext } from './appcontext';
 
 /**
@@ -53,9 +53,9 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-    
+
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             if(checkPasarCollection(contractAddress)) {
                 pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
@@ -70,7 +70,7 @@ export class CallContract {
                     reject(error)
                 });
             }
-                
+
         })
     }
 
@@ -94,16 +94,16 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-    
+
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-    
+
             let pasarContract = new walletConnectWeb3.eth.Contract(TOKEN_721_ABI, contractAddress);
             let mintFunction = pasarContract.methods.mint(tokenId, metaData);
 
-            if(collectionType == ItemType.ERC1155) {
+            if(collectionType == ERCType.ERC1155) {
                 pasarContract = new walletConnectWeb3.eth.Contract(TOKEN_1155_ABI, contractAddress);
                 mintFunction = pasarContract.methods.mint(tokenId, 1, metaData);
-            } 
+            }
 
             mintFunction.send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -136,12 +136,12 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-    
+
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-    
+
             let pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
             let burnFunction = pasarContract.methods.burn(tokenId, totalSupply);
-            if(!checkFeedsCollection(contractAddress) && !checkPasarCollection(contractAddress) && collectionType == ItemType.ERC721) {
+            if(!checkFeedsCollection(contractAddress) && !checkPasarCollection(contractAddress) && collectionType == ERCType.ERC721) {
                 pasarContract.methods.burn(tokenId);
             }
             burnFunction.send(transactionParams).on('receipt', (receipt) => {
@@ -175,7 +175,7 @@ export class CallContract {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
@@ -204,7 +204,7 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-            
+
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
 
             let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
@@ -235,14 +235,14 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-            
+
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
 
             let stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, baseToken);
             let transferFunction = stickerContract.methods.safeTransferFrom(account, toAddress, tokenId, 1);
-            if(collectionType == ItemType.ERC721)
+            if(collectionType == ERCType.ERC721)
                 transferFunction = stickerContract.methods.safeTransferFrom(account, toAddress, tokenId);
-                
+
             transferFunction.send(transactionParams).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
@@ -278,13 +278,13 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
-    
+
             let minPriceValue = BigInt(minPrice*1e18).toString();
             let reservePriceValue = BigInt(reservePrice*1e18).toString();
             let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
 
@@ -317,7 +317,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.changeSaleOrderPrice(orderId, newPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
@@ -353,7 +353,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
@@ -384,7 +384,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
 
@@ -419,7 +419,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice, quoteToken == defaultAddress ? price : 0);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.bidForOrder(orderId, price.toString(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
@@ -447,7 +447,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.settleAuctionOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
@@ -477,7 +477,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentMarketAddress();
             let pasarContract = new walletConnectWeb3.eth.Contract(Pasar_Market_ABI, contractAddress);
             pasarContract.methods.cancelOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
@@ -510,13 +510,13 @@ export class CallContract {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const diaTokenValue = BigInt((10 ** DiaTokenConfig.diaDecimals * DiaTokenConfig.diaValue * DiaTokenConfig.nPPM) / DiaTokenConfig.PPM).toString();
-            
+
             let diaAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.diaTokenContract : valuesOnMainNet.elastos.diaTokenContract
 
             let deployArgs = [name, symbol, collectionUri, diaAddress, diaTokenValue];
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             gasPrice = getFilteredGasPrice(gasPrice);
 
             let registerContract = new walletConnectWeb3.eth.Contract(contractData.abi);
@@ -529,7 +529,7 @@ export class CallContract {
                 'gas': LimitGas,
                 'gasPrice': gasPrice
             }
-            
+
             if(isInAppBrowser())
               transactionParams['to'] = ""
               registeredContract.send(transactionParams).then(newContractInstance=>{
@@ -565,7 +565,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
             let owners = [], royalties = [];
@@ -603,7 +603,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
 
@@ -634,7 +634,7 @@ export class CallContract {
             const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
 
             const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-            
+
             let contractAddress = getCurrentImportingContractAddress();
             let pasarRegister = new walletConnectWeb3.eth.Contract(Pasar_Register_ABI, contractAddress);
 
@@ -668,7 +668,7 @@ export class CallContract {
         let name = await tokenContract.methods.name().call();
         let symbol = await tokenContract.methods.symbol().call();
         let owner = await tokenContract.methods.owner().call();
-        
+
         const collectionInfo: NormalCollectionInfo = {
             name: name,
             symbol: symbol,
@@ -694,10 +694,10 @@ export class CallContract {
     ): Promise<any> {
         const transactionParams: TransactionParams = this.getTransactionParam(account, gasPrice);
         const walletConnectWeb3 = AppContext.getAppContext().getWeb3Connector();
-        
+
         let marketPlaceAddress = getCurrentMarketAddress();
         let erc20Contract = new walletConnectWeb3.eth.Contract(TOKEN_20_ABI, quoteToken);
-        
+
         let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(account, marketPlaceAddress).call())
 
         if(erc20BidderApproved < price) {

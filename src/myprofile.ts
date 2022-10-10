@@ -3,7 +3,7 @@ import sha256 from 'crypto-js/sha256';
 import Web3 from 'web3';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
-import { ItemType } from "./itemtype";
+import { ERCType } from "./erctype";
 import { Profile } from "./profile";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { isTestnetNetwork } from './networkType';
@@ -42,7 +42,7 @@ export class MyProfile extends Profile {
         name: string,
         symbol: string,
         collectionUri: string,
-        itemType: ItemType,
+        itemType: ERCType,
         progressHandler: any): Promise<string> {
         let account = await this.getUserInfo().address;
         let gasPrice = await AppContext.getAppContext().getGasPrice();
@@ -416,9 +416,9 @@ export class MyProfile extends Profile {
             }
 
             //let collectionType = collection.getErcType();
-            let collectionType = ItemType.ERC721;
+            let collectionType = ERCType.ERC721;
             let abiFile = PASAR_CONTRACT_ABI;
-            if(collectionType == ItemType.ERC721)
+            if(collectionType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
             await AppContext.getAppContext().getCallContract().deleteFunction(abiFile, baseToken, account, tokenId, totalSupply, collectionType, gasPrice);
 
@@ -457,9 +457,9 @@ export class MyProfile extends Profile {
                 }
 
                 // let collectionType = collection.getErcType();
-                let collectionType = ItemType.ERC721;
+                let collectionType = ERCType.ERC721;
                 let abiFile = PASAR_CONTRACT_ABI;
-                if(collectionType == ItemType.ERC721)
+                if(collectionType == ERCType.ERC721)
                     abiFile = TOKEN_721_ABI;
 
                 await AppContext.getAppContext().getCallContract().approvalForAll(abiFile, baseToken, toAddr, account, gasPrice);

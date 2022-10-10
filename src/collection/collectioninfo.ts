@@ -1,5 +1,5 @@
 import { Category } from "./category";
-import { ItemType } from "../itemtype";
+import { ERCType } from "../erctype";
 import { ChainType } from "../chaintype";
 
 class CollectionInfo {
@@ -13,7 +13,7 @@ class CollectionInfo {
     socialLinks: string[];
     avatar: string;
     description: string;
-    ercType: ItemType;
+    ercType: ERCType;
     category: Category;
 
     constructor(contractAddr: string, network: ChainType, creatorDid: string, creatorAddr: string, name: string, symbol: string) {
@@ -45,7 +45,7 @@ class CollectionInfo {
         return this;
     }
 
-    public setErcType(ercType: ItemType): CollectionInfo {
+    public setErcType(ercType: ERCType): CollectionInfo {
         this.ercType = ercType;
         return this;
     }
