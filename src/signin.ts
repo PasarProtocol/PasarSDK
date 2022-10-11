@@ -112,7 +112,7 @@ const signin = async () => {
       await essentialsConnector.disconnectWalletConnect();
     }
     let userInfo = await signInWithEssentials();
-    
+    isSignin = true;
     return userInfo;
 }
 
