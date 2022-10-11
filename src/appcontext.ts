@@ -1,123 +1,61 @@
 import { CollectionAddress } from "./contractaddress";
-import { ChainType } from "./chaintype";
-import { isTestnetNetwork, NetworkType } from "./networkType";
 import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import Web3 from "web3";
-import { CallContract } from "./callcontract";
 import { AssistService } from "./assistservice";
 import { isInAppBrowser} from "./global";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
 export class AppContext {
     private appDID: string;
-    private appInstanceDID: string;
 
-    private assistNode: string;
-    private ipfsNode: string;
-    private chainNode: string;
+    private assistUrl: string;
+    private ipfsUrl: string;
+    private didResover: string;
 
-    private suppoertedCollections: CollectionAddress[] = null;
     private assistService: AssistService;
-    private essentialsConnector: EssentialsConnector;
-    private walletConnectWeb3: Web3;
+    private web3: Web3;
 
     static appContext: AppContext;
 
-    private constructor() {
-        this.assistService = new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+    private constructor(env: any) {
+        this.assistUrl  = env['assistUrl'];
+        this.ipfsUrl    = env['ipfsUrl'];
+        this.didResover = env['didResover'];
+        this.appDID     = env['appDid'];
+        this.assistService = new AssistService(this.assistUrl);
+    }
+
+    static createAppContext(env: any) {
+        if(!this.appContext) {
+            this.appContext = new AppContext(env);
+        }
     }
 
     static getAppContext(): AppContext {
-        if(!this.appContext) {
-            this.appContext = new AppContext();
-        }
         return this.appContext;
     }
 
-    /**
-     * Set the collections that will be interacting with in this SDK.
-     *
-     * @param collections A list of collection contract address, including chain type.
-     * @returns The current object.
-     */
-    public setSupportedCollections(collections: CollectionAddress[]): AppContext {
-        this.suppoertedCollections = collections
-        return this
-    }
-
-    /**
-     * Get the supported collections being interacted with.
-     * @returns The list of supported contract collections.
-     */
-    public getSupportedCollections(): CollectionAddress[] {
-        return this.suppoertedCollections;
-    }
-
-    /**
-     * Customize assist service endpoint.
-     * @param assistEndpoint The target assist serivce endpoint
-     * @returns The current object of this class.
-     */
-    public setAssistNode(assistNode: string): AppContext {
-        this.assistNode = assistNode;
-        return this;
-    }
-
-    /**
-     * Get the customized assist service endpoint.
-     * @returns The customized assist service endpoint.
-     */
     public getAssistNode(): string {
-        return this.assistNode;
+        return this.assistUrl;
     }
 
-    /**
-     * Customize ipfs service endpoint
-     * @param ipfsEndpoint The target ipfs service endpoint.
-     * @returns
-     */
-    public setIPFSNode(ipfsNode: string): AppContext {
-        this.ipfsNode = ipfsNode;
-        return this;
-    }
-
-    /**
-     * Get the cutomized ipfs service endpoint.
-     * @returns The customized ipfs service endpoint.
-     */
     public getIPFSNode(): string {
-        return this.ipfsNode;
+        return this.ipfsUrl;
     }
 
-    public setChainNode(chainNode: string): AppContext {
-        this.chainNode = chainNode
-        return this
-    }
-
-    public getChainNode(): string {
-        return this.chainNode
+    public getDidResolver(): string {
+        return this.didResover
     }
 
     public getAssistService(): AssistService {
         return this.assistService;
     }
 
-    public getEssentialConnector(): EssentialsConnector {
-        if(!this.essentialsConnector) {
-            this.essentialsConnector = new EssentialsConnector();
+    public getWeb3(): Web3 {
+        if(!this.web3) {
+            let essentialsConnector = new EssentialsConnector();
+            this.web3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider())
         }
-        return this.essentialsConnector;
-    }
-
-    public getWeb3Connector(): Web3 {
-        if(!this.walletConnectWeb3) {
-            let essentialsConnector = this.getEssentialConnector();
-            this.walletConnectWeb3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider())
-        }
-        return this.walletConnectWeb3;
-    }
-
-    public getChainId() {
-        return this.getEssentialConnector().getWalletConnectProvider().wc.chainId;
+        return this.web3;
     }
 }

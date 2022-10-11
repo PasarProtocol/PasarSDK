@@ -23,7 +23,7 @@ export class CallContract {
 
     constructor(account: string) {
         this.account = account;
-        this.web3 = AppContext.getAppContext().getWeb3Connector();
+        this.web3 = AppContext.getAppContext().getWeb3();
     }
 
     private getTransactionParam(account: string, gasPrice: string, price = 0): TransactionParams {
