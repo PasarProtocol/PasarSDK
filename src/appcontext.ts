@@ -22,13 +22,10 @@ export class AppContext {
         this.assistService = new AssistService(this.assistUrl);
     }
 
-    static createAppContext(env: any) {
-        if(!this.appContext) {
-            this.appContext = new AppContext(env);
-        }
-    }
-
     static getAppContext(): AppContext {
+        if(!this.appContext) {
+            this.appContext = new AppContext(false);
+        }
         return this.appContext;
     }
 
