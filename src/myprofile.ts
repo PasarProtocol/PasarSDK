@@ -42,7 +42,7 @@ export class MyProfile {
         this.name = name;
         this.did = did;
         this.walletAddress = address;
-        this.callContract = new CallContract();
+        this.callContract = new CallContract(this.walletAddress);
     }
 
     public setBioCredential(bio: VerifiableCredential): MyProfile {
@@ -84,7 +84,7 @@ export class MyProfile {
                 "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
             }
 
-            let address = await this.callContract.createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
+            let address = await this.callContract.createCollection(name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
             progressHandler.onProgress(100);
             return address;
         }).catch (error => {
@@ -192,7 +192,7 @@ export class MyProfile {
             if (collectionInfo == null) {
                 throw new Error(`No collection deployed at address ${tokenAddress}`);
             }
-            await this.callContract.registerCollection(this.walletAddress, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
+            await this.callContract.registerCollection(tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -216,7 +216,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
+            await this.callContract.updateCollection(tokenAddress, name, collectionUri, gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);
@@ -237,7 +237,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
+            await this.callContract.updateCollectionRoyalties(tokenAddress, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);
@@ -339,7 +339,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
-            await this.callContract.mintFunctionOnCustomCollection(collection, this.walletAddress, tokenId, ChainType.ESC, tokenUri, gasPrice);
+            await this.callContract.mintFunctionOnCustomCollection(collection, tokenId, ChainType.ESC, tokenUri, gasPrice);
             progressHandler.onProgress(60);
             return tokenId;
         }).catch (error => {
@@ -370,7 +370,7 @@ export class MyProfile {
             let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
             let userInfo: UserInfo = this.getUserInfo();
             let abiFile = FEED_CONTRACT_ABI;
-            await this.callContract.mintFunction(abiFile, collection, this.walletAddress, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
+            await this.callContract.mintFunction(abiFile, collection, tokenId, 1, tokenUri, roylatyFee, userInfo, gasPrice);
             handleProgress.onProgress(100);
             return tokenId;
         }).catch (error => {
@@ -402,7 +402,7 @@ export class MyProfile {
             if (ercType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
 
-            await this.callContract.deleteFunction(abiFile, baseToken, this.walletAddress, tokenId, totalSupply, ercType, gasPrice);
+            await this.callContract.deleteFunction(abiFile, baseToken, tokenId, totalSupply, ercType, gasPrice);
 
             handleProgress.onProgress(100);
         }).catch (error => {
@@ -432,10 +432,10 @@ export class MyProfile {
             if (ercType == ERCType.ERC721)
                 abiFile = TOKEN_721_ABI;
 
-            await this.callContract.approvalForAll(abiFile, baseToken, toAddr, this.walletAddress, gasPrice);
+            await this.callContract.approvalForAll(abiFile, baseToken, toAddr, gasPrice);
             progressHandler.onProgress(50);
 
-            await this.callContract.transferNFT(abiFile, this.walletAddress, toAddr, tokenId, baseToken, ercType, gasPrice);
+            await this.callContract.transferNFT(abiFile, toAddr, tokenId, baseToken, ercType, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -473,7 +473,7 @@ export class MyProfile {
             progressHandler.onProgress(20);
             let priceValue = BigInt(price*1e18).toString();
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
+            await this.callContract.createOrderForSale(tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
 
             progressHandler.onProgress(100);
         }).catch (error => {
@@ -500,7 +500,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             let priceValue = BigInt(newPrice*1e18).toString();
-            await this.callContract.changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
+            await this.callContract.changePrice(parseInt(orderId), priceValue, newPricingToken, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -524,9 +524,9 @@ export class MyProfile {
             progressHandler.onProgress(20);
             let did = await this.getUserDid();
             if(quoteToken != defaultAddress) {
-                await this.callContract.approveToken(this.walletAddress, buyingPrice, quoteToken, gasPrice);
+                await this.callContract.approveToken(buyingPrice, quoteToken, gasPrice);
             }
-            await this.callContract.buyItem(this.walletAddress, orderId, buyingPrice, quoteToken, did, gasPrice);
+            await this.callContract.buyItem(orderId, buyingPrice, quoteToken, did, gasPrice);
 
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -560,11 +560,11 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             let marketPlaceAddress = getCurrentMarketAddress();
-            await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
+            await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, gasPrice);
             progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.createOrderForAuction(this.walletAddress, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
+            await this.callContract.createOrderForAuction(baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
         }).catch(error => {
             throw new Error(error);
         })
@@ -598,7 +598,7 @@ export class MyProfile {
             let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
             let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
-            await this.callContract.changePriceOnAuction(this.walletAddress, parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
+            await this.callContract.changePriceOnAuction(parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -625,11 +625,11 @@ export class MyProfile {
 
             let priceValue = Number(BigInt(price*1e18));
             if(quoteToken != defaultAddress) {
-                await this.callContract.approveToken(this.walletAddress, priceValue, quoteToken, gasPrice);
+                await this.callContract.approveToken(priceValue, quoteToken, gasPrice);
             }
 
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.bidItemOnAuction(this.walletAddress, orderId, priceValue, quoteToken, userInfo, gasPrice);
+            await this.callContract.bidItemOnAuction(orderId, priceValue, quoteToken, userInfo, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -647,7 +647,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.settleAuction(this.walletAddress, orderId, gasPrice);
+            await this.callContract.settleAuction(orderId, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -669,7 +669,7 @@ export class MyProfile {
     ): Promise<void> {
         await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.unlistItem(this.walletAddress, orderId, gasPrice);
+            await this.callContract.unlistItem(orderId, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
