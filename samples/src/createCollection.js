@@ -9,14 +9,14 @@ const CreateCollection = () => {
     const [background, setBackground] = useState();
     const [collectionType, setCollectionType] = useState(getCollectionType()[0]);
     const [category, setCategory] = useState(getCollectionCategories()[0]);
-    const [progress, setProgress] = useState(0);
+    const progress = {
+        onProgress:(stage) => {console.log(stage)}
+    }
+
     const [socialInfo, setSocialInfo] = useState(getCollectionSocialField())
     useEffect(() => {
         console.log(socialInfo);
     }, [])
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
 
     const handleMint = async () => {
         let royalty = [{address: getAccountInfo().address, rate: 10}];
@@ -27,7 +27,7 @@ const CreateCollection = () => {
         console.log(category);
         console.log(royalty);
         try {
-            let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, setProgress);
+            let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
             console.log(address);
         } catch(err) {
             console.log(err);
