@@ -51,11 +51,9 @@ export class MyProfile {
     }
 
     private getGasPrice = async(): Promise<string> => {
-        return await this.appContext.getWeb3Connector().eth.getGasPrice();
-    }
-
-    private getFilteredGasPrice = (_gasPrice: any): string => {
-        return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+        return await this.appContext.getWeb3Connector().eth.getGasPrice().then((_gasPrice: any) => {
+            return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
+        })
     }
 
     public getUserInfo = ():UserInfo => {
@@ -79,16 +77,15 @@ export class MyProfile {
         collectionType: ERCType = ERCType.ERC721,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        return await this.getGasPrice().then (gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
+        return await this.getGasPrice().then (async gasPrice => {
+            progressHandler.onProgress(20);
             const tokenStandard = {
                 "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
                 "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
             }
 
             let address = await this.callContract.createCollection(this.walletAddress, name, symbol, collectionUri, tokenStandard[collectionType], gasPrice);
-            progressHandler.onProgress(70);
+            progressHandler.onProgress(100);
             return address;
         }).catch (error => {
             throw new Error(error);
@@ -187,20 +184,19 @@ export class MyProfile {
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(await this.getGasPrice());
+    ): Promise<void> {
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
 
-        try {
-            let collectionInfo: NormalCollectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
-            if(collectionInfo.owner.toLowerCase() != this.walletAddress.toLowerCase()) {
-                throw new Error("You can't register this collection");
+            let collectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
+            if (collectionInfo == null) {
+                throw new Error(`No collection deployed at address ${tokenAddress}`);
             }
             await this.callContract.registerCollection(this.walletAddress, tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
-            return tokenAddress;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch (error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -218,10 +214,8 @@ export class MyProfile {
         collectionUri: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
+        return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
             await this.callContract.updateCollection(this.walletAddress, tokenAddress, name, collectionUri, gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -241,10 +235,8 @@ export class MyProfile {
         royaltyRates: RoyaltyRate[],
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
+        return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
             await this.callContract.updateCollectionRoyalties(this.walletAddress, tokenAddress, royaltyRates, gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -344,10 +336,8 @@ export class MyProfile {
         tokenUri: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        return await this.getGasPrice().then(gasPrice => {
+        return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            return getFilteredGasPrice(gasPrice)
-        }).then (async gasPrice => {
             let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
             await this.callContract.mintFunctionOnCustomCollection(collection, this.walletAddress, tokenId, ChainType.ESC, tokenUri, gasPrice);
             progressHandler.onProgress(60);
@@ -375,10 +365,8 @@ export class MyProfile {
         roylatyFee: number,
         handleProgress: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            handleProgress.onProgress(60);
+        return await this.getGasPrice().then(async gasPrice => {
+            handleProgress.onProgress(20);
             let tokenId = `0x${sha256(tokenUri.replace("pasar:json:", ""))}`;
             let userInfo: UserInfo = this.getUserInfo();
             let abiFile = FEED_CONTRACT_ABI;
@@ -407,10 +395,8 @@ export class MyProfile {
         totalSupply = 1,
         handleProgress: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then (gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            handleProgress.onProgress(30);
+        return await this.getGasPrice().then (async gasPrice => {
+            handleProgress.onProgress(20);
 
             let abiFile = PASAR_CONTRACT_ABI;
             if (ercType == ERCType.ERC721)
@@ -439,10 +425,8 @@ export class MyProfile {
         ercType: ERCType,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
 
             let abiFile = PASAR_CONTRACT_ABI;
             if (ercType == ERCType.ERC721)
@@ -485,10 +469,8 @@ export class MyProfile {
         price: number,
         progressHandler: ProgressHandler=new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then (gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             let priceValue = BigInt(price*1e18).toString();
             let userInfo: UserInfo = this.getUserInfo();
             await this.callContract.createOrderForSale(this.walletAddress, tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
@@ -515,10 +497,8 @@ export class MyProfile {
         newPrice: number,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             let priceValue = BigInt(newPrice*1e18).toString();
             await this.callContract.changePrice(this.walletAddress, parseInt(orderId), priceValue, newPricingToken, gasPrice);
             progressHandler.onProgress(100);
@@ -540,10 +520,8 @@ export class MyProfile {
         quoteToken: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             let did = await this.getUserDid();
             if(quoteToken != defaultAddress) {
                 await this.callContract.approveToken(this.walletAddress, buyingPrice, quoteToken, gasPrice);
@@ -569,7 +547,6 @@ export class MyProfile {
      * @param sellerUri The uri of seller information on IPFS storage
      * @param progressHandler The handler to deal with the progress on listing NFT item on
      *        marketplace.
-     * @returns The orderId of the NFT item listed on marketplace
      */
     public async listItemOnAuction(baseToken: string,
         tokenId: string,
@@ -579,21 +556,18 @@ export class MyProfile {
         buyoutPrice: number,
         expirationTime: number,
         progressHandler: ProgressHandler = new EmptyHandler()
-    ): Promise<string> {
-        let gasPrice = getFilteredGasPrice(this.getGasPrice());
-        progressHandler.onProgress(30);
-
-        try {
+    ): Promise<void> {
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             let marketPlaceAddress = getCurrentMarketAddress();
             await this.callContract.approvalForAll(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, this.walletAddress, gasPrice);
             progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
             await this.callContract.createOrderForAuction(this.walletAddress, baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
-            return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
+        }).catch(error => {
+            throw new Error(error);
+        })
     }
 
     /**
@@ -617,10 +591,9 @@ export class MyProfile {
         newBuyoutPrice: number,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then (gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then (async gasPrice => {
+            progressHandler.onProgress(20);
+
             let priceValue = BigInt(newMinPrice*1e18).toString();
             let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
             let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
@@ -647,10 +620,8 @@ export class MyProfile {
         price: number,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then (async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then (async gasPrice => {
+            progressHandler.onProgress(20);
 
             let priceValue = Number(BigInt(price*1e18));
             if(quoteToken != defaultAddress) {
@@ -674,10 +645,8 @@ export class MyProfile {
     public async settleAuction(orderId: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        return await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
-            progressHandler.onProgress(30);
+        return await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             await this.callContract.settleAuction(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
@@ -698,10 +667,8 @@ export class MyProfile {
         orderId: string,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
-        await this.getGasPrice().then(gasPrice => {
-            return getFilteredGasPrice(gasPrice);
-        }).then(async gasPrice => {
-            progressHandler.onProgress(30);
+        await this.getGasPrice().then(async gasPrice => {
+            progressHandler.onProgress(20);
             await this.callContract.unlistItem(this.walletAddress, orderId, gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
