@@ -490,7 +490,7 @@ export class MyProfile {
      * @param newPrice The new listed price
      * @param progressHandler The handler to deal with the progress on changing price for
      *        specific listed item on marketplace
-     * @returns The result of bidding action.
+     * @returns
      */
     public async changePrice(orderId: string,
         newPricingToken: string,
@@ -512,8 +512,10 @@ export class MyProfile {
      * This function is used to buy the item with fixed price.
      *
      * @param orderId The orderId of NFT item on maketplace
+     * @buyingPrice The price of buying the nft
+     * @quoteToken The token type of buying the nft
      * @param progressHandler The handler to deal with the progress on buying listed item
-     * @returns The orderId of buying the order
+     * @returns order
      */
     public async buyItem(orderId: string,
         buyingPrice: number,
@@ -582,7 +584,7 @@ export class MyProfile {
      *        buyout
      * @param progressHandler The handler to deal with the progress on chaning price for
      *        specific auction item on marketplace
-     * @returns The orderId
+     * @returns
      */
     public async changePriceOnAuction(orderId: string,
         newPricingToken: string,
@@ -613,7 +615,7 @@ export class MyProfile {
      * @param bidderUri The uri of bidder information on IPFS storage
      * @param progressHandler The handler to deal with the progress on bidding for NFT item
      *        on marketplace
-     * @returns The result of bidding action.
+     * @returns
      */
     public async bidItemOnAuction(orderId: string,
         quoteToken: string,

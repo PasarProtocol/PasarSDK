@@ -132,8 +132,7 @@ const listItemonAuction = async (
 }
 
 const changePrice = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
     newPrice: string,
     pricingToken: string,
     handleProgress: any = null
@@ -141,16 +140,14 @@ const changePrice = async (
     try {
         let profile = getMyProfileInfo();
 
-        let orderId: string = await profile.changePrice(tokenId, baseToken, pricingToken, parseFloat(newPrice), handleProgress);
-        return orderId;
+        await profile.changePrice(orderId, pricingToken, parseFloat(newPrice), handleProgress);
     } catch(err) {
         throw new Error(err);
     }
 }
 
 const changePriceOnAuction = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
     newMinPrice: string,
     newReservedPrice: string,
     newBuyoutPrice: string,
@@ -159,68 +156,60 @@ const changePriceOnAuction = async (
 ) => {
     try {
         let profile = getMyProfileInfo();
-        let orderId = await profile.changePriceOnAuction(tokenId, baseToken, pricingToken, parseFloat(newMinPrice), parseFloat(newReservedPrice), parseFloat(newBuyoutPrice), handleProgress);
-        return orderId;
+        await profile.changePriceOnAuction(orderId, pricingToken, parseFloat(newMinPrice), parseFloat(newReservedPrice), parseFloat(newBuyoutPrice), handleProgress);
     } catch(err) {
         throw new Error(err);
     }
 }
 
 const buyItem = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
+    buyingPrice: number,
+    quoteToken: string,
     handleProgress: any = null
 ) => {
     try {
         let profile = getMyProfileInfo();
-
-        let orderId = await profile.buyItem(tokenId, baseToken, handleProgress);
-        return orderId;
+        await profile.buyItem(orderId, buyingPrice, quoteToken, handleProgress);
     } catch(err) {
         throw new Error(err);
     }
 }
 
 const bidItemOnAuction = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
+    quoteToken: string,
     price: string,
     handleProgress: any = null
 ) => {
     try {
         let profile = getMyProfileInfo();
 
-        let orderId = await profile.bidItemOnAuction(tokenId, baseToken, parseFloat(price), handleProgress);
-        return orderId;
+        await profile.bidItemOnAuction(orderId, quoteToken, parseFloat(price), handleProgress);
     } catch(err) {
         throw new Error(err);
     }
 }
 
 const settleAuction = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
     handleProgress: any = null
 ) => {
     try {
         let profile = getMyProfileInfo();
-
-        let orderId = await profile.settleAuction(tokenId, baseToken, handleProgress);
-        return orderId;
+        await profile.settleAuction(orderId, handleProgress);
     } catch(err) {
         throw new Error(err);
     }
 }
 
 const unlistItem = async (
-    tokenId: string,
-    baseToken: string,
+    orderId: string,
     handleProgress: any = null
 ) => {
     try {
         let profile = getMyProfileInfo();
-
-        await profile.unlistItem(tokenId, baseToken, handleProgress);
+        await profile.unlistItem(orderId, handleProgress);
     } catch(err) {
         throw new Error(err);
     }
