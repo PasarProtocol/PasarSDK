@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
+import { isInAppBrowser, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
 import { NormalCollectionInfo, TransactionParams, UserInfo } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
@@ -69,7 +69,7 @@ export class CallContract {
             } else if(checkFeedsCollection(contractAddress)) {
                 pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000, userInfo.did).send(transactionParams).on('receipt', (receipt) => {
                     resolve(receipt);
-                }).on('error', (error) => {
+                }).on('error', (error: any) => {
                     reject(error)
                 });
             }
