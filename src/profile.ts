@@ -18,20 +18,7 @@ export class Profile {
     constructor() {
     }
 
-    public setUserInfo = (info: UserInfo) => {
-        this.userInfo = info;
-    }
-
-    public getUserInfo = ():UserInfo => {
-        return this.userInfo;
-    }
-
-    public deleteUserInfo = () => {
-        this.userInfo.name = null;
-        this.userInfo.bio = null;
-        this.userInfo.did = null;
-        this.userInfo.address = null;
-    }
+    
 
     /**
      * Query the NFTs owned by this profile.

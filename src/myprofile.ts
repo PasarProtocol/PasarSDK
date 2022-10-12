@@ -29,7 +29,7 @@ import { CallContract } from './callcontract';
  */
 export class MyProfile {
     
-    private appContext: AppContext = AppContext.getAppContext();
+    private appContext: AppContext;
     private callContract: CallContract;
 
     private name: VerifiableCredential;
@@ -44,17 +44,7 @@ export class MyProfile {
         this.did = did;
         this.walletAddress = address;
         this.callContract = new CallContract(this.walletAddress);
-    }
-
-    static myProfile: MyProfile;
-
-    static getMyProfile(name: VerifiableCredential, did: string, address: string): MyProfile {
-        if(!this.myProfile) {
-            console.log(111111111111);
-            this.myProfile = new MyProfile(name, did, address);
-        }
-        console.log(2222222222);
-        return this.myProfile;
+        this.appContext = AppContext.getAppContext();
     }
 
     public setBioCredential(bio: VerifiableCredential): MyProfile {
@@ -63,13 +53,24 @@ export class MyProfile {
     }
 
     private getGasPrice = async(): Promise<string> => {
-        return await this.appContext.getWeb3Connector().eth.getGasPrice().then((_gasPrice: any) => {
+        return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice().then((_gasPrice: any) => {
             return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
         })
     }
 
+    public setUserInfo = (info: UserInfo) => {
+        this.userInfo = info;
+    }
+
     public getUserInfo = ():UserInfo => {
         return this.userInfo;
+    }
+
+    public deleteUserInfo = () => {
+        this.userInfo.name = null;
+        this.userInfo.bio = null;
+        this.userInfo.did = null;
+        this.userInfo.address = null;
     }
 
     /**
@@ -89,8 +90,9 @@ export class MyProfile {
         collectionType: ERCType = ERCType.ERC721,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        return await MyProfile.myProfile.getGasPrice().then (async gasPrice => {
-            progressHandler.onProgress(20);
+        return await this.getGasPrice().then (async gasPrice => {
+            console.log(111111111);
+            progressHandler.onProgress(70);
             const tokenStandard = {
                 "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
                 "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
@@ -141,7 +143,7 @@ export class MyProfile {
 
             let avatarsrc =  `pasar:image:${avatar_add.path}`;
             let backgroundsrc =  `pasar:image:${background_add.path}`;
-            let userInfo = MyProfile.getMyProfile(null, "", "").getUserInfo();
+            let userInfo = this.getUserInfo();
             console.log(userInfo);
             const dataObj = {
                 avatar: avatarsrc,

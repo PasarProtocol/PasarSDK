@@ -19,7 +19,7 @@ let myProfileInfo, profileInfo;
 
 const getMyProfileInfo = () => {
     if(!myProfileInfo) {
-        myProfileInfo = MyProfile.getMyProfile(null, '', '');
+        myProfileInfo = new MyProfile(null, '', '');
     }
 
     return myProfileInfo;
@@ -67,12 +67,13 @@ const mintNft = async (
 const deleteNft = async (
     baseToken: string,
     tokenId: string,
+    ercType: ERCType,
     totalSupply = 1,
     handleProgress: any = null
 ) => {
     try {
         let profile = getMyProfileInfo();
-        await profile.deleteItem(tokenId, baseToken, totalSupply, handleProgress);
+        await profile.deleteItem(tokenId, baseToken, ercType, totalSupply, handleProgress);
     } catch(err) {
         throw new Error(err);
     }
@@ -254,8 +255,7 @@ const registerCollection = async (
         let profile = getMyProfileInfo();
         
         let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        let resultContract:string = await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
-        return resultContract;
+        await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
     } catch(err) {
         throw new Error(err);
     }
@@ -322,7 +322,7 @@ const getCollectionCategories = () => {
 }
 
 const getAccountInfo = () => {
-    return getProfileInfo().getUserInfo();
+    return getMyProfileInfo().getUserInfo();
 }
 
 const getListedItem = async (
@@ -431,13 +431,14 @@ const getCollectionSocialField = () => {
 
 const signIn = async() => {
     let userInfo = await signin();
+    myProfileInfo = new MyProfile(userInfo['name'], userInfo['did'], userInfo['address']);
     console.log(userInfo);
-    getProfileInfo().setUserInfo(userInfo);
+    getMyProfileInfo().setUserInfo(userInfo);
 }
 
 const singOut = async() => {
     await signout();
-    getProfileInfo().deleteUserInfo();
+    getMyProfileInfo().deleteUserInfo();
 }
 
 export {
