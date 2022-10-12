@@ -1,25 +1,32 @@
+import { Chain } from "pretend";
+
 enum ChainType {
-    ESC = "Elastos Smart Chain",
-    FSN = "Fusion",
-    ETH = "Ethereum"
+    ESC = "ESC",
+    ETH = "ETH",
+    FSN = "FSN"
 }
+
+const chainTypes: ChainType[] = [
+    ChainType.ESC,
+    ChainType.ETH,
+    ChainType.FSN
+]
 
 const getChainTypes = (): string[] => {
-    return [
-        ChainType.ESC,
-        ChainType.ETH,
-        ChainType.FSN
-    ]
+    return chainTypes;
 }
 
+const chainIdMapType = new Map<number, ChainType>([
+    [20,    ChainType.ESC],
+    [21,    ChainType.ESC],
+    [1,     ChainType.ETH],
+    [3,     ChainType.ETH],
+    [32659, ChainType.FSN],
+    [46688, ChainType.FSN]
+]);
+
 const getChainTypeById = (chainId: number): ChainType => {
-    if (chainId === 20 || chainId===21)
-        return ChainType.ESC;
-    if (chainId===1 || chainId===3)
-        return ChainType.ETH;
-    if (chainId===32659 || chainId===46688)
-        return ChainType.FSN;
-    return ChainType.ESC;
+    return chainIdMapType[chainId]
 }
 
 export {
