@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { isInAppBrowser, checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
+import { checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
 import { NormalCollectionInfo, TransactionParams, UserInfo } from './utils';
 import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
 import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
@@ -482,7 +482,7 @@ export class CallContract {
                 'gas': LimitGas,
                 'gasPrice': gasPrice
             }
-
+/*
             if(isInAppBrowser())
               transactionParams['to'] = ""
               registeredContract.send(transactionParams).then(newContractInstance=>{
@@ -491,8 +491,9 @@ export class CallContract {
             }).catch((error) => {
                 reject(error);
             })
-
+*/
         })
+
     }
 
     /**

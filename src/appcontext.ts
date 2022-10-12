@@ -1,8 +1,5 @@
-import { CollectionAddress } from "./contractaddress";
-import { valuesOnTestNet, valuesOnMainNet } from "./constant";
 import Web3 from "web3";
 import { AssistService } from "./assistservice";
-import { isInAppBrowser} from "./global";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
 export class AppContext {
@@ -51,10 +48,14 @@ export class AppContext {
         return this.assistService;
     }
 
+    public isInAppBrowser(): boolean {
+        return window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
+    }
+
     public getWeb3(): Web3 {
         if(!this.web3) {
             let essentialsConnector = new EssentialsConnector();
-            this.web3 = new Web3(isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider())
+            this.web3 = new Web3(this.isInAppBrowser() ? window['elastos'].getWeb3Provider() : essentialsConnector.getWalletConnectProvider())
         }
         return this.web3;
     }
