@@ -1,11 +1,10 @@
-import { create, IPFSHTTPClient } from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
-import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet, defaultAddress } from "./constant";
+import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID, getCurrentMarketAddress } from "./global";
 import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
@@ -110,12 +109,7 @@ export class MyProfile {
     ) : Promise<string> {
         let ipfsURL:string;
         try {
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
-            const client = create({ url: ipfsURL });
+            const client = create({ url: this.appContext.getIPFSNode()});
             progressHandler.onProgress(10);
 
             let avatar_add = await client.add(avatar);
@@ -262,14 +256,7 @@ export class MyProfile {
         progressHandler:ProgressHandler = new EmptyHandler(),
     ): Promise<string> {
         try {
-            let ipfsURL:string;
-
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
-            const client = create({ url: ipfsURL });
+            const client = create({ url: this.appContext.getIPFSNode() });
             progressHandler.onProgress(10);
 
             let image_add = await client.add(itemImage);
@@ -679,15 +666,7 @@ export class MyProfile {
      * @returns ipfs path.
      */
     public async getUserDid(): Promise<string> {
-        let ipfsURL:string;
-
-        if(isTestnetNetwork()) {
-            ipfsURL = valuesOnTestNet.urlIPFS;
-        } else {
-            ipfsURL = valuesOnMainNet.urlIPFS;
-        }
-
-        const client = create({ url: ipfsURL });
+        const client = create({ url: this.appContext.getIPFSNode() });
 
         let jsonDid:UserInfo = this.getUserInfo();
 
