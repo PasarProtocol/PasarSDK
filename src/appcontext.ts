@@ -19,11 +19,15 @@ export class AppContext {
         this.appDID     = env['appDid'];
     }
 
-    static getAppContext(): AppContext {
+    static createAppContext(env: any) {
         if(!this.appContext) {
-            this.appContext = new AppContext(false);
+            console.log(env);
+            this.appContext = new AppContext(env);
         }
-        return this.appContext;
+    }
+
+    static getAppContext(): AppContext {
+       return this.appContext;
     }
 
     public getAssistNode(): string {
