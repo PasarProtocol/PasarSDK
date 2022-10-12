@@ -1,6 +1,6 @@
 {
   "name": "@pasarprotocol/pasar-sdk-development",
-  "version": "0.0.143",
+  "version": "0.0.149",
   "description": "PasarProtocol NFT Marketplace SDK",
   "exports": {
     "node": "./dist/pasar-sdk.js",

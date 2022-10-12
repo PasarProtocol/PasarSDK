@@ -112,6 +112,7 @@ const signin = async () => {
       await essentialsConnector.disconnectWalletConnect();
     }
     let userInfo = await signInWithEssentials();
+    console.log(userInfo);
     isSignin = true;
     return userInfo;
 }

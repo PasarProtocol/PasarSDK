@@ -12,14 +12,14 @@ import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./gl
 import { Profile } from "./profile";
 import { AssistService } from "./assistservice";
 import { getChainTypes as _getChainTypes} from "./chaintype";
-import { CollectionSocialField } from "./utils";
+import { CollectionSocialField, UserInfo } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 let myProfileInfo, profileInfo;
 
 const getMyProfileInfo = () => {
     if(!myProfileInfo) {
-        myProfileInfo = new MyProfile(null, '', '');
+        myProfileInfo = MyProfile.getMyProfile(null, '', '');
     }
 
     return myProfileInfo;
@@ -252,6 +252,7 @@ const registerCollection = async (
 ) => {
     try {
         let profile = getMyProfileInfo();
+        
         let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
         let resultContract:string = await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
         return resultContract;
@@ -430,6 +431,7 @@ const getCollectionSocialField = () => {
 
 const signIn = async() => {
     let userInfo = await signin();
+    console.log(userInfo);
     getProfileInfo().setUserInfo(userInfo);
 }
 

@@ -28,7 +28,8 @@ import { CallContract } from './callcontract';
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile {
-    private appContext: AppContext;
+    
+    private appContext: AppContext = AppContext.getAppContext();
     private callContract: CallContract;
 
     private name: VerifiableCredential;
@@ -43,6 +44,17 @@ export class MyProfile {
         this.did = did;
         this.walletAddress = address;
         this.callContract = new CallContract(this.walletAddress);
+    }
+
+    static myProfile: MyProfile;
+
+    static getMyProfile(name: VerifiableCredential, did: string, address: string): MyProfile {
+        if(!this.myProfile) {
+            console.log(111111111111);
+            this.myProfile = new MyProfile(name, did, address);
+        }
+        console.log(2222222222);
+        return this.myProfile;
     }
 
     public setBioCredential(bio: VerifiableCredential): MyProfile {
@@ -77,7 +89,7 @@ export class MyProfile {
         collectionType: ERCType = ERCType.ERC721,
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
-        return await this.getGasPrice().then (async gasPrice => {
+        return await MyProfile.myProfile.getGasPrice().then (async gasPrice => {
             progressHandler.onProgress(20);
             const tokenStandard = {
                 "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
@@ -129,9 +141,8 @@ export class MyProfile {
 
             let avatarsrc =  `pasar:image:${avatar_add.path}`;
             let backgroundsrc =  `pasar:image:${background_add.path}`;
-
-            let jsonDid:UserInfo = this.getUserInfo();
-
+            let userInfo = MyProfile.getMyProfile(null, "", "").getUserInfo();
+            console.log(userInfo);
             const dataObj = {
                 avatar: avatarsrc,
                 background: backgroundsrc,
@@ -145,9 +156,9 @@ export class MyProfile {
             const signature = await requestSigndataOnTokenID(plainText);
             progressHandler.onProgress(40);
             const creatorObject = {
-                did: jsonDid.did,
-                name: jsonDid.name || "",
-                description: jsonDid.bio || "",
+                did: userInfo.did,
+                name: userInfo.name || "",
+                description: userInfo.bio || "",
                 signature: signature && signature.signature ? signature.signature : ""
             }
 
