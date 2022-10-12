@@ -21,7 +21,6 @@ export class AppContext {
 
     static createAppContext(env: any) {
         if(!this.appContext) {
-            console.log(env);
             this.appContext = new AppContext(env);
         }
     }
