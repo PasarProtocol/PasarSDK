@@ -55,7 +55,7 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
               resolve({success: 2})
               return
             }
-              
+
             const fileName = file.name;
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -67,20 +67,20 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
                       resolve({success: 2})
                       return
                     }
-  
+
                     const imgWidth = img.width;
                     const imgHeight = img.height;
-  
+
                     if (imgWidth <= 0 || imgHeight <= 0) {
                       resolve({success: 2})
                       return
                     }
-  
+
                     const canvasSize = zoomImgSize(imgWidth, imgHeight, maxWidth, maxHeight);
-                    
+
                     const canvas = document.createElement('canvas');
                     [canvas.width, canvas.height] = canvasSize;
-  
+
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     ctx.canvas.toBlob((blob) => {
@@ -88,7 +88,7 @@ const resizeImage = (file, maxWidth, maxHeight, quality = 1) => {
                             type: `image/${imageType}`,
                             lastModified: Date.now()
                         });
-  
+
                         const reader = new window.FileReader();
                         reader.readAsArrayBuffer(file);
                         reader.onloadend = () => {
@@ -148,7 +148,7 @@ const checkPasarCollection = (address) => {
             return false;
         }
     }
-    
+
 }
 
 const getCurrentChainType = (chainId) => {
@@ -182,7 +182,7 @@ const getCurrentMarketAddress = () => {
         } else {
             return valuesOnMainNet.fusion.pasarMarketPlaceContract;
         }
-    }   
+    }
 }
 
 const getCurrentImportingContractAddress = () => {
@@ -205,7 +205,7 @@ const getCurrentImportingContractAddress = () => {
         } else {
             return valuesOnMainNet.fusion.pasarRegisterContract;
         }
-    }   
+    }
 }
 
 const getCurrentChainId = () => {
@@ -213,9 +213,6 @@ const getCurrentChainId = () => {
     let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
     return chainId;
 }
-
-const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
-const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
 
 const StringIsNumber = value => isNaN(Number(value)) === true;
 
@@ -230,20 +227,18 @@ const getChainTypeNumber = (chaintype:string) => {
 }
 
 const getChainTypeString = (chaintype: number) => {
-    if(chaintype == 1) {    
+    if(chaintype == 1) {
         return ChainType.ESC;
     } else if(chaintype == 2) {
         return ChainType.ETH;
     } else if(chaintype == 3) {
         return ChainType.FSN;
     }
-    
+
 }
 
 export {
     resizeImage,
-    isInAppBrowser,
-    getFilteredGasPrice,
     requestSigndataOnTokenID,
     StringIsNumber,
     checkPasarCollection,

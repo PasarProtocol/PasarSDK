@@ -1,23 +1,19 @@
-import { create, IPFSHTTPClient } from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
-import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { resizeImage, isInAppBrowser, getFilteredGasPrice, requestSigndataOnTokenID, checkFeedsCollection, getCurrentChainType, getCurrentMarketAddress } from "./global";
-import { CollectionSocialField, ImageDidInfo, NFTDidInfo, NormalCollectionInfo, UserDidInfo, UserInfo } from './utils';
+import { defaultAddress } from "./constant";
+import { resizeImage, requestSigndataOnTokenID, getCurrentMarketAddress } from "./global";
+import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
 import FEED_CONTRACT_ABI from './contracts/abis/stickerABI';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
-import TOKEN_20_ABI from './contracts/abis/erc20ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
 import TOKEN_1155_CODE from './contracts/bytecode/token1155Code';
-import { ChainType, getChainTypeById, getChainTypes } from './chaintype';
-import { CollectionInfo } from './collection/collectioninfo';
-import { NftItem } from './nftitem';
+import { ChainType } from './chaintype';
 import { AppContext } from './appcontext';
 import { EmptyHandler, ProgressHandler } from './progresshandler';
 
@@ -53,7 +49,7 @@ export class MyProfile {
     }
 
     private getGasPrice = async(): Promise<string> => {
-        return await AppContext.getAppContext().getWeb3Connector().eth.getGasPrice().then((_gasPrice: any) => {
+        return await this.appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
             return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
         })
     }
@@ -126,12 +122,7 @@ export class MyProfile {
     ) : Promise<string> {
         let ipfsURL:string;
         try {
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
-            const client = create({ url: ipfsURL });
+            const client = create({ url: this.appContext.getIPFSNode()});
             progressHandler.onProgress(10);
 
             let avatar_add = await client.add(avatar);
@@ -276,14 +267,7 @@ export class MyProfile {
         progressHandler:ProgressHandler = new EmptyHandler(),
     ): Promise<string> {
         try {
-            let ipfsURL:string;
-
-            if(isTestnetNetwork()) {
-                ipfsURL = valuesOnTestNet.urlIPFS;
-            } else {
-                ipfsURL = valuesOnMainNet.urlIPFS;
-            }
-            const client = create({ url: ipfsURL });
+            const client = create({ url: this.appContext.getIPFSNode() });
             progressHandler.onProgress(10);
 
             let image_add = await client.add(itemImage);
@@ -501,7 +485,7 @@ export class MyProfile {
      * @param newPrice The new listed price
      * @param progressHandler The handler to deal with the progress on changing price for
      *        specific listed item on marketplace
-     * @returns
+     * @returns The result of bidding action.
      */
     public async changePrice(orderId: string,
         newPricingToken: string,
@@ -523,10 +507,8 @@ export class MyProfile {
      * This function is used to buy the item with fixed price.
      *
      * @param orderId The orderId of NFT item on maketplace
-     * @buyingPrice The price of buying the nft
-     * @quoteToken The token type of buying the nft
      * @param progressHandler The handler to deal with the progress on buying listed item
-     * @returns order
+     * @returns The orderId of buying the order
      */
     public async buyItem(orderId: string,
         buyingPrice: number,
@@ -595,7 +577,7 @@ export class MyProfile {
      *        buyout
      * @param progressHandler The handler to deal with the progress on chaning price for
      *        specific auction item on marketplace
-     * @returns
+     * @returns The orderId
      */
     public async changePriceOnAuction(orderId: string,
         newPricingToken: string,
@@ -626,7 +608,7 @@ export class MyProfile {
      * @param bidderUri The uri of bidder information on IPFS storage
      * @param progressHandler The handler to deal with the progress on bidding for NFT item
      *        on marketplace
-     * @returns
+     * @returns The result of bidding action.
      */
     public async bidItemOnAuction(orderId: string,
         quoteToken: string,
@@ -695,15 +677,7 @@ export class MyProfile {
      * @returns ipfs path.
      */
     public async getUserDid(): Promise<string> {
-        let ipfsURL:string;
-
-        if(isTestnetNetwork()) {
-            ipfsURL = valuesOnTestNet.urlIPFS;
-        } else {
-            ipfsURL = valuesOnMainNet.urlIPFS;
-        }
-
-        const client = create({ url: ipfsURL });
+        const client = create({ url: this.appContext.getIPFSNode() });
 
         let jsonDid:UserInfo = this.getUserInfo();
 
