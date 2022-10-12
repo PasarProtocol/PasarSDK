@@ -91,7 +91,6 @@ export class MyProfile {
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
         return await this.getGasPrice().then (async gasPrice => {
-            console.log(111111111);
             progressHandler.onProgress(70);
             const tokenStandard = {
                 "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
@@ -144,7 +143,6 @@ export class MyProfile {
             let avatarsrc =  `pasar:image:${avatar_add.path}`;
             let backgroundsrc =  `pasar:image:${background_add.path}`;
             let userInfo = this.getUserInfo();
-            console.log(userInfo);
             const dataObj = {
                 avatar: avatarsrc,
                 background: backgroundsrc,

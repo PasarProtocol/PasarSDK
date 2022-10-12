@@ -432,7 +432,6 @@ const getCollectionSocialField = () => {
 const signIn = async() => {
     let userInfo = await signin();
     myProfileInfo = new MyProfile(userInfo['name'], userInfo['did'], userInfo['address']);
-    console.log(userInfo);
     getMyProfileInfo().setUserInfo(userInfo);
 }
 
