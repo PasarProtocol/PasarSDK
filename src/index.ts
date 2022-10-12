@@ -12,8 +12,9 @@ import { Profile } from "./profile";
 import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField, UserInfo } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
+import valuesMainNet from "./contracts/deploy/mainnet.json";
+import valuesTestNet from "./contracts/deploy/testnet.json";
 import { AppContext } from "./appcontext";
-import { getAllListedItems } from "./assistservice";
 
 let myProfileInfo, profileInfo;
 
@@ -34,6 +35,7 @@ const getProfileInfo = () => {
 }
 
 const initialize = (testnet = true) => {
+    AppContext.createAppContext(testnet ? valuesTestNet : valuesMainNet);
     getMyProfileInfo();
     getProfileInfo();
 }
