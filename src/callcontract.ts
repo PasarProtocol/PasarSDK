@@ -3,12 +3,12 @@ import { isTestnetNetwork } from './networkType';
 import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
 import { checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
 import { NormalCollectionInfo, TransactionParams, UserInfo } from './utils';
-import Pasar_Market_ABI from "./contracts/abis/pasarMarketABI";
-import Pasar_Register_ABI from "./contracts/abis/pasarRegisterABI";
+import marketV2ABI from "./contracts/abis/marketV2";
+import RegistryABI from "./contracts/abis/registry";
 import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
-import TOKEN_721_ABI from './contracts/abis/token721ABI';
-import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
-import TOKEN_20_ABI from './contracts/abis/erc20ABI';
+import Token721ABI from './contracts/abis/token721ABI';
+import Token1155ABI from './contracts/abis/token1155ABI';
+import Token20ABI from './contracts/abis/erc20ABI';
 import { RoyaltyRate } from './RoyaltyRate';
 import { ERCType } from './erctype';
 import { AppContext } from './appcontext';
@@ -26,26 +26,6 @@ export class CallContract {
         this.web3 = AppContext.getAppContext().getWeb3();
     }
 
-    private getTransactionParam(account: string, gasPrice: string, price = 0): TransactionParams {
-        return {
-            'from': account,
-            'gasPrice': gasPrice,
-            'gas': this.gasLimit,
-            'value': price
-        };
-    }
-    /**
-     * call the mint function on contract
-     *
-     * @param contractAbi abi file for calling
-     * @param contractAddress address of contract
-     * @param tokenId tokenId of being minted
-     * @param totalSupply quantity of nft of being minted
-     * @param royaltyFee royalty fee of nft
-     * @param userInfo the user information
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being minted the nft
-     */
     public mintFunction (
         contractAbi: any,
         contractAddress: string,
@@ -57,7 +37,12 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
+            const transactionParams = {
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            };
 
             let pasarContract = new this.web3.eth.Contract(contractAbi, contractAddress);
             if(checkPasarCollection(contractAddress)) {
@@ -73,20 +58,10 @@ export class CallContract {
                     reject(error)
                 });
             }
-
         })
     }
 
-    /**
-     * call the mint function on custom contract
-     *
-     * @param contractAbi abi file for calling
-     * @param contractAddress address of contract
-     * @param tokenId tokenId of being minted
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being minted the nft
-     */
-     public mintFunctionOnCustomCollection (
+    public mintFunctionOnCustomCollection (
         contractAddress: string,
         tokenId: string,
         collectionType: string,
@@ -94,17 +69,20 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let pasarContract = new this.web3.eth.Contract(TOKEN_721_ABI, contractAddress);
+            let pasarContract = new this.web3.eth.Contract(Token721ABI, contractAddress);
             let mintFunction = pasarContract.methods.mint(tokenId, metaData);
 
             if(collectionType == ERCType.ERC1155) {
-                pasarContract = new this.web3.eth.Contract(TOKEN_1155_ABI, contractAddress);
+                pasarContract = new this.web3.eth.Contract(Token1155ABI, contractAddress);
                 mintFunction = pasarContract.methods.mint(tokenId, 1, metaData);
             }
 
-            mintFunction.send(transactionParams).on('receipt', (receipt) => {
+            mintFunction.send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -112,34 +90,26 @@ export class CallContract {
         })
     }
 
-    /**
-     * burn the nft
-     *
-     * @param contractAbi abi file for calling
-     * @param contractAddress address of contract
-     * @param tokenId tokenId of being minted
-     * @param totalSupply quantity of nft of being minted
-     * @param royaltyFee royalty fee of nft
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being minted the nft
-     */
-     public deleteFunction (
+    public deleteFunction (
         contractAbi: any,
         contractAddress: string,
         tokenId: string,
         totalSupply: number,
         collectionType: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
             let pasarContract = new this.web3.eth.Contract(contractAbi, contractAddress);
             let burnFunction = pasarContract.methods.burn(tokenId, totalSupply);
             if(!checkFeedsCollection(contractAddress) && !checkPasarCollection(contractAddress) && collectionType == ERCType.ERC721) {
                 pasarContract.methods.burn(tokenId);
             }
-            burnFunction.send(transactionParams).on('receipt', (receipt) => {
+            burnFunction.send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -147,107 +117,81 @@ export class CallContract {
         })
     }
 
-    /**
-     * list the nft on marketplace
-     *
-     * @param tokenId tokenId of being minted
-     * @param baseToken the collection address of nft
-     * @param royaltyFee royalty fee of nft
-     * @param userInfo user information
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public createOrderForSale (
+    public createOrderForSale (
         tokenId: string,
         baseToken: string,
         price: string,
         quoteToken: string,
         userInfo: UserInfo,
+        marketContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
+            let pasarContract = new this.web3.eth.Contract(marketV2ABI, marketContract);
+            pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), userInfo.did).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * approval the item
-     *
-     * @param contractAbi the abi file of collection
-     * @param essentialsConnector essestial connector for creating web3
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being been approval the nft
-     */
-     public approvalForAll (
+    // Approve the NFT item on collection can be sold on market.
+    public approvalForAll (
         contractAbi: any,
         baseToken: string,
         approvalAddress: any,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let stickerContract = new this.web3.eth.Contract(contractAbi, baseToken);
-            stickerContract.methods.setApprovalForAll(approvalAddress, true).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(contractAbi, baseToken).methods.setApprovalForAll(approvalAddress, true).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * transfer the nft to another
-     *
-     * @param contractAbi the abi file of collection
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being been approval the nft
-     */
-     public transferNFT (
+    // Transfer NFT to another address.
+    public transferNFT (
         contractAbi: any,
         toAddress: string,
         tokenId: string,
         baseToken: string,
         collectionType: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
             let stickerContract = new this.web3.eth.Contract(contractAbi, baseToken);
             let transferFunction = stickerContract.methods.safeTransferFrom(this.account, toAddress, tokenId, 1);
             if(collectionType == ERCType.ERC721)
                 transferFunction = stickerContract.methods.safeTransferFrom(this.account, toAddress, tokenId);
 
-            transferFunction.send(transactionParams).on('receipt', (receipt) => {
+            transferFunction.send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * list the nft on auction
-     *
-     * @param tokenId tokenId of being minted
-     * @param baseToken the collection address of nft
-     * @param quoteToken The contract address of ERC20 token as pricing token
-     * @param reservePrice The minimum pricing that user
-     * @param buyoutPrice The buyout price for the auction order, set to 0 to disable buyout
-     * @param expirationTime: The time for ending the auction
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public createOrderForAuction (
+    // List NFT item on market on auction mode.
+    public createOrderForAuction (
         baseToken: string,
         tokenId: string,
         quoteToken: string,
@@ -256,196 +200,161 @@ export class CallContract {
         buyoutPrice: number,
         expirationTime: number,
         userInfo: UserInfo,
+        marketContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let minPriceValue = BigInt(minPrice*1e18).toString();
-            let reservePriceValue = BigInt(reservePrice*1e18).toString();
-            let buyoutPriceValue = BigInt(buyoutPrice*1e18).toString();
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-
-            pasarContract.methods.createOrderForAuction(baseToken, tokenId, 1, quoteToken, minPriceValue, reservePriceValue, buyoutPriceValue, (new Date().getTime()/1000).toFixed(), (expirationTime/1000).toFixed(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.createOrderForAuction(
+                baseToken,
+                tokenId,
+                1,
+                quoteToken,
+                BigInt(minPrice*1e18).toString(),
+                BigInt(reservePrice*1e18).toString(),
+                BigInt(buyoutPrice*1e18).toString(),
+                (new Date().getTime()/1000).toFixed(),
+                (expirationTime/1000).toFixed(), userInfo.did
+            ).send({'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * call the change function on contract
-     *
-     * @param account my wallet address
-     * @param orderId The orderId of NFT item on maketplace
-     * @param quoteToken The token address of new pricing token
-     * @param newPrice The new listed price
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public changePrice (
-        orderId: number,
+    public changePrice (orderId: number,
         newPrice: string,
         quoteToken: string,
+        contractMarket: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.changeSaleOrderPrice(orderId, newPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(marketV2ABI, contractMarket).methods.changeSaleOrderPrice(
+                orderId,
+                newPrice,
+                quoteToken
+            ).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * call the change function on contract for auction listed
-     *
-     * @param orderId The orderId of NFT item on maketplace
-     * @param quoteToken The token address of new pricing token
-     * @param newMinPrice The new minimum starting price for bidding on the auction
-     * @param newReservedPrice The new minimum pricing that user
-     * @param newBuyoutPrice The new buyout price for the auction order, set to 0 to disable buyout
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public changePriceOnAuction (
-        orderId: number,
+    // change the price for listed NFT on auction.
+    public changePriceOnAuction (orderId: number,
         newMinPrice: string,
         newReservedPrice: string,
         newBuyoutPrice: string,
         quoteToken: string,
+        marketContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * buy the fixed listed nft
-     *
-     * @param orderId The orderId of NFT item on maketplace
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public buyItem (
-        orderId: string,
+    // buy the listed nft with fixed price.
+    public buyItem (orderId: string,
         price: number,
         quoteToken: string,
         did: string,
+        marketContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = this.getTransactionParam(this.account, gasPrice, quoteToken == defaultAddress ? price : 0);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-
-            pasarContract.methods.buyOrder(orderId, did).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.buyOrder(orderId, did).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': quoteToken == defaultAddress ? price : 0
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * bid to the auction nft
-     *
-     * @param account my wallet address
-     * @param orderId The orderId of NFT item on maketplace
-     * @param price The prie of bid
-     * @param quoteToken the token type of bidding
-     * @param userInfo user Information
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public bidItemOnAuction (
+    public bidItemOnAuction (
         orderId: string,
         price: number,
         quoteToken: string,
         userInfo: UserInfo,
+        marketContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice, quoteToken == defaultAddress ? price : 0);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.bidForOrder(orderId, price.toString(), userInfo.did).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.bidForOrder(orderId, price.toString(), userInfo.did).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': quoteToken == defaultAddress ? price : 0
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error: Error) => {
+                reject(error)
+            })
+        })
+    }
+
+    public settleAuction (orderId: string,
+        marketContract: string,
+        gasPrice: string
+    ): Promise<void> {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.settleAuctionOrder(orderId).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice
+            }).on('receipt', (receipt: any) => {
+                resolve(receipt);
+            }).on('error', (error: Error) => {
+                reject(error)
+            })
+        })
+    }
+
+    // unlist NFT item from market
+    public unlistItem (orderId: string,
+        marketContract: string,
+        gasPrice: string
+    ): Promise<void> {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.cancelOrder(orderId).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': LimitGas,
+                'value': gasPrice
+            }).on('receipt', (receipt: any) => {
+                resolve(receipt);
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
     }
 
-    /**
-     * Settle the listed NFT item on auction on marketplace
-     *
-     * @param account my wallet address
-     * @param orderId The orderId of NFT item on maketplace
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public settleAuction (
-        orderId: string,
-        gasPrice: string
-    ): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
 
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.settleAuctionOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
-                resolve(receipt);
-            }).on('error', (error) => {
-                reject(error)
-            });
-        })
-    }
-
-    /**
-     * Unlist an item from marketplace, either it's with fixed price or on auction
-     * When the item is on auction with bidding price, it would fail to call this function
-     * to unlist NFT item.
-     *
-     * @param orderId The orderId of NFT item on maketplace
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public unlistItem (
-        orderId: string,
-        gasPrice: string
-    ): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentMarketAddress();
-            let pasarContract = new this.web3.eth.Contract(Pasar_Market_ABI, contractAddress);
-            pasarContract.methods.cancelOrder(orderId).send(transactionParams).on('receipt', (receipt) => {
-                resolve(receipt);
-            }).on('error', (error) => {
-                reject(error)
-            });
-        })
-    }
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
@@ -496,35 +405,29 @@ export class CallContract {
 
     }
 
-    /**
-     * Register an specific NFT collection onto Pasar marketplace.
-     *
-     * @param tokenAddress the address of collection
-     * @param name The name of NFT collection
-     * @param collectionUri the uri of nft on ipfs
-     * @param royaltyRates the list of owners and royalties
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
+   // Register a collection contract onto Pasar marketplace platform.
      public registerCollection (
-        tokenAddress: string,
+        collectionAddr: string,
         name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
+        registryContract: string,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentImportingContractAddress();
-            let pasarRegister = new this.web3.eth.Contract(Pasar_Register_ABI, contractAddress);
+            let pasarRegister = new this.web3.eth.Contract(RegistryABI, registryContract);
             let owners = [], royalties = [];
 
             for(var i = 0; i < royaltyRates.length; i++) {
                 owners.push(royaltyRates[i].address);
                 royalties.push(royaltyRates[i].rate*10000)
             }
-            pasarRegister.methods.registerToken(tokenAddress, name, collectionUri, owners, royalties).send(transactionParams).on('receipt', (receipt) => {
+            pasarRegister.methods.registerToken(collectionAddr, name, collectionUri, owners, royalties).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -532,28 +435,20 @@ export class CallContract {
         })
     }
 
-    /**
-     * Update an specific NFT collection onto Pasar marketplace.
-     *
-     * @param tokenAddress the address of collection
-     * @param name The name of NFT collection
-     * @param collectionUri the uri of nft on ipfs
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public updateCollection (
-        tokenAddress: string,
+    // update collection with name and uri.
+    public updateCollection (collectionAddr: string,
         name: string,
         collectionUri: string,
+        registryContract: string,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentImportingContractAddress();
-            let pasarRegister = new this.web3.eth.Contract(Pasar_Register_ABI, contractAddress);
-
-            pasarRegister.methods.updateTokenInfo(tokenAddress, name, collectionUri).send(transactionParams).on('receipt', (receipt) => {
+            new this.web3.eth.Contract(RegistryABI, registryContract).methods.updateTokenInfo(collectionAddr, name, collectionUri).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -561,24 +456,14 @@ export class CallContract {
         })
     }
 
-    /**
-     * Update the royalties of collection
-     *
-     * @param tokenAddress the address of collection
-     * @param royaltyRates new royalties of collection
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public updateCollectionRoyalties (
-        tokenAddress: string,
+    // update royalties of the collection
+    public updateCollectionRoyalties (collectionAddr: string,
         royaltyRates: RoyaltyRate[],
+        registryContract: string,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const transactionParams: TransactionParams = this.getTransactionParam(this.account, gasPrice);
-
-            let contractAddress = getCurrentImportingContractAddress();
-            let pasarRegister = new this.web3.eth.Contract(Pasar_Register_ABI, contractAddress);
+            let pasarRegistry = new this.web3.eth.Contract(RegistryABI, registryContract);
 
             let owners = [], royalties = [];
 
@@ -587,7 +472,12 @@ export class CallContract {
                 royalties.push(royaltyRates[i].rate*10000)
             }
 
-            pasarRegister.methods.changeTokenRoyalty(tokenAddress, owners, royalties).send(transactionParams).on('receipt', (receipt) => {
+            pasarRegistry.methods.changeTokenRoyalty(collectionAddr, owners, royalties).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
                 reject(error)
@@ -595,51 +485,20 @@ export class CallContract {
         })
     }
 
-    /**
-     * Get the name, symbol, owner of collection
-     *
-     * @param tokenAddress address of collection
-     * @returns result of being listed the nft
-     */
-     public async getCollectionInfo (
-        tokenAddress: string,
-    ): Promise<NormalCollectionInfo> {
-        const tokenContract = new this.web3.eth.Contract(COMMON_CONTRACT_ABI, tokenAddress);
-
-        let name = await tokenContract.methods.name().call();
-        let symbol = await tokenContract.methods.symbol().call();
-        let owner = await tokenContract.methods.owner().call();
-
-        const collectionInfo: NormalCollectionInfo = {
-            name: name,
-            symbol: symbol,
-            owner: owner
-        };
-        return collectionInfo;
-    }
-
-    /**
-     * buy the fixed listed nft
-     *
-     * @param account my wallet address
-     * @param price the price of allowanced the token
-     * @param quoteToken the token address of collection
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public async approveToken (
-        amount: number,
+    public async approveToken (amount: number,
         quoteToken: string,
-        gasPrice: string
+        marketContract: string,
+        gasPrice: string,
     ): Promise<any> {
-        const transactionParams = this.getTransactionParam(this.account, gasPrice);
-        let marketPlaceAddress = getCurrentMarketAddress();
-        let erc20Contract = new this.web3.eth.Contract(TOKEN_20_ABI, quoteToken);
-
-        let erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(this.account, marketPlaceAddress).call())
-
-        if(erc20BidderApproved < amount) {
-            await erc20Contract.methods.approve(marketPlaceAddress, amount.toString()).send(transactionParams);
+        let erc20Contract = new this.web3.eth.Contract(Token20ABI, quoteToken);
+        let approvedAmount = BigInt(await erc20Contract.methods.allowance(this.account, marketContract).call())
+        if (approvedAmount >= amount) {
+            await erc20Contract.methods.approve(marketContract, amount.toString()).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice
+            });
         }
     }
 }

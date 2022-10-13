@@ -5,10 +5,10 @@ import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { defaultAddress } from "./constant";
-import { resizeImage, requestSigndataOnTokenID, getCurrentMarketAddress } from "./global";
+import { resizeImage, requestSigndataOnTokenID, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
 import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
-import PASAR_CONTRACT_ABI from './contracts/abis/stickerV2ABI';
-import FEED_CONTRACT_ABI from './contracts/abis/stickerABI';
+import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
+import FEED_CONTRACT_ABI from './contracts/abis/feedsCollection';
 import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import TOKEN_1155_ABI from './contracts/abis/token1155ABI';
 import TOKEN_721_CODE from './contracts/bytecode/token721Code';
@@ -24,7 +24,7 @@ import { CallContract } from './callcontract';
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile {
-    
+
     private appContext: AppContext;
     private callContract: CallContract;
 
@@ -183,6 +183,7 @@ export class MyProfile {
      */
     public async registerCollection(
         tokenAddress: string,
+        name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
         progressHandler: ProgressHandler = new EmptyHandler()
@@ -190,11 +191,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
 
-            let collectionInfo = await this.callContract.getCollectionInfo(tokenAddress);
-            if (collectionInfo == null) {
-                throw new Error(`No collection deployed at address ${tokenAddress}`);
-            }
-            await this.callContract.registerCollection(tokenAddress, collectionInfo.name, collectionUri, royaltyRates, gasPrice);
+            await this.callContract.registerCollection(tokenAddress, name, collectionUri, royaltyRates,getCurrentImportingContractAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -218,7 +215,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.updateCollection(tokenAddress, name, collectionUri, gasPrice);
+            await this.callContract.updateCollection(tokenAddress, name, collectionUri,getCurrentImportingContractAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);
@@ -239,7 +236,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.updateCollectionRoyalties(tokenAddress, royaltyRates, gasPrice);
+            await this.callContract.updateCollectionRoyalties(tokenAddress, royaltyRates, getCurrentImportingContractAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);
@@ -468,7 +465,7 @@ export class MyProfile {
             progressHandler.onProgress(20);
             let priceValue = BigInt(price*1e18).toString();
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.createOrderForSale(tokenId, baseToken, priceValue, pricingToken, userInfo, gasPrice);
+            await this.callContract.createOrderForSale(tokenId, baseToken, priceValue, pricingToken, userInfo, getCurrentMarketAddress(), gasPrice);
 
             progressHandler.onProgress(100);
         }).catch (error => {
@@ -495,7 +492,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             let priceValue = BigInt(newPrice*1e18).toString();
-            await this.callContract.changePrice(parseInt(orderId), priceValue, newPricingToken, gasPrice);
+            await this.callContract.changePrice(parseInt(orderId), priceValue, newPricingToken, getCurrentMarketAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -519,9 +516,9 @@ export class MyProfile {
             progressHandler.onProgress(20);
             let did = await this.getUserDid();
             if(quoteToken != defaultAddress) {
-                await this.callContract.approveToken(buyingPrice, quoteToken, gasPrice);
+                await this.callContract.approveToken(buyingPrice, quoteToken, getCurrentMarketAddress(), gasPrice);
             }
-            await this.callContract.buyItem(orderId, buyingPrice, quoteToken, did, gasPrice);
+            await this.callContract.buyItem(orderId, buyingPrice, quoteToken, did, getCurrentMarketAddress(), gasPrice);
 
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -559,7 +556,7 @@ export class MyProfile {
             progressHandler.onProgress(50);
 
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.createOrderForAuction(baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, gasPrice);
+            await this.callContract.createOrderForAuction(baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, userInfo, getCurrentMarketAddress(), gasPrice);
         }).catch(error => {
             throw new Error(error);
         })
@@ -593,7 +590,7 @@ export class MyProfile {
             let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
             let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
 
-            await this.callContract.changePriceOnAuction(parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, gasPrice);
+            await this.callContract.changePriceOnAuction(parseInt(orderId), priceValue, reservePriceValue, buyoutPriceValue, newPricingToken, getCurrentMarketAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -620,11 +617,11 @@ export class MyProfile {
 
             let priceValue = Number(BigInt(price*1e18));
             if(quoteToken != defaultAddress) {
-                await this.callContract.approveToken(priceValue, quoteToken, gasPrice);
+                await this.callContract.approveToken(priceValue, quoteToken, getCurrentMarketAddress(), gasPrice);
             }
 
             let userInfo: UserInfo = this.getUserInfo();
-            await this.callContract.bidItemOnAuction(orderId, priceValue, quoteToken, userInfo, gasPrice);
+            await this.callContract.bidItemOnAuction(orderId, priceValue, quoteToken, userInfo, getCurrentMarketAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -642,7 +639,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.settleAuction(orderId, gasPrice);
+            await this.callContract.settleAuction(orderId, getCurrentMarketAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -664,7 +661,7 @@ export class MyProfile {
     ): Promise<void> {
         await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.callContract.unlistItem(orderId, gasPrice);
+            await this.callContract.unlistItem(orderId, getCurrentMarketAddress(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
