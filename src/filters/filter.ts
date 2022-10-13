@@ -1,4 +1,5 @@
 enum FilterType {
+    Empty = "Empty",
     ListedStatus = "Listed status",
     PriceRange = "PrinceRange",
     Collections = "Collections",
@@ -28,7 +29,14 @@ class Filter {
     }
 }
 
+class EmptyFilter extends Filter {
+    constructor() {
+        super(FilterType.Empty, null);
+    }
+}
+
 export {
+    FilterType,
     Filter,
-    FilterType
+    EmptyFilter,
 }
