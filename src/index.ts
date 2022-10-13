@@ -14,6 +14,7 @@ import { AssistService } from "./assistservice";
 import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField, UserInfo } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
+import { AppContext } from "./appcontext";
 
 let myProfileInfo, profileInfo;
 
@@ -27,7 +28,7 @@ const getMyProfileInfo = () => {
 
 const getProfileInfo = () => {
     if(!profileInfo) {
-        profileInfo = new Profile();
+        profileInfo = new Profile('', '',  AppContext.getAppContext());
     }
 
     return profileInfo;
@@ -253,7 +254,7 @@ const registerCollection = async (
 ) => {
     try {
         let profile = getMyProfileInfo();
-        
+
         let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
         await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
     } catch(err) {
