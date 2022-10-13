@@ -2,7 +2,6 @@ import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import { ChainType } from "./chaintype";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
-import { isTestnetNetwork } from "./networkType";
 
 /**
  * get new width and height of resizing image.
@@ -165,46 +164,22 @@ const getCurrentMarketAddress = () => {
     let chainId = getCurrentChainId();
 
     if(getCurrentChainType(chainId) == ChainType.ESC) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.elastos.pasarMarketPlaceContract;
-        } else {
-            return valuesOnMainNet.elastos.pasarMarketPlaceContract;
-        }
+        return valuesOnTestNet.elastos.pasarMarketPlaceContract;
     } else if(getCurrentChainType(chainId) == ChainType.ETH) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.ethereum.pasarMarketPlaceContract;
-        } else {
-            return valuesOnMainNet.ethereum.pasarMarketPlaceContract;
-        }
+        return valuesOnTestNet.ethereum.pasarMarketPlaceContract;
     } else if(getCurrentChainType(chainId) == ChainType.FSN) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.fusion.pasarMarketPlaceContract;
-        } else {
-            return valuesOnMainNet.fusion.pasarMarketPlaceContract;
-        }
+        return valuesOnTestNet.fusion.pasarMarketPlaceContract;
     }
 }
 
 const getCurrentImportingContractAddress = () => {
     let chainId = getCurrentChainId();
     if(getCurrentChainType(chainId) == ChainType.ESC) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.elastos.pasarRegisterContract;
-        } else {
-            return valuesOnMainNet.elastos.pasarRegisterContract;
-        }
+        return valuesOnTestNet.elastos.pasarRegisterContract;
     } else if(getCurrentChainType(chainId) == ChainType.ETH) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.ethereum.pasarRegisterContract;
-        } else {
-            return valuesOnMainNet.ethereum.pasarRegisterContract;
-        }
+        return valuesOnTestNet.ethereum.pasarRegisterContract;
     } else if(getCurrentChainType(chainId) == ChainType.FSN) {
-        if(isTestnetNetwork()) {
-            return valuesOnTestNet.fusion.pasarRegisterContract;
-        } else {
-            return valuesOnMainNet.fusion.pasarRegisterContract;
-        }
+        return valuesOnTestNet.fusion.pasarRegisterContract;
     }
 }
 

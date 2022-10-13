@@ -1,8 +1,7 @@
 import Web3 from 'web3';
-import { isTestnetNetwork } from './networkType';
-import { valuesOnTestNet, valuesOnMainNet, DiaTokenConfig, LimitGas, defaultAddress } from "./constant";
-import { checkPasarCollection, checkFeedsCollection, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
-import { NormalCollectionInfo, TransactionParams, UserInfo } from './utils';
+import { LimitGas, defaultAddress } from "./constant";
+import { checkPasarCollection, checkFeedsCollection } from "./global";
+import { UserInfo } from './utils';
 import marketV2ABI from "./contracts/abis/marketV2";
 import RegistryABI from "./contracts/abis/registry";
 import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
@@ -375,11 +374,10 @@ export class CallContract {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            const diaTokenValue = BigInt((10 ** DiaTokenConfig.diaDecimals * DiaTokenConfig.diaValue * DiaTokenConfig.nPPM) / DiaTokenConfig.PPM).toString();
+            let diaAddress = "0x0000000000000000000000000000000000000000"; // TODO;
+            let diaValue = 0; // TODO;
 
-            let diaAddress = isTestnetNetwork() ? valuesOnTestNet.elastos.diaTokenContract : valuesOnMainNet.elastos.diaTokenContract
-
-            let deployArgs = [name, symbol, collectionUri, diaAddress, diaTokenValue];
+            let deployArgs = [name, symbol, collectionUri, diaAddress, diaValue];
 
             let registerContract = new this.web3.eth.Contract(contractData.abi);
             let registeredContract = registerContract.deploy({

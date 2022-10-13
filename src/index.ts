@@ -2,7 +2,6 @@
 'use strict';
 
 import { signin, signout, checkSign } from "./signin";
-import { isTestnetNetwork, NetworkType, setNetworkType } from "./networkType";
 import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
 import { Category, getCategoryList } from "./collection/category";
@@ -35,7 +34,6 @@ const getProfileInfo = () => {
 }
 
 const initialize = (testnet = true) => {
-    setNetworkType(testnet ? NetworkType.TestNet : NetworkType.MainNet);
     getMyProfileInfo();
     getProfileInfo();
 }
@@ -332,7 +330,7 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let assistService =  new AssistService(isTestnetNetwork() ? valuesOnTestNet.assistURL: valuesOnMainNet.assistURL);
+        let assistService =  new AssistService(valuesOnTestNet.assistURL);
         let info = await assistService.getAllListedItems(collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
