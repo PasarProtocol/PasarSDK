@@ -1,35 +1,65 @@
-import { ListTypes } from './listtype';
+import { ListType } from './listtype';
 import { ChainType } from './chaintype';
 
 export class NftItem {
+    // token metadata
     private tokenId: string;
     private tokenIdHex: string;
     private name: string;
     private description: string;
     private thumbnail: string;
     private image: string;
-    private baseToken: string;
     private sensitive: boolean;
     private properties: any;
-    private tokenVersion: number;
-    private marketPlace: ChainType;
+
+    private createTime: number; // Minted timestamp
+    private baseToken: string;  // Collection contract.
+    private network: ChainType; // ESC/ETH/FSN
+
     private holder: string;
     private royaltyOwner: string;
-    private createTime: number;
-    private marketTime: number;
-    private endTime: number;
-    private orderId: any;
-    private quoteToken: any;
-    private price: any;
-    private buyoutPrice: any;
-    private reservePrice: any;
-    private minPrice: any;
-    private orderState: any;
-    private orderType: string;
+    private royaltyRate: number;
 
-    constructor(id: string, tokenIdHex: string,  name: string, description: string, thumbnail: string, image:string, sesitive: boolean, properties: any,
-        tokenVersion: number, marketPlace: number, holder: string, royaltyOwner: string, createTime: number, marketTime: number, endTime: number,
-        orderId: any = null, quoteToken: any = null, price: any = null, buyoutPrice: any = null, reservePrice: any = null, minPrice: any = null, orderState: any = null, orderType: any = null) {
+    // fields relatd to be listed on market.
+    private listedTime: number;
+
+    private orderId: string;
+    private orderType: ListType;
+    private quoteToken: string;
+    private orderState: any;
+
+    // listed as fixed price
+    private fixedPrice: string;
+
+    // listed as auction
+    private expiration: number;
+    private minPrice: string;
+    private reservePrice: string;
+    private buyoutPrice: string;
+
+    constructor(id: string,
+        tokenIdHex: string,
+        name: string,
+        description: string,
+        thumbnail: string,
+        image:string,
+        sesitive: boolean,
+        properties: any,
+        tokenVersion: number,
+        networkIndex: number,
+        holder: string,
+        royaltyOwner: string,
+        createTime: number,
+        marketTime: number,
+        endTime: number,
+        orderId: string = null,
+        quoteToken: string = null,
+        price: string = null,
+        buyoutPrice: string = null,
+        reservePrice: string = null,
+        minPrice: string = null,
+        orderState: any = null,
+        orderType: any = null) {
 
         this.tokenId = id;
         this.tokenIdHex = tokenIdHex;
@@ -39,15 +69,14 @@ export class NftItem {
         this.image = image;
         this.sensitive = sesitive;
         this.properties = properties;
-        this.tokenVersion = tokenVersion;
         this.holder = holder;
         this.royaltyOwner = royaltyOwner;
         this.createTime = createTime;
-        this.marketTime = marketTime;
-        this.endTime = endTime;
+        this.listedTime = marketTime;
+        this.expiration = endTime;
         this.orderId = orderId;
         this.quoteToken = quoteToken;
-        this.price = price;
+        this.fixedPrice = price;
         this.buyoutPrice = buyoutPrice;
         this.reservePrice = reservePrice;
         this.minPrice = minPrice;
@@ -57,56 +86,116 @@ export class NftItem {
         if(orderType == null || orderType == "") {
             this.orderType = null;
         } else if(parseInt(orderType) == 1) {
-            this.orderType = ListTypes.fixedPrice;
+            this.orderType = ListType.fixedPrice;
         } else if(parseInt(orderType) == 2) {
-            this.orderType = ListTypes.onAuction;
+            this.orderType = ListType.onAuction;
         }
 
-        switch(marketPlace) {
+        switch(networkIndex) {
             case 1:
-                this.marketPlace = ChainType.ESC;
+                this.network = ChainType.ESC;
                 break;
             case 2:
-                this.marketPlace = ChainType.ETH;
+                this.network = ChainType.ETH;
                 break;
             case 3:
-                this.marketPlace = ChainType.FSN;
+                this.network = ChainType.FSN;
                 break;
             default:
-                this.marketPlace = ChainType.ESC;
+                this.network = ChainType.ESC;
                 break;
         }
     }
 
     public getTokenId(): string {
-        return this.tokenId.toString();
+        return this.tokenId;
     }
 
-    public getCollectionAddress(): string {
-        return this.baseToken.toString();
+    public getName(): string {
+        return this.name;
+    }
+
+    public getDescription(): string {
+        return this.description;
+    }
+
+    public getThumbnail(): string {
+        return this.thumbnail;
+    }
+
+    public getImage(): string {
+        return this.image;
+    }
+
+    public getEnsensitve(): boolean {
+        return this.sensitive;
+    }
+
+    public getProperties(): any {
+        return this.properties;
+    }
+
+    public getCreated(): number {
+        return this.createTime;
+    }
+
+    public getCollection(): string {
+        return this.baseToken;
+    }
+
+    public getChainNetwork(): ChainType {
+        return this.network;
+    }
+
+    public getHolder(): string {
+        return this.holder;
+    }
+
+    public getRoyaltyOwner(): string {
+        return this.royaltyOwner;
+    }
+
+    public getRoyaltyRate(): number {
+        return this.royaltyRate;
+    }
+
+    public getListed(): number {
+        return this.listedTime;
     }
 
     public getOrderId(): string {
-        return this.orderId.toString();
+        return this.orderId;
     }
 
-    public getQuoteToken(): string {
-        return this.quoteToken.toString();
+    public getListType(): ListType {
+        return this.orderType;
     }
 
-    public getPrice(): string {
-        return this.price.toString();
+    public getPricingToken(): string {
+        return this.quoteToken;
     }
 
-    public getOrderType(): string {
-        return this.orderType.toString();
+    public getFixedPrice(): string {
+        return this.fixedPrice;
+    }
+
+    public getExpirated(): number {
+        return this.expiration;
+    }
+
+    public getMinPrice(): string {
+        return this.minPrice;
+    }
+
+    public getReservePrice(): string {
+        return this.reservePrice;
+    }
+
+    public getBuyoutPrice(): string {
+        return this.buyoutPrice;
     }
 
     public getOrderState(): string {
         return this.orderState.toString();
-    }
-
-    public getBuyoutPrice(): string {
-        return this.buyoutPrice ? this.buyoutPrice.toString() : null;
     }
 }
