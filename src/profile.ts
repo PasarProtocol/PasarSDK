@@ -1,6 +1,5 @@
-import { list } from "postcss";
 import { AppContext } from "./appcontext"
-import { AssistService } from "./assistservice";
+import { getBiddingItems, getCreatedItems, getListedItems, getOwnedCollections, getOwnedItems, getSoldItems } from "./assistservice";
 import { CollectionInfo } from "./collection/collectioninfo";
 import { EmptyFilter } from "./filters/filter";
 import { NftItem } from "./nftitem"
@@ -10,6 +9,7 @@ class Quantites{
     private listedCount: number;
     private soldCount: number;
     private createdCount: number;
+    private biddingCount: number;
     private collections: number;
 
     constructor(owned: number, listed: number, sold: number, created: number, collections: number) {
@@ -32,6 +32,10 @@ class Quantites{
         return this.soldCount;
     }
 
+    public getBidding(): number {
+        return this.biddingCount;
+    }
+
     public getCreated(): number {
         return this.createdCount;
     }
@@ -44,12 +48,12 @@ class Quantites{
 export class Profile {
     private userDid: string;
     private walletAddr: string;
-    private assistService: AssistService;
+    private assistUrl: string;
 
     constructor(userDid: string, walletAddr: string, appContext: AppContext) {
         this.userDid = userDid;
         this.walletAddr = walletAddr;
-        this.assistService = new AssistService(appContext.getAssistNode());
+        this.assistUrl = appContext.getAssistNode();
     }
 
     public queryQuantites(): Promise<Quantites> {
@@ -67,7 +71,7 @@ export class Profile {
         _capcity = 0,
         _filter = new EmptyFilter()
     ): Promise<NftItem[]> {
-        return await this.assistService.getOwnedItems(this.walletAddr).catch(error => {
+        return await getOwnedItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
     }
@@ -82,7 +86,7 @@ export class Profile {
         _capcity = 0,
         _filter = new EmptyFilter()
     ): Promise<NftItem[]> {
-        return await this.assistService.getListedItems(this.walletAddr).catch((error) => {
+        return await getListedItems(this.assistUrl, this.walletAddr).catch((error) => {
             throw new Error(error);
         })
     }
@@ -97,7 +101,7 @@ export class Profile {
         _capcity = 0,
         _filter = new EmptyFilter()
     ): Promise<NftItem[]> {
-        return await this.assistService.getBiddingItems(this.walletAddr).catch(error => {
+        return await getBiddingItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         });
     }
@@ -111,7 +115,7 @@ export class Profile {
         _lessThen = 0,
         _capcity = 0,
         _filter = new EmptyFilter()): Promise<NftItem[]> {
-        return await this.assistService.getCreatedItems(this.walletAddr).catch(error => {
+        return await getCreatedItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
     }
@@ -126,7 +130,7 @@ export class Profile {
         _capcity = 0,
         _filter = new EmptyFilter()
     ): Promise<NftItem[]> {
-        return await this.assistService.getSoldItems(this.walletAddr).catch (error => {
+        return await getSoldItems(this.assistUrl, this.walletAddr).catch (error => {
             throw new Error(error);
         })
     }
@@ -137,7 +141,7 @@ export class Profile {
      * @returns: A list of NFT items.
      */
      public async queryCollections(_filter = new EmptyFilter()): Promise<CollectionInfo[]> {
-        return await this.assistService.getOwnedCollections(this.walletAddr).catch(error => {
+        return await getOwnedCollections(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
     }

@@ -9,11 +9,11 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { Profile } from "./profile";
-import { AssistService } from "./assistservice";
 import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField, UserInfo } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 import { AppContext } from "./appcontext";
+import { getAllListedItems } from "./assistservice";
 
 let myProfileInfo, profileInfo;
 
@@ -330,8 +330,7 @@ const getListedItem = async (
     pageSize = 10,
 ) => {
     try {
-        let assistService =  new AssistService(valuesOnTestNet.assistURL);
-        let info = await assistService.getAllListedItems(collectionAddr, pageNum, pageSize);
+        let info = await getAllListedItems(valuesOnTestNet.assistURL, collectionAddr, pageNum, pageSize);
         return info;
     } catch(err) {
         throw new Error(err);
