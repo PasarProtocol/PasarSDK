@@ -1,5 +1,4 @@
 import Web3 from "web3";
-import { AssistService } from "./assistservice";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
 export class AppContext {
@@ -9,7 +8,6 @@ export class AppContext {
     private ipfsUrl: string;
     private didResover: string;
 
-    private assistService: AssistService;
     private web3: Web3;
 
     static appContext: AppContext;
@@ -19,7 +17,6 @@ export class AppContext {
         this.ipfsUrl    = env['ipfsUrl'];
         this.didResover = env['didResover'];
         this.appDID     = env['appDid'];
-        this.assistService = new AssistService(this.assistUrl);
     }
 
     static getAppContext(): AppContext {
@@ -39,10 +36,6 @@ export class AppContext {
 
     public getDidResolver(): string {
         return this.didResover
-    }
-
-    public getAssistService(): AssistService {
-        return this.assistService;
     }
 
     public isInAppBrowser(): boolean {
