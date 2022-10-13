@@ -1,12 +1,8 @@
 import SigninEE from './SigninEE'
-import { initialize } from '@pasarprotocol/pasar-sdk-development';
-import { useEffect } from 'react';
+import { AppContext } from '@pasarprotocol/pasar-sdk-development';
 
 function App() {
-
-  useEffect(() => {
-    initialize();
-  }, [])
+  AppContext.createAppContext(true)
 
   return (
     <div className="App">

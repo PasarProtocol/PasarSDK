@@ -1,6 +1,6 @@
 
 import React, {useEffect, useState} from 'react'
-import { signIn, singOut, checkSign, getListedItem, getOwnedCollection, getOwnedListedItem, getOwnedItem, getCreatedItem, getBiddingItem, getSoldItem } from '@pasarprotocol/pasar-sdk-development';
+import { checkSign, Profile } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
@@ -8,50 +8,50 @@ import {
 function SigninEE() {
   const navigate = useNavigate();
   const [login, setLogin] = useState(checkSign());
-
+  let profile =  new Profile("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
   const handleGetListedItem = async () => {
-    let result = await getListedItem();
-    console.log(result);
+    // let result = await getListedItem();
+    // console.log(result);
   }
 
   const handleGetOwnedCollection = async () => {
-    let result = await getOwnedCollection("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    let result = await profile.queryCollections();
     console.log(result);
   }
 
   const handleGetOwnedListedNft = async () => {
-    let result = await getOwnedListedItem("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    let result = await profile.queryListedItems();
     console.log(result);
   }
 
   const handleGetOwnedNft = async () => {
-    let result = await getOwnedItem("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    let result = await profile.queryOwnedItems();
     console.log(result);
   }
 
   const handleGetCreatedNft = async () => {
-    let result = await getCreatedItem("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    let result = await profile.queryCreatedItems();
     console.log(result);
   }
 
   const handleGetBiddingNft = async () => {
-    let result = await getBiddingItem("0x31334831f575b3c847bBEb92f8692cf26fbfADdA");
+    let result = await profile.queryBiddingItems();
     console.log(result);
   }
 
   const handleGetSoldNft = async () => {
-    let result = await getSoldItem("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+    let result = await profile.querySoldItems();
     console.log(result);
   }
 
   const handleSigninEE1 = async () => {
-    let result = await signIn();
-    setLogin(checkSign());
+    // let result = await signIn();
+    // setLogin(checkSign());
   }
 
   const handleSignout = async () => {
-    await singOut();
-    setLogin(checkSign());
+    // await singOut();
+    // setLogin(checkSign());
   }
 
   const handleClickButton = (path) => {

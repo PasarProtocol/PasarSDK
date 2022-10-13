@@ -1,5 +1,7 @@
 import Web3 from "web3";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
+import valuesMainNet from "./contracts/deploy/mainnet.json";
+import valuesTestNet from "./contracts/deploy/testnet.json";
 
 export class AppContext {
     private appDID: string;
@@ -12,16 +14,17 @@ export class AppContext {
 
     static appContext: AppContext;
 
-    private constructor(env: any) {
+    private constructor(testnet: boolean) {
+        let env = testnet ? valuesTestNet : valuesMainNet
         this.assistUrl  = env['assistUrl'];
         this.ipfsUrl    = env['ipfsUrl'];
         this.didResover = env['didResover'];
         this.appDID     = env['appDid'];
     }
 
-    static createAppContext(env: any) {
+    static createAppContext(testnet: boolean) {
         if(!this.appContext) {
-            this.appContext = new AppContext(env);
+            this.appContext = new AppContext(testnet);
         }
     }
 
