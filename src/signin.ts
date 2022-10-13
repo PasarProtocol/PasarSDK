@@ -2,8 +2,7 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { statSync } from 'fs';
-import { DidResolverUrl, valuesOnTestNet, valuesOnMainNet } from './constant';
-import { isTestnetNetwork } from './networkType';
+import { DidResolverUrl, valuesOnTestNet } from './constant';
 import { UserInfo } from './utils';
 
 const essentialsConnector = new EssentialsConnector();
@@ -29,7 +28,7 @@ const initConnectivitySDK = async () => {
     }
 
     await connectivity.registerConnector(essentialsConnector).then(async () => {
-        connectivity.setApplicationDID(isTestnetNetwork() ? valuesOnTestNet.didApplication : valuesOnMainNet.didApplication);
+        connectivity.setApplicationDID(valuesOnTestNet.didApplication);
         connectivityInitialized = true;
 
         console.log('essentialsConnector', essentialsConnector);
@@ -92,7 +91,7 @@ const signInWithEssentials = async () => {
             did: sDid,
             address: essentialAddress
         }
-        
+
         return user;
       }
     } catch (e) {
