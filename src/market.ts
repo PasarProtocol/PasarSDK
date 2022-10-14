@@ -19,9 +19,9 @@ class Market {
 
     /**
      * TODO:
-     * @param earilerThan
-     * @param maximum
-     * @param dispatcher
+     * @param collectionAddr the collection addresses
+     * @param pageNum the page number
+     * @param pageSize cell size per page
      */
     public queryItems(earilerThan: number, maximum: number, filter = new EmptyFilter()): Promise<NftItem[]> {
         throw new Error("Method not implemented");
@@ -35,8 +35,4 @@ class Market {
         })
     */
     }
-}
-
-export {
-    Market
 }
