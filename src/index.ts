@@ -326,91 +326,6 @@ const getAccountInfo = () => {
     return getMyProfileInfo().getUserInfo();
 }
 
-const getListedItem = async (
-    collectionAddr = "",
-    pageNum = 1,
-    pageSize = 10,
-) => {
-    try {
-        let info = await getAllListedItems(valuesOnTestNet.assistURL, collectionAddr, pageNum, pageSize);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getOwnedCollection = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.queryCollections(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getOwnedListedItem = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.queryListedItems(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getOwnedItem = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.queryOwnedItems(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getCreatedItem = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.queryCreatedItems(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getBiddingItem = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.queryBiddingItems(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const getSoldItem = async (
-    walletAddr: string
-) => {
-    try {
-        let profile = getProfileInfo();
-        let info = await profile.querySoldItems(walletAddr);
-        return info;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const getChainTypes = () => {
     return _getChainTypes();
 }
@@ -467,13 +382,6 @@ export {
     getAccountInfo,
     updateCollectionInfo,
     updateCollectionRoyalties,
-    getListedItem,
-    getOwnedCollection,
-    getOwnedListedItem,
-    getOwnedItem,
-    getCreatedItem,
-    getBiddingItem,
-    getSoldItem,
     getChainTypes,
     AppContext,
     Profile,
