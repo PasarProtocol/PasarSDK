@@ -9,6 +9,7 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { Profile } from "./profile";
+import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
 import { CollectionSocialField, UserInfo } from "./utils";
 import { valuesOnMainNet, valuesOnTestNet } from "./constant";
@@ -476,4 +477,5 @@ export {
     getChainTypes,
     AppContext,
     Profile,
+    Market
 }
