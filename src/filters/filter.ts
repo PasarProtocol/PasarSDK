@@ -3,8 +3,9 @@ import { Condition } from "./condition";
 export class Filter {
     private conditions: Condition[];
 
-    public appendCondition(condition: Condition) {
+    public appendCondition(condition: Condition): Filter{
         this.conditions.push(condition);
+        return this;
     }
 
     public count(): number {
