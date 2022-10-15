@@ -1,85 +1,109 @@
 import Web3 from 'web3';
-import { LimitGas, defaultAddress } from "./constant";
-import { checkPasarCollection, checkFeedsCollection } from "./global";
-import { UserInfo } from './utils';
+import { LimitGas } from "./constant";
 import marketV2ABI from "./contracts/abis/marketV2";
 import RegistryABI from "./contracts/abis/registry";
-import COMMON_CONTRACT_ABI from "./contracts/abis/commonABI";
+import FeedsCollectionABI from "./contracts/abis/feedsCollection";
+import PasarCollectionABI from "./contracts/abis/pasarCollection";
 import Token721ABI from './contracts/abis/token721ABI';
-import Token1155ABI from './contracts/abis/token1155ABI';
 import Token20ABI from './contracts/abis/erc20ABI';
 import { RoyaltyRate } from './RoyaltyRate';
-import { ERCType } from './erctype';
 import { AppContext } from './appcontext';
 
 /**
  * This class is to call the contract functions
  */
-export class CallContract {
+export class ContractHelper {
+    private static zeroAddr = "0x0000000000000000000000000000000000000000";
     private gasLimit = LimitGas;
     private account: string;
     private web3: Web3;
 
-    constructor(account: string) {
+    constructor(account: string, appContext: AppContext) {
         this.account = account;
-        this.web3 = AppContext.getAppContext().getWeb3();
+        this.web3 = appContext.getWeb3();
     }
 
-    public mintFunction (
-        contractAbi: any,
-        contractAddress: string,
+    private mintERC1155Item = (
+        collectionABI: any,
+        collectionAddress: string,
         tokenId: string,
-        totalSupply: number,
-        metaData: string,
-        royaltyFee: number,
-        userInfo: UserInfo,
+        tokenURI: string,
+        royaltyRate: number,
+        didURI: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> => {
         return new Promise((resolve, reject) => {
-            const transactionParams = {
+            new this.web3.eth.Contract(collectionABI, collectionAddress).methods.mint(
+                tokenId, 1, tokenURI, royaltyRate * 10000, didURI
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': LimitGas,
                 'value': gasPrice,
-            };
-
-            let pasarContract = new this.web3.eth.Contract(contractAbi, contractAddress);
-            if(checkPasarCollection(contractAddress)) {
-                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000).send(transactionParams).on('receipt', (receipt) => {
-                    resolve(receipt);
-                }).on('error', (error) => {
-                    reject(error)
-                });
-            } else if(checkFeedsCollection(contractAddress)) {
-                pasarContract.methods.mint(tokenId, totalSupply, metaData, royaltyFee * 10000, userInfo.did).send(transactionParams).on('receipt', (receipt) => {
-                    resolve(receipt);
-                }).on('error', (error: any) => {
-                    reject(error)
-                });
-            }
+            }).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error: any) => {
+                reject(error)
+            });
         })
     }
 
-    public mintFunctionOnCustomCollection (
-        contractAddress: string,
+    public mintFromFeedsCollection(
+        collectionAddr: string,
         tokenId: string,
-        collectionType: string,
-        metaData: string,
+        tokenURI: string,
+        royaltyRate: number,
+        didURI: string,
         gasPrice: string
-    ): Promise<any> {
+    ):Promise<void> {
+        return this.mintERC1155Item(FeedsCollectionABI, collectionAddr, tokenId, tokenURI, royaltyRate, didURI, gasPrice);
+    }
+
+    public mintFromPasarCollection(
+        collectionAddr: string,
+        tokenId: string,
+        tokenURI: string,
+        royaltyRate: number,
+        didURI: string,
+        gasPrice: string
+    ): Promise<void> {
+        return this.mintERC1155Item(PasarCollectionABI, collectionAddr, tokenId, tokenURI, royaltyRate, didURI, gasPrice);
+    }
+
+    public mintERC721Item (
+        collectionAddr: string,
+        tokenId: string,
+        tokenURI: string,
+        didURI: string,
+        gasPrice: string
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            let pasarContract = new this.web3.eth.Contract(Token721ABI, contractAddress);
-            let mintFunction = pasarContract.methods.mint(tokenId, metaData);
-
-            if(collectionType == ERCType.ERC1155) {
-                pasarContract = new this.web3.eth.Contract(Token1155ABI, contractAddress);
-                mintFunction = pasarContract.methods.mint(tokenId, 1, metaData);
-            }
-
-            mintFunction.send({
+            new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.mint(
+                tokenId, tokenURI, didURI
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': LimitGas,
+                'value': gasPrice,
+            }).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error: any) => {
+                reject(error)
+            });
+        })
+    }
+
+    private burnERC1155Item = (
+        collectionABI: any,
+        collectionAddr: string,
+        tokenId: string,
+        gasPrice: string
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(collectionABI, collectionAddr).methods.burn(tokenId, 1).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': LimitGas,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -89,28 +113,122 @@ export class CallContract {
         })
     }
 
-    public deleteFunction (
-        contractAbi: any,
-        contractAddress: string,
+    public burnItemInFeeds(
+        collectionAddr: string,
         tokenId: string,
-        totalSupply: number,
-        collectionType: string,
+        gasPrice: string
+    ): Promise<void> {
+        return this.burnERC1155Item(FeedsCollectionABI, collectionAddr, tokenId, gasPrice);
+    }
+
+    public burnItemInPasar(
+        collectionAddr: string,
+        tokenId: string,
+        gasPrice: string
+    ): Promise<void> {
+        return this.burnERC1155Item(PasarCollectionABI, collectionAddr, tokenId, gasPrice);
+    }
+
+    public burnERC721Item(
+        collectionAddr: string,
+        tokenId: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            let pasarContract = new this.web3.eth.Contract(contractAbi, contractAddress);
-            let burnFunction = pasarContract.methods.burn(tokenId, totalSupply);
-            if(!checkFeedsCollection(contractAddress) && !checkPasarCollection(contractAddress) && collectionType == ERCType.ERC721) {
-                pasarContract.methods.burn(tokenId);
-            }
-            burnFunction.send({
+            new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.burn(tokenId).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': LimitGas,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
+                reject(error)
+            });
+        })
+    }
+
+    // Approve the NFT item on collection can be sold on market.
+    public approveItems (
+        contractABI: any,
+        baseToken: string,
+        approvalAddress: any,
+        gasPrice: string
+    ): Promise<void> {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(contractABI, baseToken).methods.setApprovalForAll(
+                approvalAddress, true
+            ).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
+                resolve(receipt);
+            }).on('error', (error: Error) => {
+                reject(error)
+            });
+        })
+    }
+
+    private transferERC1155Item = (
+        contractABI: any,
+        toAddress: string,
+        tokenId: string,
+        baseToken: string,
+        gasPrice: string
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(contractABI, baseToken).methods.safeTransferFrom(
+                this.account, toAddress, tokenId, 1
+            ).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
+                resolve(receipt);
+            }).on('error', (error: Error) => {
+                reject(error)
+            });
+        })
+    }
+
+    public transferItemInFeeds(
+        to: string,
+        tokenId: string,
+        baseToken: string,
+        gasPrice: string
+    ): Promise<void> {
+        return this.transferERC1155Item(FeedsCollectionABI, to, tokenId, baseToken, gasPrice);
+    }
+
+    public transferItemInPasar(
+        to: string,
+        tokenId: string,
+        baseToken: string,
+        gasPrice: string
+    ): Promise<void> {
+        return this.transferERC1155Item(PasarCollectionABI, to, tokenId, baseToken, gasPrice);
+    }
+
+    public transfer721Item = (
+        toAddress: string,
+        tokenId: string,
+        baseToken: string,
+        gasPrice: string
+    ): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(Token721ABI, baseToken).methods.safeTransferFrom(
+                this.account, toAddress, tokenId
+            ).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': this.gasLimit,
+                'value': gasPrice,
+            }).on('receipt', (receipt: any) => {
+                resolve(receipt);
+            }).on('error', (error: Error) => {
                 reject(error)
             });
         })
@@ -121,13 +239,15 @@ export class CallContract {
         baseToken: string,
         price: string,
         quoteToken: string,
-        userInfo: UserInfo,
+        sellerURI: string,
         marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            let pasarContract = new this.web3.eth.Contract(marketV2ABI, marketContract);
-            pasarContract.methods.createOrderForSale(baseToken, tokenId, 1, quoteToken, price, (new Date().getTime()/1000).toFixed(), userInfo.did).send({
+            let startTime = (new Date().getTime()/1000).toFixed();
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.createOrderForSale(
+                baseToken, tokenId, 1, quoteToken, price, startTime, sellerURI
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -140,56 +260,6 @@ export class CallContract {
         })
     }
 
-    // Approve the NFT item on collection can be sold on market.
-    public approvalForAll (
-        contractAbi: any,
-        baseToken: string,
-        approvalAddress: any,
-        gasPrice: string
-    ): Promise<void> {
-        return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(contractAbi, baseToken).methods.setApprovalForAll(approvalAddress, true).send({
-                'from': this.account,
-                'gasPrice': gasPrice,
-                'gas': this.gasLimit,
-                'value': gasPrice,
-            }).on('receipt', (receipt: any) => {
-                resolve(receipt);
-            }).on('error', (error: Error) => {
-                reject(error)
-            });
-        })
-    }
-
-    // Transfer NFT to another address.
-    public transferNFT (
-        contractAbi: any,
-        toAddress: string,
-        tokenId: string,
-        baseToken: string,
-        collectionType: string,
-        gasPrice: string
-    ): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let stickerContract = new this.web3.eth.Contract(contractAbi, baseToken);
-            let transferFunction = stickerContract.methods.safeTransferFrom(this.account, toAddress, tokenId, 1);
-            if(collectionType == ERCType.ERC721)
-                transferFunction = stickerContract.methods.safeTransferFrom(this.account, toAddress, tokenId);
-
-            transferFunction.send({
-                'from': this.account,
-                'gasPrice': gasPrice,
-                'gas': this.gasLimit,
-                'value': gasPrice,
-            }).on('receipt', (receipt: any) => {
-                resolve(receipt);
-            }).on('error', (error: Error) => {
-                reject(error)
-            });
-        })
-    }
-
-    // List NFT item on market on auction mode.
     public createOrderForAuction (
         baseToken: string,
         tokenId: string,
@@ -198,7 +268,7 @@ export class CallContract {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        userInfo: UserInfo,
+        sellerURI: string,
         marketContract: string,
         gasPrice: string
     ): Promise<void> {
@@ -212,7 +282,7 @@ export class CallContract {
                 BigInt(reservePrice*1e18).toString(),
                 BigInt(buyoutPrice*1e18).toString(),
                 (new Date().getTime()/1000).toFixed(),
-                (expirationTime/1000).toFixed(), userInfo.did
+                (expirationTime/1000).toFixed(), sellerURI
             ).send({'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -233,9 +303,7 @@ export class CallContract {
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, contractMarket).methods.changeSaleOrderPrice(
-                orderId,
-                newPrice,
-                quoteToken
+                orderId, newPrice, quoteToken
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
@@ -249,7 +317,6 @@ export class CallContract {
         })
     }
 
-    // change the price for listed NFT on auction.
     public changePriceOnAuction (orderId: number,
         newMinPrice: string,
         newReservedPrice: string,
@@ -259,7 +326,9 @@ export class CallContract {
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.changeAuctionOrderPrice(orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken).send({
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.changeAuctionOrderPrice(
+                orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -272,7 +341,6 @@ export class CallContract {
         })
     }
 
-    // buy the listed nft with fixed price.
     public buyItem (orderId: string,
         price: number,
         quoteToken: string,
@@ -281,11 +349,13 @@ export class CallContract {
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.buyOrder(orderId, did).send({
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.buyOrder(
+                orderId, did
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
-                'value': quoteToken == defaultAddress ? price : 0
+                'value': quoteToken == ContractHelper.zeroAddr ? price : 0
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
             }).on('error', (error: Error) => {
@@ -298,16 +368,18 @@ export class CallContract {
         orderId: string,
         price: number,
         quoteToken: string,
-        userInfo: UserInfo,
+        bidderURI: string,
         marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.bidForOrder(orderId, price.toString(), userInfo.did).send({
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.bidForOrder(
+                orderId, price.toString(), bidderURI,
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
-                'value': quoteToken == defaultAddress ? price : 0
+                'value': quoteToken == ContractHelper.zeroAddr ? price : 0
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
             }).on('error', (error: Error) => {
@@ -321,7 +393,9 @@ export class CallContract {
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.settleAuctionOrder(orderId).send({
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.settleAuctionOrder(
+                orderId
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -334,13 +408,14 @@ export class CallContract {
         })
     }
 
-    // unlist NFT item from market
     public unlistItem (orderId: string,
         marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.cancelOrder(orderId).send({
+            new this.web3.eth.Contract(marketV2ABI, marketContract).methods.cancelOrder(
+                orderId
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': LimitGas,
@@ -353,20 +428,7 @@ export class CallContract {
         })
     }
 
-
-
-    /**
-     * Create a NFT collection contract and deploy it on specific EVM blockchain.
-     *
-     * @param name The name of NFT collection
-     * @param symbol The symbol of NFT collection
-     * @param collectionUri the uri of nft on ipfs
-     * @param contractData the contract file data
-     * @param essentialsConnector essestial connector for creating web3
-     * @param gasPrice the value of gas process for calling the contract
-     * @returns result of being listed the nft
-     */
-     public createCollection (
+    public createCollection (
         name: string,
         symbol: string,
         collectionUri: string,
@@ -377,17 +439,21 @@ export class CallContract {
             let diaAddress = "0x0000000000000000000000000000000000000000"; // TODO;
             let diaValue = 0; // TODO;
 
-            let deployArgs = [name, symbol, collectionUri, diaAddress, diaValue];
-
-            let registerContract = new this.web3.eth.Contract(contractData.abi);
-            let registeredContract = registerContract.deploy({
+            new this.web3.eth.Contract(contractData.abi).deploy({
                 data: `0x${contractData.code}`,
-                arguments: deployArgs,
+                arguments: [
+                    name,
+                    symbol,
+                    collectionUri,
+                    diaAddress,
+                    diaValue
+                ],
             })
             let transactionParams = {
                 'from': this.account,
                 'gas': LimitGas,
-                'gasPrice': gasPrice
+                'gasPrice': gasPrice,
+                "to": "",
             }
 /*
             if(isInAppBrowser())
@@ -403,24 +469,26 @@ export class CallContract {
 
     }
 
-   // Register a collection contract onto Pasar marketplace platform.
-     public registerCollection (
+    public registerCollection (
         collectionAddr: string,
         name: string,
         collectionUri: string,
         royaltyRates: RoyaltyRate[],
         registryContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
-            let pasarRegister = new this.web3.eth.Contract(RegistryABI, registryContract);
-            let owners = [], royalties = [];
+            let owners = [];
+            let royalties = [];
 
             for(var i = 0; i < royaltyRates.length; i++) {
                 owners.push(royaltyRates[i].address);
                 royalties.push(royaltyRates[i].rate*10000)
             }
-            pasarRegister.methods.registerToken(collectionAddr, name, collectionUri, owners, royalties).send({
+
+            new this.web3.eth.Contract(RegistryABI, registryContract).methods.registerToken(
+                collectionAddr, name, collectionUri, owners, royalties
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -433,15 +501,16 @@ export class CallContract {
         })
     }
 
-    // update collection with name and uri.
-    public updateCollection (collectionAddr: string,
+    public updateCollectionInfo(collectionAddr: string,
         name: string,
         collectionUri: string,
         registryContract: string,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(RegistryABI, registryContract).methods.updateTokenInfo(collectionAddr, name, collectionUri).send({
+            new this.web3.eth.Contract(RegistryABI, registryContract).methods.updateTokenInfo(
+                collectionAddr, name, collectionUri
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -454,23 +523,23 @@ export class CallContract {
         })
     }
 
-    // update royalties of the collection
     public updateCollectionRoyalties (collectionAddr: string,
         royaltyRates: RoyaltyRate[],
         registryContract: string,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            let pasarRegistry = new this.web3.eth.Contract(RegistryABI, registryContract);
-
-            let owners = [], royalties = [];
+            let owners = [];
+            let royalties = [];
 
             for(var i = 0; i < royaltyRates.length; i++) {
                 owners.push(royaltyRates[i].address);
                 royalties.push(royaltyRates[i].rate*10000)
             }
 
-            pasarRegistry.methods.changeTokenRoyalty(collectionAddr, owners, royalties).send({
+            new this.web3.eth.Contract(RegistryABI, registryContract).methods.changeTokenRoyalty(
+                collectionAddr, owners, royalties
+            ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': this.gasLimit,
@@ -500,3 +569,4 @@ export class CallContract {
         }
     }
 }
+

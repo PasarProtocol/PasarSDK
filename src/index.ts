@@ -20,7 +20,7 @@ let myProfileInfo, profileInfo;
 
 const getMyProfileInfo = () => {
     if(!myProfileInfo) {
-        myProfileInfo = new MyProfile(null, '', '');
+        myProfileInfo = new MyProfile(null, '', '', null);
     }
 
     return myProfileInfo;
@@ -346,7 +346,7 @@ const getCollectionSocialField = () => {
 
 const signIn = async() => {
     let userInfo = await signin();
-    myProfileInfo = new MyProfile(userInfo['name'], userInfo['did'], userInfo['address']);
+    myProfileInfo = new MyProfile(userInfo['name'], userInfo['did'], userInfo['address'], null);
     getMyProfileInfo().setUserInfo(userInfo);
 }
 
