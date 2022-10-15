@@ -1,3 +1,5 @@
+import { Condition, ConditionType } from "../filters/condition";
+
 enum Category {
     General = 'General',
     Collectibles = 'Collectibles',
@@ -5,7 +7,7 @@ enum Category {
     Photograhpy = 'Photography',
     TradingCards = 'TradingCards',
     Utility = 'Utility',
-    Domains = 'Domains'
+    Domains = 'Domains',
 }
 
 const getCategoryList = (): string[] => {
@@ -20,7 +22,21 @@ const getCategoryList = (): string[] => {
     ];
 }
 
+class CategoryConditon extends Condition {
+    private category: Category;
+
+    public constructor(category: Category = null) {
+        super(ConditionType.CollectionCategory);
+        this.category = category;
+    }
+
+    public getCategory(): Category {
+        return this.category;
+    }
+}
+
 export {
     Category,
-    getCategoryList
+    getCategoryList,
+    CategoryConditon,
 }

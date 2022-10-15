@@ -1,42 +1,17 @@
-enum FilterType {
-    Empty = "Empty",
-    ListedStatus = "Listed status",
-    PriceRange = "PrinceRange",
-    Collections = "Collections",
-    ItemTypes = "ItemTypes",
-    Tokens = "Tokens",
-    Sensitive = "Sensitve",
-    Blockchains = "Blockchains",
-    OrAggregated = "Or",
-    AndAggregated = "And",
-}
+import { Condition } from "./condition";
 
-class Filter {
-    private type: FilterType;
-    private body: any;
+export class Filter {
+    private conditions: Condition[];
 
-    protected constructor(type: FilterType, body: any) {
-        this.type = type
-        this.body = body
+    public appendCondition(condition: Condition) {
+        this.conditions.push(condition);
     }
 
-    protected setBody(value: any) {
-        this.body = value
+    public count(): number {
+        return this.conditions.length;
     }
 
-    protected getBody(): any{
-        return this.body
+    public getCondition(index: number) {
+        return this.count() > index ? this.conditions[index]: null;
     }
-}
-
-class EmptyFilter extends Filter {
-    constructor() {
-        super(FilterType.Empty, null);
-    }
-}
-
-export {
-    FilterType,
-    Filter,
-    EmptyFilter,
 }

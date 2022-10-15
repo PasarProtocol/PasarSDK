@@ -1,19 +1,19 @@
 import { ChainType } from "./chaintype";
 
-export class CollectionAddress {
-    private contractAddr: string;
-    private chain: ChainType
+export class ContractAddress {
+    private contract: string;
+    private network: ChainType
 
-    constructor(addr: string, chain: ChainType) {
-        this.contractAddr = addr;
-        this.chain = chain;
+    constructor(addr: string, network: ChainType) {
+        this.contract = addr;
+        this.network = network;
     }
 
-    public getContractAddr(): string {
-        return this.contractAddr;
+    public getContract(): string {
+        return this.contract;
     }
 
-    public getChain(): ChainType {
-        return this.chain;
+    public getNetwork(): ChainType {
+        return this.network;
     }
 }
