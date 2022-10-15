@@ -2,6 +2,7 @@ import { Filter } from "../filters/filter";
 import { NftItem } from "../nftitem";
 import { AppContext } from "../appcontext";
 import { CollectionInfo } from "./collectioninfo";
+import { ContractAddress } from "../contractaddress";
 
 class Collection {
     private appContext: AppContext;
@@ -11,12 +12,8 @@ class Collection {
         this.info = collecionInfo;
     }
 
-    public getContractAddress(): string {
-        return this.info.constractAddr;
-    }
-
-    public getNetwork(): string {
-        return this.info.network;
+    public getContractAddress(): ContractAddress {
+        return new ContractAddress(this.info.constractAddr, this.info.network);
     }
 
     public getOwnerdDid(): string {
