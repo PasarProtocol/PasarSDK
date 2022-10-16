@@ -160,29 +160,6 @@ const getCurrentChainType = (chainId) => {
     return ''
 }
 
-const getCurrentMarketAddress = () => {
-    let chainId = getCurrentChainId();
-
-    if(getCurrentChainType(chainId) == ChainType.ESC) {
-        return valuesOnTestNet.elastos.pasarMarketPlaceContract;
-    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
-        return valuesOnTestNet.ethereum.pasarMarketPlaceContract;
-    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
-        return valuesOnTestNet.fusion.pasarMarketPlaceContract;
-    }
-}
-
-const getCurrentImportingContractAddress = () => {
-    let chainId = getCurrentChainId();
-    if(getCurrentChainType(chainId) == ChainType.ESC) {
-        return valuesOnTestNet.elastos.pasarRegisterContract;
-    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
-        return valuesOnTestNet.ethereum.pasarRegisterContract;
-    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
-        return valuesOnTestNet.fusion.pasarRegisterContract;
-    }
-}
-
 const getCurrentChainId = () => {
     let essentialsConnector: EssentialsConnector = new EssentialsConnector();
     let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
@@ -221,6 +198,4 @@ export {
     getChainTypeNumber,
     getChainTypeString,
     getCurrentChainType,
-    getCurrentMarketAddress,
-    getCurrentImportingContractAddress,
 }
