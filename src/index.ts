@@ -11,8 +11,7 @@ import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./gl
 import { Profile } from "./profile";
 import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
-import { CollectionSocialField, UserInfo } from "./utils";
-import { valuesOnMainNet, valuesOnTestNet } from "./constant";
+import { CollectionSocialField } from "./utils";
 
 import { AppContext } from "./appcontext";
 

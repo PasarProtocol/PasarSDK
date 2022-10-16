@@ -5,10 +5,9 @@ import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./RoyaltyRate";
 import { defaultAddress } from "./constant";
-import { resizeImage, requestSigndataOnTokenID, getCurrentMarketAddress, getCurrentImportingContractAddress } from "./global";
+import { resizeImage, requestSigndataOnTokenID } from "./global";
 import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
-import TOKEN_721_ABI from './contracts/abis/token721ABI';
 import { AppContext } from './appcontext';
 import { EmptyHandler, ProgressHandler } from './progresshandler';
 
@@ -182,7 +181,7 @@ export class MyProfile {
             progressHandler.onProgress(20);
 
             await this.contractHelper.registerCollection(
-                tokenAddress, name, collectionUri, royaltyRates, getCurrentImportingContractAddress(), gasPrice
+                tokenAddress, name, collectionUri, royaltyRates, this.appContext.getRegistryContract(), gasPrice
             );
             progressHandler.onProgress(100);
         }).catch (error => {
@@ -208,7 +207,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             await this.contractHelper.updateCollectionInfo(
-                tokenAddress, name, collectionUri,getCurrentImportingContractAddress(), gasPrice
+                tokenAddress, name, collectionUri, this.appContext.getRegistryContract(), gasPrice
             );
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -231,7 +230,7 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             await this.contractHelper.updateCollectionRoyalties(
-                tokenAddress, royaltyRates, getCurrentImportingContractAddress(), gasPrice
+                tokenAddress, royaltyRates, this.appContext.getRegistryContract(), gasPrice
             );
             progressHandler.onProgress(100);
         }).catch(error => {
@@ -539,7 +538,7 @@ export class MyProfile {
                 BigInt(price*1e18).toString(),
                 pricingToken,
                 sellerURI,
-                getCurrentMarketAddress(),
+                this.appContext.getMarketContract(),
                 gasPrice
             );
             progressHandler.onProgress(100);
@@ -570,7 +569,7 @@ export class MyProfile {
                 parseInt(orderId),
                 BigInt(newPrice*1e18).toString(),
                 newPricingToken,
-                getCurrentMarketAddress(),
+                this.appContext.getMarketContract(),
                 gasPrice
             );
             progressHandler.onProgress(100);
@@ -597,11 +596,11 @@ export class MyProfile {
             progressHandler.onProgress(20);
             if(quoteToken != defaultAddress) {
                 await this.contractHelper.approveToken(
-                    buyingPrice, quoteToken, getCurrentMarketAddress(), gasPrice
+                    buyingPrice, quoteToken, this.appContext.getMarketContract(), gasPrice
                 );
             }
             await this.contractHelper.buyItem(
-                orderId, buyingPrice, quoteToken, buyerURI, getCurrentMarketAddress(), gasPrice
+                orderId, buyingPrice, quoteToken, buyerURI, this.appContext.getMarketContract(), gasPrice
             );
 
             progressHandler.onProgress(100);
@@ -636,12 +635,11 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            let marketPlaceAddress = getCurrentMarketAddress();
-            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, baseToken, marketPlaceAddress, gasPrice);
+            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             progressHandler.onProgress(50);
 
             await this.contractHelper.createOrderForAuction(
-                baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI, getCurrentMarketAddress(), gasPrice
+                baseToken, tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI, this.appContext.getMarketContract(), gasPrice
             );
         }).catch(error => {
             throw new Error(error);
@@ -682,7 +680,7 @@ export class MyProfile {
                 reservePriceValue,
                 buyoutPriceValue,
                 newPricingToken,
-                getCurrentMarketAddress(),
+                this.appContext.getMarketContract(),
                 gasPrice
             );
             progressHandler.onProgress(100);
@@ -712,10 +710,10 @@ export class MyProfile {
 
             let priceValue = Number(BigInt(price*1e18));
             if(quoteToken != defaultAddress) {
-                await this.contractHelper.approveToken(priceValue, quoteToken, getCurrentMarketAddress(), gasPrice);
+                await this.contractHelper.approveToken(priceValue, quoteToken, this.appContext.getMarketContract(), gasPrice);
             }
 
-            await this.contractHelper.bidItemOnAuction(orderId, priceValue, quoteToken, bidderURI, getCurrentMarketAddress(), gasPrice);
+            await this.contractHelper.bidItemOnAuction(orderId, priceValue, quoteToken, bidderURI, this.appContext.getMarketContract(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -733,7 +731,7 @@ export class MyProfile {
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.contractHelper.settleAuction(orderId, getCurrentMarketAddress(), gasPrice);
+            await this.contractHelper.settleAuction(orderId, this.appContext.getMarketContract(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -755,7 +753,7 @@ export class MyProfile {
     ): Promise<void> {
         await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-            await this.contractHelper.unlistItem(orderId, getCurrentMarketAddress(), gasPrice);
+            await this.contractHelper.unlistItem(orderId, this.appContext.getMarketContract(), gasPrice);
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
