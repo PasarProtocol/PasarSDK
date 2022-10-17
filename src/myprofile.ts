@@ -6,11 +6,11 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
-import { ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
+import { UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import { AppContext } from './appcontext';
 
-import {VerifiableCredential } from '@elastosfoundation/did-js-sdk';
+import { VerifiableCredential } from '@elastosfoundation/did-js-sdk';
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
 
@@ -53,6 +53,8 @@ export class MyProfile {
         if (nameCredential) {
             this.nameCredential = nameCredential
             this.name = nameCredential.getSubject().getProperty('name');
+        } else {
+            this.name = "";
         }
         return this;
     }
@@ -61,6 +63,8 @@ export class MyProfile {
         if (description) {
             this.descriptionCredential = description;
             this.description = description.getSubject().getProperty('description');
+        } else {
+            this.description = "";
         }
         return this;
     }
@@ -75,21 +79,6 @@ export class MyProfile {
         return await this.appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
             return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
         })
-    }
-
-    public setUserInfo = (info: UserInfo) => {
-        this.userInfo = info;
-    }
-
-    public getUserInfo = ():UserInfo => {
-        return this.userInfo;
-    }
-
-    public deleteUserInfo = () => {
-        this.userInfo.name = null;
-        this.userInfo.bio = null;
-        this.userInfo.did = null;
-        this.userInfo.address = null;
     }
 
     /**
@@ -124,15 +113,14 @@ export class MyProfile {
      * @param socialLinks The social media related to this NFT collection
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    public createCollectionMetadata(description: string,
+    public async createCollectionMetadata(description: string,
         avatarPath: string,
         bannerPath: string,
         category: Category,
         socialLinks: SocialLinks) {
 
-        return Promise.resolve().then(async () => {
+        try {
             const client = create({ url: this.appContext.getIPFSNode()});
-
             const dataJson = {
                 avatar: `pasar:image:${(await client.add(avatarPath)).path}`,
                 banner: `pasar:image:${(await client.add(bannerPath)).path}`,
@@ -156,9 +144,9 @@ export class MyProfile {
             }
 
             return `pasar:json:${(await client.add(JSON.stringify(metadataJson))).path}`;
-        }).catch(err => {
-            throw new Error(err);
-        })
+        }catch(error) {
+            throw new Error(error);
+        }
     }
 
     /**
@@ -255,22 +243,20 @@ export class MyProfile {
                 thumbnail_add = await client.add(thumbnail.fileContent);
             }
 
-            let jsonDid:UserInfo = this.getUserInfo();
-
-            const creatorObject: UserDidInfo = {
-                "did": jsonDid.did,
-                "name": jsonDid.name || "",
-                "description": jsonDid.bio || ""
+            const creatorObject = {
+                "did": this.did,
+                "name": this.name,
+                "description": this.description,
             }
 
-            const imageObject: ImageDidInfo = {
+            const imageObject = {
                 "image": `pasar:image:${image_add.path}`,
                 "kind": itemImage.type.replace('image/', ''),
                 "size": itemImage.size,
                 "thumbnail": `pasar:image:${thumbnail_add.path}`,
             }
 
-            const metaObj: NFTDidInfo = {
+            const metaObj = {
                 "version": "2",
                 "type": 'image',
                 "name": itemName,
@@ -449,8 +435,22 @@ export class MyProfile {
      *
      * @eturns The uri of metadata json file pushed onto IPFS storage.
      */
-    public createTraderMetadata(): Promise<string> {
-        throw new Error("Method not implemented");
+    public async createTraderMetadata() {
+        try {
+            const client = create({
+                 url: this.appContext.getIPFSNode()
+            });
+
+            let result = await client.add(JSON.stringify({
+                "did": this.did,
+                "name": this.name,
+                "description": this.description
+            }));
+
+            return `pasar:json:${result.path}`;
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     /**
@@ -671,25 +671,5 @@ export class MyProfile {
         }).catch (error => {
             throw new Error(error);
         })
-    }
-
-    /**
-     * Upload the user did info to ipfs
-     *
-     * @returns ipfs path.
-     */
-    public async getUserDid(): Promise<string> {
-        const client = create({ url: this.appContext.getIPFSNode() });
-
-        let jsonDid:UserInfo = this.getUserInfo();
-
-        const creatorObject: UserDidInfo = {
-            "did": jsonDid.did,
-            "name": jsonDid.name || "",
-            "description": jsonDid.bio || ""
-        }
-
-        let didUri = await client.add(JSON.stringify(creatorObject));
-        return `pasar:json:${didUri.path}`;
     }
 }
