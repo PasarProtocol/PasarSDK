@@ -2,7 +2,7 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { statSync } from 'fs';
-import { DidResolverUrl, valuesOnTestNet } from './constant';
+import { DidResolverUrl } from './constant';
 import { UserInfo } from './utils';
 
 const essentialsConnector = new EssentialsConnector();
@@ -28,7 +28,7 @@ const initConnectivitySDK = async () => {
     }
 
     await connectivity.registerConnector(essentialsConnector).then(async () => {
-        connectivity.setApplicationDID(valuesOnTestNet.didApplication);
+        connectivity.setApplicationDID("did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB");
         connectivityInitialized = true;
 
         console.log('essentialsConnector', essentialsConnector);
