@@ -1,7 +1,5 @@
 import Web3 from "web3";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import valuesMainNet from "./contracts/deploy/mainnet.json";
-import valuesTestNet from "./contracts/deploy/testnet.json";
 import { getChainTypeById } from "./chaintype";
 
 export class AppContext {
@@ -19,7 +17,11 @@ export class AppContext {
     static appContext: AppContext;
 
     private constructor(testnet: boolean) {
-        this.env = testnet ? valuesTestNet : valuesMainNet
+        if (testnet)
+            this.env = require("./contracts/deploy/testnet.json");
+        else
+            this.env = require("./contracts/deploy/mainnet.json");
+
         this.assistUrl  = this.env['assistUrl'];
         this.ipfsUrl    = this.env['ipfsUrl'];
         this.didResover = this.env['didResover'];
@@ -61,14 +63,16 @@ export class AppContext {
     }
 
     public getRegistryContract(): string {
-        let chainId = this.essenitalConnector.getWalletConnectProvider().wc.chainId;
-        let chainName = getChainTypeById(chainId).toString();
-        return this.env["contracts"][chainName.toLowerCase()]["registry"];
+        let chainName = getChainTypeById(
+            this.essenitalConnector.getWalletConnectProvider().wc.chainId
+        ).toString().toLowerCase();
+        return this.env["contracts"][chainName]["registry"];
     }
 
     public getMarketContract(): string {
-        let chainId = this.essenitalConnector.getWalletConnectProvider().wc.chainId;
-        let chainName = getChainTypeById(chainId).toString();
-        return this.env["contracts"][chainName.toLowerCase()]["marketv2"];
+        let chainName = getChainTypeById(
+            this.essenitalConnector.getWalletConnectProvider().wc.chainId
+        ).toString().toLowerCase();
+        return this.env["contracts"][chainName]["marketv2"];
     }
 }
