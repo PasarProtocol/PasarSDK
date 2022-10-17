@@ -235,12 +235,12 @@ export class ContractHelper {
     }
 
     public createOrderForSale (
+        marketContract: string,
         tokenId: string,
         baseToken: string,
         price: string,
         quoteToken: string,
         sellerURI: string,
-        marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -261,6 +261,7 @@ export class ContractHelper {
     }
 
     public createOrderForAuction (
+        marketContract: string,
         baseToken: string,
         tokenId: string,
         quoteToken: string,
@@ -269,7 +270,6 @@ export class ContractHelper {
         buyoutPrice: number,
         expirationTime: number,
         sellerURI: string,
-        marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -295,10 +295,10 @@ export class ContractHelper {
         })
     }
 
-    public changePrice (orderId: number,
+    public changePrice (contractMarket: string,
+        orderId: number,
         newPrice: string,
         quoteToken: string,
-        contractMarket: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -317,12 +317,12 @@ export class ContractHelper {
         })
     }
 
-    public changePriceOnAuction (orderId: number,
+    public changePriceOnAuction (marketContract: string,
+        orderId: number,
         newMinPrice: string,
         newReservedPrice: string,
         newBuyoutPrice: string,
         quoteToken: string,
-        marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -341,11 +341,11 @@ export class ContractHelper {
         })
     }
 
-    public buyItem (orderId: string,
+    public buyItem (marketContract: string,
+        orderId: string,
         price: number,
         quoteToken: string,
         did: string,
-        marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -364,12 +364,11 @@ export class ContractHelper {
         })
     }
 
-    public bidItemOnAuction (
+    public bidItemOnAuction (marketContract: string,
         orderId: string,
         price: number,
         quoteToken: string,
         bidderURI: string,
-        marketContract: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -388,8 +387,8 @@ export class ContractHelper {
         })
     }
 
-    public settleAuction (orderId: string,
-        marketContract: string,
+    public settleAuction (marketContract: string,
+        orderId: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -408,8 +407,8 @@ export class ContractHelper {
         })
     }
 
-    public unlistItem (orderId: string,
-        marketContract: string,
+    public unlistItem (marketContract: string,
+        orderId: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
