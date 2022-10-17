@@ -7,7 +7,7 @@ import { getListTypes, isOnAuction } from "./listtype";
 import { Category, getCategoryList } from "./collection/category";
 import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
-import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
+import { StringIsNumber } from "./global";
 import { Profile } from "./profile";
 import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
@@ -53,10 +53,7 @@ const mintNft = async (
         let profile = getMyProfileInfo();
         let tokenId:string;
         let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
-        if(checkFeedsCollection(baseToken) || checkPasarCollection(baseToken))
-            tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
-        else
-            tokenId = await profile.creatItem(baseToken, resultMetadata, handleProgress);
+        tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
 
         return tokenId;
     } catch(err) {
