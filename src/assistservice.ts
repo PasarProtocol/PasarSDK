@@ -2,9 +2,8 @@
  * This class get the nfts from pasar assist backend
  */
 
-import { ChainType } from "./chaintype";
+import { ChainType, getChainIndexByType } from "./chaintype";
 import { CollectionInfo } from "./collection/collectioninfo";
-import { getChainTypeNumber } from "./global";
 import { ERCType } from "./erctype";
 import { NftItem } from "./nftitem";
 import { NftListInfo } from "./nftlistinfo";
@@ -58,7 +57,7 @@ const getAllListedItems = async (assistUrl: string, collectionAddr = '', pageNum
 }
 
 const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
-    return await fetch(`${assistUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainTypeNumber(chainType)}`).then (async response => {
+    return await fetch(`${assistUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainIndexByType(chainType)}`).then (async response => {
         let json = await response.json();
         if (json['code'] != 200) {
             throw new Error("Call API to fetch collection info failed");

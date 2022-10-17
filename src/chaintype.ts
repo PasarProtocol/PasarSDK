@@ -1,3 +1,5 @@
+import { Chain } from "pretend";
+
 enum ChainType {
     ESC = "ESC",
     ETH = "ETH",
@@ -27,8 +29,19 @@ const getChainTypeById = (chainId: number): ChainType => {
     return chainIdMapType[chainId]
 }
 
+const chainTypeToIndex = new Map<ChainType, number>([
+    [ChainType.ESC, 1],
+    [ChainType.ETH, 2],
+    [ChainType.FSN, 3]
+])
+
+const getChainIndexByType = (chaintype:ChainType) => {
+    return chainTypeToIndex[chaintype];
+}
+
 export {
     ChainType,
     getChainTypes,
-    getChainTypeById
+    getChainTypeById,
+    getChainIndexByType
 }
