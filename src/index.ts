@@ -316,23 +316,16 @@ const getCollectionCategories = () => {
     return getCategoryList();
 }
 
-const getAccountInfo = () => {
-    return getMyProfileInfo().getUserInfo();
-}
-
 const getChainTypes = () => {
     return _getChainTypes();
 }
 
 const signIn = async() => {
-    let userInfo = await signin();
-    myProfileInfo = new MyProfile(userInfo['did'], userInfo['address'], null, null, null, null);
-    getMyProfileInfo().setUserInfo(userInfo);
+    myProfileInfo = await signin();
 }
 
 const singOut = async() => {
     await signout();
-    getMyProfileInfo().deleteUserInfo();
 }
 
 export {
@@ -358,7 +351,6 @@ export {
     registerCollection,
     getCollectionType,
     getCollectionCategories,
-    getAccountInfo,
     updateCollectionInfo,
     updateCollectionRoyalties,
     getChainTypes,

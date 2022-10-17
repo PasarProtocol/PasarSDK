@@ -6,7 +6,6 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
-import { UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import { AppContext } from './appcontext';
 
@@ -29,8 +28,6 @@ export class MyProfile {
     private nameCredential: VerifiableCredential;
     private descriptionCredential: VerifiableCredential;
     private avatarCredential: VerifiableCredential;
-
-    private userInfo: UserInfo;
 
     constructor(did: string,
         walletAddress: string,
