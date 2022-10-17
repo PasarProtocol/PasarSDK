@@ -3,7 +3,7 @@ import { DID, connectivity } from '@elastosfoundation/elastos-connectivity-sdk-j
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { statSync } from 'fs';
 import { DidResolverUrl } from './constant';
-import { UserInfo } from './utils';
+import { MyProfile } from './myprofile';
 
 const essentialsConnector = new EssentialsConnector();
 const isInAppBrowser = () => window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
@@ -85,15 +85,9 @@ const signInWithEssentials = async () => {
         if (isInAppBrowser())
           essentialAddress = await window['elastos'].getWeb3Provider().address
 
-          let user:UserInfo = {
-            name: name.toString(),
-            bio: bio.toString(),
-            did: sDid,
-            address: essentialAddress
-        }
-
-        return user;
+        return new MyProfile(sDid, essentialAddress, nameCredential, bioCredential, null, null);
       }
+      return null;
     } catch (e) {
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
@@ -110,10 +104,9 @@ const signin = async () => {
     } else if (essentialsConnector.hasWalletConnectSession()) {
       await essentialsConnector.disconnectWalletConnect();
     }
-    let userInfo = await signInWithEssentials();
-    console.log(userInfo);
+    let myprofile = await signInWithEssentials();
     isSignin = true;
-    return userInfo;
+    return myprofile;
 }
 
 const signout = async () => {
