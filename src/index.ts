@@ -11,7 +11,6 @@ import { StringIsNumber } from "./global";
 import { Profile } from "./profile";
 import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
-import { CollectionSocialField } from "./utils";
 
 import { AppContext } from "./appcontext";
 
@@ -243,7 +242,7 @@ const registerCollection = async (
     avatar: any,
     background: any,
     category: Category,
-    socialMedias: CollectionSocialField,
+    socialMedias: any,
     royalties: RoyaltyRate[],
     handleProgress: any = null
 ) => {
@@ -264,7 +263,7 @@ const updateCollectionInfo = async (
     avatar: any,
     background: any,
     category: Category,
-    socialMedias: CollectionSocialField,
+    socialMedias: any,
     handleProgress: any = null
 ) => {
     try {
@@ -325,20 +324,6 @@ const getChainTypes = () => {
     return _getChainTypes();
 }
 
-const getCollectionSocialField = () => {
-    let socials: CollectionSocialField = {
-        "website": "",
-        "profile": "",
-        "feeds": "",
-        "twitter": "",
-        "discord": "",
-        "telegram": "",
-        "medium": ""
-    }
-
-    return socials;
-}
-
 const signIn = async() => {
     let userInfo = await signin();
     myProfileInfo = new MyProfile(userInfo['did'], userInfo['address'], null, null, null, null);
@@ -373,7 +358,6 @@ export {
     registerCollection,
     getCollectionType,
     getCollectionCategories,
-    getCollectionSocialField,
     getAccountInfo,
     updateCollectionInfo,
     updateCollectionRoyalties,
