@@ -3,7 +3,7 @@ import sha256 from 'crypto-js/sha256';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
-import { RoyaltyRate } from "./RoyaltyRate";
+import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
 import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
@@ -64,11 +64,12 @@ export class MyProfile {
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
+     * Currently only ERC721 standard is supported.
      *
      * @param name The name of NFT collection
      * @param symbol The symbol of NFT collection
      * @param collectionUri The uri of NFT collection
-     * @param progressHandler The handler to deal with progress on creating and deploying an
+     * @param progressHandler The handler to deal with progress on deploying an
      *        NFT collection contract
      * @returns The deployed NFT collection contract address.
      */
@@ -78,11 +79,11 @@ export class MyProfile {
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<string> {
         return await this.getGasPrice().then (async gasPrice => {
-            progressHandler.onProgress(70);
-
-            let address = await this.contractHelper.createCollection(
+            progressHandler.onProgress(20);
+            return await this.contractHelper.createCollection(
                 name, symbol, collectionUri, ERCType.ERC721, gasPrice
             );
+        }).then (address => {
             progressHandler.onProgress(100);
             return address;
         }).catch (error => {
@@ -165,7 +166,7 @@ export class MyProfile {
      * @param tokenAddress The NFT collection contract address
      * @param collectionUri The uri of the NFT collection referring to the metadata json file on
      *        IPFS storage
-     * @param royaltyRates The roraylty rates for this NFT collection
+     * @param royalties The roraylty rates for this NFT collection
      * @param progressHandler: The handlder to deal with the progress on registeraton of this
      *        NFT collection onto Pasar marketplace
      * @returns The result of whether this NFT collection contract is registered ont Pasar or not
@@ -174,15 +175,15 @@ export class MyProfile {
         tokenAddress: string,
         name: string,
         collectionUri: string,
-        royaltyRates: RoyaltyRate[],
+        royalties: RoyaltyRate[],
         progressHandler: ProgressHandler = new EmptyHandler()
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
-
             await this.contractHelper.registerCollection(
-                tokenAddress, name, collectionUri, royaltyRates, this.appContext.getRegistryContract(), gasPrice
+                this.appContext.getRegistryContract(), tokenAddress, name, collectionUri, royalties, gasPrice
             );
+        }).then (()=> {
             progressHandler.onProgress(100);
         }).catch (error => {
             throw new Error(error);
@@ -207,8 +208,9 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             await this.contractHelper.updateCollectionInfo(
-                tokenAddress, name, collectionUri, this.appContext.getRegistryContract(), gasPrice
+                this.appContext.getRegistryContract(), tokenAddress, name, collectionUri, gasPrice
             );
+        }).then (()=> {
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);
@@ -230,8 +232,9 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             progressHandler.onProgress(20);
             await this.contractHelper.updateCollectionRoyalties(
-                tokenAddress, royaltyRates, this.appContext.getRegistryContract(), gasPrice
+                this.appContext.getRegistryContract(), tokenAddress, royaltyRates, gasPrice
             );
+        }).then(() => {
             progressHandler.onProgress(100);
         }).catch(error => {
             throw new Error(error);

@@ -6,7 +6,7 @@ import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
 import { Category, getCategoryList } from "./collection/category";
 import { ERCType } from "./erctype";
-import { RoyaltyRate } from "./RoyaltyRate";
+import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { checkPasarCollection, checkFeedsCollection, StringIsNumber } from "./global";
 import { Profile } from "./profile";
 import { Market } from "./market";
