@@ -115,41 +115,6 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
     return signedData
 }
 
-const checkFeedsCollection = (address) => {
-    let chainId = getCurrentChainId();
-
-    if(getCurrentChainType(chainId) == ChainType.ESC && (address == valuesOnMainNet.elastos.stickerContract || address == valuesOnTestNet.elastos.stickerContract)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-const checkPasarCollection = (address) => {
-    let chainId = getCurrentChainId();
-
-    if(getCurrentChainType(chainId) == ChainType.ESC) {
-        if(address == valuesOnMainNet.elastos.stickerV2Contract || address == valuesOnTestNet.elastos.stickerV2Contract) {
-            return true;
-        } else {
-            return false;
-        }
-    } else if(getCurrentChainType(chainId) == ChainType.ETH) {
-        if(address == valuesOnMainNet.ethereum.stickerV2Contract || address == valuesOnTestNet.ethereum.stickerV2Contract) {
-            return true;
-        } else {
-            return false;
-        }
-    } else if(getCurrentChainType(chainId) == ChainType.FSN) {
-        if(address == valuesOnMainNet.fusion.stickerV2Contract || address == valuesOnTestNet.fusion.stickerV2Contract) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-}
-
 const getCurrentChainType = (chainId) => {
     if (chainId===20 || chainId===21)
     return ChainType.ESC;
@@ -193,8 +158,6 @@ export {
     resizeImage,
     requestSigndataOnTokenID,
     StringIsNumber,
-    checkPasarCollection,
-    checkFeedsCollection,
     getChainTypeNumber,
     getChainTypeString,
     getCurrentChainType,
