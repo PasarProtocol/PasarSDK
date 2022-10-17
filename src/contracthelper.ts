@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import { LimitGas } from "./constant";
 import marketV2ABI from "./contracts/abis/marketV2";
 import RegistryABI from "./contracts/abis/registry";
 import FeedsCollectionABI from "./contracts/abis/feedsCollection";
@@ -9,12 +8,13 @@ import Token20ABI from './contracts/abis/erc20ABI';
 import { RoyaltyRate } from './collection/RoyaltyRate';
 import { AppContext } from './appcontext';
 
+const gasLimit = 5000000;
+
 /**
  * This class is to call the contract functions
  */
 export class ContractHelper {
     private static zeroAddr = "0x0000000000000000000000000000000000000000";
-    private gasLimit = LimitGas;
     private account: string;
     private web3: Web3;
 
@@ -38,7 +38,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -83,7 +83,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -103,7 +103,7 @@ export class ContractHelper {
             new this.web3.eth.Contract(collectionABI, collectionAddr).methods.burn(tokenId, 1).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -138,7 +138,7 @@ export class ContractHelper {
             new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.burn(tokenId).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -161,7 +161,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -184,7 +184,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -224,7 +224,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -250,7 +250,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -285,7 +285,7 @@ export class ContractHelper {
                 (expirationTime/1000).toFixed(), sellerURI
             ).send({'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -307,7 +307,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -331,7 +331,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -354,7 +354,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': quoteToken == ContractHelper.zeroAddr ? price : 0
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -377,7 +377,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': quoteToken == ContractHelper.zeroAddr ? price : 0
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -397,7 +397,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -417,7 +417,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'value': gasPrice
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
@@ -450,7 +450,7 @@ export class ContractHelper {
             })
             let transactionParams = {
                 'from': this.account,
-                'gas': LimitGas,
+                'gas': gasLimit,
                 'gasPrice': gasPrice,
                 "to": "",
             }
@@ -490,7 +490,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -512,7 +512,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -542,7 +542,7 @@ export class ContractHelper {
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
@@ -563,7 +563,7 @@ export class ContractHelper {
             await erc20Contract.methods.approve(marketContract, amount.toString()).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
-                'gas': this.gasLimit,
+                'gas': gasLimit,
                 'value': gasPrice
             });
         }
