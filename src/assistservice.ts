@@ -1,5 +1,6 @@
 import { ChainType, getChainIndexByType } from "./chaintype";
 import { CollectionInfo } from "./collection/collectioninfo";
+import { CollectionPage } from "./collection/collectionpage";
 import { ERCType } from "./erctype";
 import { ItemInfo } from "./iteminfo";
 import { ItemPage } from "./itempage";
@@ -118,7 +119,7 @@ const getItemByTokenId = async (assistUrl: string, baseToken:string, tokenId:str
     })
 }
 
-const getOwnedCollections = async (assistUrl: string, walletAddress: string): Promise<CollectionInfo[]> => {
+const getOwnedCollections = async (assistUrl: string, walletAddress: string): Promise<CollectionPage> => {
     return await fetch(`${assistUrl}/api/v2/sticker/getCollectionByOwner/${walletAddress}?marketPlace=1`).then(async response => {
         let data = await response.json();
         if (data['code'] != 200) {
@@ -149,7 +150,8 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
 
             collections.push(info);
         }
-        return collections;
+
+        return new CollectionPage(0, 0, body.length, collections);
     }).catch (error => {
         throw new Error(`Failed to get listed NFTs with error: ${error}`);
     })

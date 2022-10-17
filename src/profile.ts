@@ -1,6 +1,7 @@
 import { AppContext } from "./appcontext"
 import { getBiddingItems, getCreatedItems, getListedItems, getOwnedItems, getSoldItems, getOwnedCollections } from "./assistservice";
 import { CollectionInfo } from "./collection/collectioninfo";
+import { CollectionPage } from "./collection/collectionpage";
 import { Filter } from "./filters/filter";
 import { ItemPage } from "./itempage";
 
@@ -153,7 +154,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<CollectionInfo[]> {
+    ): Promise<CollectionPage> {
         return await getOwnedCollections(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
