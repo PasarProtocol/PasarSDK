@@ -1,7 +1,4 @@
 import { DID as ConnDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
-import { ChainType } from "./chaintype";
-import { valuesOnMainNet, valuesOnTestNet } from "./constant";
 
 /**
  * get new width and height of resizing image.
@@ -115,50 +112,10 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
     return signedData
 }
 
-const getCurrentChainType = (chainId) => {
-    if (chainId===20 || chainId===21)
-    return ChainType.ESC;
-    if (chainId===1 || chainId===3)
-        return ChainType.ETH;
-    if (chainId===32659 || chainId===46688)
-        return ChainType.FSN;
-    return ''
-}
-
-const getCurrentChainId = () => {
-    let essentialsConnector: EssentialsConnector = new EssentialsConnector();
-    let chainId: number = essentialsConnector.getWalletConnectProvider().wc.chainId;
-    return chainId;
-}
-
 const StringIsNumber = value => isNaN(Number(value)) === true;
-
-const getChainTypeNumber = (chaintype:string) => {
-    if(chaintype == ChainType.ESC) {
-        return 1;
-    } else if(chaintype == ChainType.ETH) {
-        return 2;
-    } else if(chaintype ==  ChainType.FSN) {
-        return 3;
-    }
-}
-
-const getChainTypeString = (chaintype: number) => {
-    if(chaintype == 1) {
-        return ChainType.ESC;
-    } else if(chaintype == 2) {
-        return ChainType.ETH;
-    } else if(chaintype == 3) {
-        return ChainType.FSN;
-    }
-
-}
 
 export {
     resizeImage,
     requestSigndataOnTokenID,
     StringIsNumber,
-    getChainTypeNumber,
-    getChainTypeString,
-    getCurrentChainType,
 }
