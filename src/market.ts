@@ -1,12 +1,17 @@
 import { AppContext } from "./appcontext"
 import { Filter } from "./filters/filter";
-import { NftItem } from "./nftitem";
 import { NftListInfo } from "./nftlistinfo";
 
 /**
  * This class represents the Pasar marketplace where NFT items are being traded.
  */
 export class Market {
+    private assistUrl: string;
+
+    public constructor(appContext: AppContext) {
+        this.assistUrl = appContext.getAssistNode();
+    }
+
     private earilerThan: number = Math.floor(Date.now() / 1000);
 
     /**
@@ -18,12 +23,15 @@ export class Market {
     }
 
     /**
-     * TODO:
-     * @param collectionAddr the collection addresses
-     * @param pageNum the page number
-     * @param pageSize cell size per page
+     * Query listed items on marketplace.
+     * @param earilerThan
+     * @param maximum
+     * @param filter
      */
-    public queryItems(earilerThan: number, maximum: number, filter = new Filter()): Promise<NftItem[]> {
+    public queryItems(earilerThan: number = Date.now(),
+        maximum = 0,
+        filter = new Filter()
+    ): Promise<NftListInfo[]> {
         throw new Error("Method not implemented");
     /*
     public async queryItems(collectionAddr:string = "", pageNum:number = 1, pageSize:number = 10,): Promise<NftListInfo> {

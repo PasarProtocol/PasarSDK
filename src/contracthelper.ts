@@ -6,7 +6,7 @@ import FeedsCollectionABI from "./contracts/abis/feedsCollection";
 import PasarCollectionABI from "./contracts/abis/pasarCollection";
 import Token721ABI from './contracts/abis/token721ABI';
 import Token20ABI from './contracts/abis/erc20ABI';
-import { RoyaltyRate } from './RoyaltyRate';
+import { RoyaltyRate } from './collection/RoyaltyRate';
 import { AppContext } from './appcontext';
 
 /**
@@ -469,25 +469,25 @@ export class ContractHelper {
 
     }
 
-    public registerCollection (
+    public registerCollection (registryContract: string,
         collectionAddr: string,
         name: string,
         collectionUri: string,
-        royaltyRates: RoyaltyRate[],
-        registryContract: string,
+        royalties: RoyaltyRate[],
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
-            let owners = [];
-            let royalties = [];
+            let addresses: string[] = [];
+            let values: number[] = [];
+            let item: any;
 
-            for(var i = 0; i < royaltyRates.length; i++) {
-                owners.push(royaltyRates[i].address);
-                royalties.push(royaltyRates[i].rate*10000)
+            for (item in royalties) {
+                addresses.push(item.receiptAddr);
+                values.push(item.value * 10000);
             }
 
             new this.web3.eth.Contract(RegistryABI, registryContract).methods.registerToken(
-                collectionAddr, name, collectionUri, owners, royalties
+                collectionAddr, name, collectionUri, addresses, values,
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
@@ -501,12 +501,12 @@ export class ContractHelper {
         })
     }
 
-    public updateCollectionInfo(collectionAddr: string,
+    public updateCollectionInfo(registryContract: string,
+        collectionAddr: string,
         name: string,
         collectionUri: string,
-        registryContract: string,
         gasPrice: string
-    ): Promise<any> {
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(RegistryABI, registryContract).methods.updateTokenInfo(
                 collectionAddr, name, collectionUri
@@ -523,22 +523,23 @@ export class ContractHelper {
         })
     }
 
-    public updateCollectionRoyalties (collectionAddr: string,
-        royaltyRates: RoyaltyRate[],
-        registryContract: string,
+    public updateCollectionRoyalties (registryContract: string,
+        collectionAddr: string,
+        royalties: RoyaltyRate[],
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            let owners = [];
-            let royalties = [];
+            let addresses: string[] = [];
+            let values: number[] = [];
+            let item: any;
 
-            for(var i = 0; i < royaltyRates.length; i++) {
-                owners.push(royaltyRates[i].address);
-                royalties.push(royaltyRates[i].rate*10000)
+            for (item in royalties) {
+                addresses.push(item.receiptAddr);
+                values.push(item.value * 10000);
             }
 
             new this.web3.eth.Contract(RegistryABI, registryContract).methods.changeTokenRoyalty(
-                collectionAddr, owners, royalties
+                collectionAddr, addresses, values
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
