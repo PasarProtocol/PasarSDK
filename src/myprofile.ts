@@ -21,24 +21,54 @@ export class MyProfile {
     private appContext: AppContext;
     private contractHelper: ContractHelper;
 
-    private name: VerifiableCredential;
-    private bio: VerifiableCredential;
+    private name: string;
+    private description: string;
     private did: string;
     private walletAddress: string;
 
+    private nameCredential: VerifiableCredential;
+    private descriptionCredential: VerifiableCredential;
+    private avatarCredential: VerifiableCredential;
+
     private userInfo: UserInfo;
 
-    constructor(name: VerifiableCredential, did: string, address: string, appContext: AppContext) {
-        this.name = name;
+    constructor(did: string,
+        walletAddress: string,
+        nameCredential: VerifiableCredential,
+        bioCredential: VerifiableCredential,
+        avatarCredenital: VerifiableCredential,
+        appContext: AppContext) {
+
+        this.updateNameCredential(nameCredential);
+        this.updateDescriptionCredential(bioCredential);
+        this.updateAvatarCredential(avatarCredenital);
+
         this.did = did;
-        this.walletAddress = address;
-        this.contractHelper = new ContractHelper(this.walletAddress, appContext);
+        this.walletAddress = walletAddress;
         this.appContext = appContext;
+        this.contractHelper = new ContractHelper(this.walletAddress, appContext);
     }
 
-    public setBioCredential(bio: VerifiableCredential): MyProfile {
-        this.bio = bio;
+    public updateNameCredential(nameCredential: VerifiableCredential): MyProfile {
+        if (nameCredential) {
+            this.nameCredential = nameCredential
+            this.name = nameCredential.getSubject().getProperty('name');
+        }
         return this;
+    }
+
+    public updateDescriptionCredential(description: VerifiableCredential): MyProfile {
+        if (description) {
+            this.descriptionCredential = description;
+            this.description = description.getSubject().getProperty('description');
+        }
+        return this;
+    }
+
+    public updateAvatarCredential(avatar: VerifiableCredential) {
+        if (avatar) {
+            this.avatarCredential = avatar;
+        }
     }
 
     private getGasPrice = async(): Promise<string> => {

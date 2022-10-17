@@ -22,25 +22,6 @@ export interface NFTDidInfo {
     "properties": any,
 }
 
-export interface ResultOnIpfs {
-    "success": boolean,
-    "result": string,
-    "medadata": string
-}
-
-export interface TransactionParams {
-    'from': string,
-    'gasPrice': string,
-    'gas': number,
-    'value': number
-}
-
-export interface NormalCollectionInfo {
-    "name": string,
-    "symbol": string,
-    "owner": string
-}
-
 export interface CollectionSocialField {
     "website": string,
     "profile": string,
