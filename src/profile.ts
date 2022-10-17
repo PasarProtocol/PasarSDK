@@ -1,50 +1,8 @@
 import { AppContext } from "./appcontext"
 import { getBiddingItems, getCreatedItems, getListedItems, getOwnedItems, getSoldItems, getOwnedCollections } from "./assistservice";
-import { CollectionInfo } from "./collection/collectioninfo";
 import { CollectionPage } from "./collection/collectionpage";
 import { Filter } from "./filters/filter";
 import { ItemPage } from "./itempage";
-
-class Quantites{
-    private ownedCount: number;
-    private listedCount: number;
-    private soldCount: number;
-    private createdCount: number;
-    private biddingCount: number;
-    private collections: number;
-
-    constructor(owned: number, listed: number, sold: number, created: number, collections: number) {
-        this.ownedCount = owned;
-        this.listedCount = listed;
-        this.soldCount = sold;
-        this.createdCount = created;
-        this.collections = collections;
-    }
-
-    public getOwned(): number {
-        return this.ownedCount;
-    }
-
-    public getListed(): number {
-        return this.listedCount;
-    }
-
-    public getSold(): number {
-        return this.soldCount;
-    }
-
-    public getBidding(): number {
-        return this.biddingCount;
-    }
-
-    public getCreated(): number {
-        return this.createdCount;
-    }
-
-    public getCollections(): number {
-        return this.collections;
-    }
-}
 
 export class Profile {
     private userDid: string;
