@@ -1,7 +1,7 @@
 import { ListType } from './listtype';
 import { ChainType } from './chaintype';
 
-export class NftItem {
+export class ItemInfo {
     // token metadata
     private tokenId: string;
     private tokenIdHex: string;

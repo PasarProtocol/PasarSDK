@@ -1,8 +1,8 @@
 import { Filter } from "../filters/filter";
-import { NftItem } from "../nftitem";
 import { AppContext } from "../appcontext";
 import { CollectionInfo } from "./collectioninfo";
 import { ContractAddress } from "../contractaddress";
+import { ItemPage } from "../itempage";
 
 class Collection {
     private appContext: AppContext;
@@ -64,7 +64,10 @@ class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryItems(earlierThen: number, maximum: number, queryFilters: Filter = null): Promise<NftItem[]> {
+    public queryItems(earlierThen: number,
+        capcity = 0,
+        filter: Filter = new Filter()
+    ): Promise<ItemPage> {
         throw new Error("Method not implemented");
     }
 }

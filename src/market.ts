@@ -1,6 +1,6 @@
 import { AppContext } from "./appcontext"
 import { Filter } from "./filters/filter";
-import { NftListInfo } from "./nftlistinfo";
+import { ItemPage } from "./itempage";
 
 /**
  * This class represents the Pasar marketplace where NFT items are being traded.
@@ -31,7 +31,7 @@ export class Market {
     public queryItems(earilerThan: number = Date.now(),
         maximum = 0,
         filter = new Filter()
-    ): Promise<NftListInfo[]> {
+    ): Promise<ItemPage> {
         throw new Error("Method not implemented");
     /*
     public async queryItems(collectionAddr:string = "", pageNum:number = 1, pageSize:number = 10,): Promise<NftListInfo> {
