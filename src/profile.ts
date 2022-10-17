@@ -1,5 +1,5 @@
 import { AppContext } from "./appcontext"
-import { getBiddingItems, getCreatedItems, getListedItems, getOwnedCollections, getOwnedItems, getSoldItems } from "./assistservice";
+import { getBiddingItems, getCreatedItems, getListedItems, getOwnedItems, getSoldItems, getOwnedCollections } from "./assistservice";
 import { CollectionInfo } from "./collection/collectioninfo";
 import { Filter } from "./filters/filter";
 import { NftItem } from "./nftitem"
@@ -63,12 +63,14 @@ export class Profile {
     /**
      * Query the NFTs owned by this profile.
      *
-     * @param _filter: A filter condition
+     * @param _ealierThen
+     * @param _capacity
+     * @param _filter A filter condition
      * @returns: A list of NFT items.
      */
      public async queryOwnedItems(
-        _lessThen = 0,
-        _capcity = 0,
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
         _filter = new Filter()
     ): Promise<NftItem[]> {
         return await getOwnedItems(this.assistUrl, this.walletAddr).catch(error => {
@@ -78,12 +80,14 @@ export class Profile {
 
     /**
      * Query the NFTs listed by this profile onto marketplace.
+     * @param _ealierThen
+     * @param _capacity
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
     public async queryListedItems(
-        _lessThen = 0,
-        _capcity = 0,
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
         _filter = new Filter()
     ): Promise<NftItem[]> {
         return await getListedItems(this.assistUrl, this.walletAddr).catch((error) => {
@@ -93,12 +97,14 @@ export class Profile {
 
     /**
      * Query the NFTs made bidding by this profile on market
+     * @param _ealierThen
+     * @param _capacity
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
     public async queryBiddingItems(
-        _lessThen = 0,
-        _capcity = 0,
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
         _filter = new Filter()
     ): Promise<NftItem[]> {
         return await getBiddingItems(this.assistUrl, this.walletAddr).catch(error => {
@@ -108,13 +114,16 @@ export class Profile {
 
     /**
      * Query the NFTs created by this profile.
+     * @param _ealierThen
+     * @param _capacity
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
      public async queryCreatedItems(
-        _lessThen = 0,
-        _capcity = 0,
-        _filter = new Filter()): Promise<NftItem[]> {
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
+        _filter = new Filter()
+    ): Promise<NftItem[]> {
         return await getCreatedItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
@@ -122,12 +131,14 @@ export class Profile {
 
     /**
      * Query the NFTs sold by this profile
+     * @param _ealierThen
+     * @param _capacity
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
      public async querySoldItems(
-        _lessThen = 0,
-        _capcity = 0,
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
         _filter = new Filter()
     ): Promise<NftItem[]> {
         return await getSoldItems(this.assistUrl, this.walletAddr).catch (error => {
@@ -137,10 +148,16 @@ export class Profile {
 
     /**
      * Query all the collection regsitered onto Pasar marketplace
+     * @param _ealierThen
+     * @param _capacity
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
-     public async queryCollections(_filter = new Filter()): Promise<CollectionInfo[]> {
+     public async queryCollections(
+        _ealierThen: number = Date.now(),
+        _capacity = 0,
+        _filter = new Filter()
+    ): Promise<CollectionInfo[]> {
         return await getOwnedCollections(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })

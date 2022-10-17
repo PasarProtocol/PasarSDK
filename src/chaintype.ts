@@ -1,5 +1,3 @@
-import { Chain } from "pretend";
-
 enum ChainType {
     ESC = "ESC",
     ETH = "ETH",
