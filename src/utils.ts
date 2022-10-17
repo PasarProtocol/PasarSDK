@@ -22,16 +22,6 @@ export interface NFTDidInfo {
     "properties": any,
 }
 
-export interface CollectionSocialField {
-    "website": string,
-    "profile": string,
-    "feeds": string,
-    "twitter": string,
-    "discord": string,
-    "telegram": string,
-    "medium": string
-}
-
 export interface UserInfo {
     name:string,
     bio:string,

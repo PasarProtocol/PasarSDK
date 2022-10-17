@@ -6,13 +6,14 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
-import { CollectionSocialField, ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
+import { ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import { AppContext } from './appcontext';
 import { EmptyHandler, ProgressHandler } from './progresshandler';
 
 import {VerifiableCredential } from '@elastosfoundation/did-js-sdk';
 import { ContractHelper } from './contracthelper';
+import { SocialLinks } from './sociallinks';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -126,59 +127,41 @@ export class MyProfile {
      * @param handleProgress The handler to deal with the progress
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    public async createCollectionMetadata(description: string,
-        avatar: any,
-        background: any,
+    public createCollectionMetadata(description: string,
+        avatarPath: string,
+        bannerPath: string,
         category: Category,
-        socialMedias: CollectionSocialField,
-        progressHandler: ProgressHandler = new EmptyHandler()
-    ) : Promise<string> {
-        let ipfsURL:string;
-        try {
+        socialLinks: SocialLinks) {
+
+        return Promise.resolve().then(async () => {
             const client = create({ url: this.appContext.getIPFSNode()});
-            progressHandler.onProgress(10);
 
-            let avatar_add = await client.add(avatar);
-            progressHandler.onProgress(20);
-
-            let background_add = await client.add(background);
-            progressHandler.onProgress(30);
-
-            let avatarsrc =  `pasar:image:${avatar_add.path}`;
-            let backgroundsrc =  `pasar:image:${background_add.path}`;
-            let userInfo = this.getUserInfo();
-            const dataObj = {
-                avatar: avatarsrc,
-                background: backgroundsrc,
+            const dataJson = {
+                avatar: `pasar:image:${(await client.add(avatarPath)).path}`,
+                banner: `pasar:image:${(await client.add(bannerPath)).path}`,
                 description,
                 category: category.toString().toLowerCase(),
-                socials: socialMedias
+                socials: socialLinks.toJson(),
             }
-            const plainBuffer = Buffer.from(JSON.stringify(dataObj))
-            const plainText = bs58.encode(plainBuffer)
-
+            const plainText = bs58.encode(Buffer.from(JSON.stringify(dataJson)))
             const signature = await requestSigndataOnTokenID(plainText);
-            progressHandler.onProgress(40);
-            const creatorObject = {
-                did: userInfo.did,
-                name: userInfo.name || "",
-                description: userInfo.bio || "",
+            const creatorJson = {
+                did: this.did,
+                name: this.name || "",
+                description: this.description || "",
                 signature: signature && signature.signature ? signature.signature : ""
             }
 
-            const metaObj = {
+            const metadataJson = {
                 "version": "1",
-                "creator": creatorObject,
-                "data": dataObj
+                "creator": creatorJson,
+                "data": dataJson
             }
 
-            let metaData = await client.add(JSON.stringify(metaObj));
-            progressHandler.onProgress(50);
-
-            return `pasar:json:${metaData.path}`;
-        } catch(err) {
+            return `pasar:json:${(await client.add(JSON.stringify(metadataJson))).path}`;
+        }).catch(err => {
             throw new Error(err);
-        }
+        })
     }
 
     /**
