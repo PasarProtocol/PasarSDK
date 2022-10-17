@@ -9,7 +9,6 @@ import { resizeImage, requestSigndataOnTokenID } from "./global";
 import { ImageDidInfo, NFTDidInfo, UserDidInfo, UserInfo } from './utils';
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import { AppContext } from './appcontext';
-import { EmptyHandler, ProgressHandler } from './progresshandler';
 
 import {VerifiableCredential } from '@elastosfoundation/did-js-sdk';
 import { ContractHelper } from './contracthelper';
@@ -118,13 +117,11 @@ export class MyProfile {
     /**
      * Generate a metadata json file of the NFT collection that is about to be registered.
      *
-     * @param name The name of NFT collection
      * @param description The brief description of NFT collection
-     * @param avatar The avatar image path
-     * @param background The background image path
+     * @param avatarPath The avatar image path
+     * @param bannerPath The background image path
      * @param category The category of NFT collection
-     * @param socialMedias The social media related to this NFT collection
-     * @param handleProgress The handler to deal with the progress
+     * @param socialLinks The social media related to this NFT collection
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
     public createCollectionMetadata(description: string,
@@ -200,8 +197,7 @@ export class MyProfile {
      */
     public async updateCollectionURI(tokenAddress: string,
         name: string,
-        collectionUri: string,
-        progressHandler: ProgressHandler = new EmptyHandler()
+        collectionUri: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             await this.contractHelper.updateCollectionInfo(
@@ -238,8 +234,7 @@ export class MyProfile {
      * @param itemImage The actual image of an NFT item
      * @param version The version of nft
      * @param properties properties of nft
-     * @param sensitive Indicator whether the NFT item contains sensitive content or not.
-     * @param handleProgress The function to set the progress value of being uploaded ipfs process
+     * @param sensitive Indicator whether the NFT item contains sensitive content or not
      * @returns The result is the did information.
      */
     public async createItemMetadata(
@@ -247,18 +242,13 @@ export class MyProfile {
         itemDescription: string,
         itemImage: any,
         properties: any = null,
-        sensitive = false,
-        progressHandler:ProgressHandler = new EmptyHandler(),
+        sensitive = false
     ): Promise<string> {
         try {
             const client = create({ url: this.appContext.getIPFSNode() });
-            progressHandler.onProgress(10);
-
             let image_add = await client.add(itemImage);
-            progressHandler.onProgress(20);
 
             let thumbnail:any = await resizeImage(itemImage, 300, 300);
-            progressHandler.onProgress(30);
 
             let thumbnail_add = image_add;
             if(thumbnail['success'] === 0) {
@@ -292,7 +282,6 @@ export class MyProfile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-            progressHandler.onProgress(60);
 
             return `pasar:json:${metaData.path}`;
         } catch(err) {
@@ -458,8 +447,6 @@ export class MyProfile {
     /**
      * Create a metadata json file for trading either buyer or seller.
      *
-     * @param progressHandler The handler to deal with the progress on uploading json
-     *        metadata file for current user
      * @eturns The uri of metadata json file pushed onto IPFS storage.
      */
     public createTraderMetadata(): Promise<string> {
