@@ -2,7 +2,7 @@ import { AppContext } from "./appcontext"
 import { getBiddingItems, getCreatedItems, getListedItems, getOwnedItems, getSoldItems, getOwnedCollections } from "./assistservice";
 import { CollectionInfo } from "./collection/collectioninfo";
 import { Filter } from "./filters/filter";
-import { NftItem } from "./nftitem"
+import { ItemPage } from "./itempage";
 
 class Quantites{
     private ownedCount: number;
@@ -56,10 +56,6 @@ export class Profile {
         this.assistUrl = appContext.getAssistNode();
     }
 
-    public queryQuantites(): Promise<Quantites> {
-        throw new Error("Method not implemented");
-    }
-
     /**
      * Query the NFTs owned by this profile.
      *
@@ -72,7 +68,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<NftItem[]> {
+    ): Promise<ItemPage> {
         return await getOwnedItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
@@ -89,7 +85,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<NftItem[]> {
+    ): Promise<ItemPage> {
         return await getListedItems(this.assistUrl, this.walletAddr).catch((error) => {
             throw new Error(error);
         })
@@ -106,7 +102,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<NftItem[]> {
+    ): Promise<ItemPage> {
         return await getBiddingItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         });
@@ -123,7 +119,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<NftItem[]> {
+    ): Promise<ItemPage> {
         return await getCreatedItems(this.assistUrl, this.walletAddr).catch(error => {
             throw new Error(error);
         })
@@ -140,7 +136,7 @@ export class Profile {
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
-    ): Promise<NftItem[]> {
+    ): Promise<ItemPage> {
         return await getSoldItems(this.assistUrl, this.walletAddr).catch (error => {
             throw new Error(error);
         })
