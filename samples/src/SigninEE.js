@@ -1,9 +1,11 @@
 
 import React, {useEffect, useState} from 'react'
-import { checkSign, Profile, Market } from '@pasarprotocol/pasar-sdk-development';
+import {Profile, Market } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
+
+import {signin, signout, checkSign} from "./connect/connectors";
 
 function SigninEE() {
   const navigate = useNavigate();
@@ -46,13 +48,16 @@ function SigninEE() {
   }
 
   const handleSigninEE1 = async () => {
-    // let result = await signIn();
-    // setLogin(checkSign());
+    let result = await signin();
+    console.log(result);
+    localStorage.setItem("user", result);
+    setLogin(checkSign());
   }
 
   const handleSignout = async () => {
-    // await singOut();
-    // setLogin(checkSign());
+    await signout();
+    localStorage.removeItem("user");
+    setLogin(checkSign());
   }
 
   const handleClickButton = (path) => {
