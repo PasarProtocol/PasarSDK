@@ -8,8 +8,8 @@ import { ItemPage } from "./itempage";
 export class Market {
     private assistUrl: string;
 
-    public constructor(appContext: AppContext) {
-        this.assistUrl = appContext.getAssistNode();
+    public constructor() {
+        this.assistUrl = AppContext.getAppContext().getAssistNode();
     }
 
     private earilerThan: number = Math.floor(Date.now() / 1000);
