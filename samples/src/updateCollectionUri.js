@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCollectionCategories, updateCollectionInfo, getCollectionSocialField } from "@pasarprotocol/pasar-sdk-development";
+import { getCollectionCategories, updateCollectionInfo } from "@pasarprotocol/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
@@ -9,7 +9,7 @@ const UpdateCollectionInfo = () => {
     const [collectionAddress, setCollectionAddress] = useState("");
     const [category, setCategory] = useState(getCollectionCategories()[0]);
     const [progress, setProgress] = useState(0);
-    const [socialInfo, setSocialInfo] = useState(getCollectionSocialField());
+    const [socialInfo, setSocialInfo] = useState();
     useEffect(() => {
         console.log(progress);
     }, [progress]);

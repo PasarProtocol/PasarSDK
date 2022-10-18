@@ -25,7 +25,7 @@ const getMyProfileInfo = () => {
 
 const getProfileInfo = () => {
     if(!profileInfo) {
-        profileInfo = new Profile('', '',  AppContext.getAppContext());
+        profileInfo = new Profile('', '');
     }
 
     return profileInfo;

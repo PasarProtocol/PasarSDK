@@ -9,10 +9,10 @@ export class Profile {
     private walletAddr: string;
     private assistUrl: string;
 
-    constructor(userDid: string, walletAddr: string, appContext: AppContext) {
+    constructor(userDid: string, walletAddr: string) {
         this.userDid = userDid;
         this.walletAddr = walletAddr;
-        this.assistUrl = appContext.getAssistNode();
+        this.assistUrl = AppContext.getAppContext().getAssistNode();
     }
 
     /**

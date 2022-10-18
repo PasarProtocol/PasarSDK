@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createCollection, getCollectionType, getCollectionCategories, getAccountInfo, getCollectionSocialField } from "@pasarprotocol/pasar-sdk-development";
+import { createCollection, getCollectionType, getCollectionCategories, getAccountInfo } from "@pasarprotocol/pasar-sdk-development";
 
 const CreateCollection = () => {
     const [name, setName] = useState('');
@@ -13,25 +13,25 @@ const CreateCollection = () => {
         onProgress:(stage) => {console.log(stage)}
     }
 
-    const [socialInfo, setSocialInfo] = useState(getCollectionSocialField())
+    const [socialInfo, setSocialInfo] = useState()
     useEffect(() => {
         console.log(socialInfo);
     }, [])
 
     const handleMint = async () => {
-        let royalty = [{address: getAccountInfo().address, rate: 10}];
+        // let royalty = [{address: getAccountInfo().address, rate: 10}];
 
-        console.log(name);
-        console.log(description);
-        console.log(collectionType);
-        console.log(category);
-        console.log(royalty);
-        try {
-            let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
-            console.log(address);
-        } catch(err) {
-            console.log(err);
-        }
+        // console.log(name);
+        // console.log(description);
+        // console.log(collectionType);
+        // console.log(category);
+        // console.log(royalty);
+        // try {
+        //     let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
+        //     console.log(address);
+        // } catch(err) {
+        //     console.log(err);
+        // }
     }
 
     return (

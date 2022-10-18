@@ -2,6 +2,8 @@ import Web3 from "web3";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { getChainTypeById } from "./chaintype";
 import WalletConnectProvider  from "@walletconnect/web3-provider";
+import valuesTestNet from "./contracts/deploy/testnet.json";
+import valuesMainNet from "./contracts/deploy/mainnet.json";
 
 export class AppContext {
     private appDID: string;
@@ -29,7 +31,7 @@ export class AppContext {
     static createAppContext(testnet: boolean) {
         if(!this.appContext) {
             this.appContext = new AppContext(
-                testnet ? require("./contracts/deploy/testnet.json"): require("./contracts/deploy/mainnet.json")
+                testnet ? valuesTestNet: valuesMainNet
             );
         }
     }
