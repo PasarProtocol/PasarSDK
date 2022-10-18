@@ -17,7 +17,7 @@ let myProfileInfo, profileInfo;
 
 const getMyProfileInfo = () => {
     if(!myProfileInfo) {
-        myProfileInfo = new MyProfile('', '', null, null, null, null);
+        myProfileInfo = new MyProfile('', '', null, null, null);
     }
     return myProfileInfo;
 }
@@ -210,31 +210,6 @@ const unlistItem = async (
     }
 }
 
-const createCollection = async (
-    name: string,
-    description: string,
-    symbol: string,
-    avatar: any,
-    background: any,
-    itemType: ERCType,
-    category: Category,
-    socialMedias: any,
-    royalties: RoyaltyRate[],
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-
-        let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        let collectionAddress:string = await profile.createCollection(name, symbol, resultIpfs, itemType, handleProgress);
-        let address = await profile.registerCollection(collectionAddress, resultIpfs, royalties, handleProgress);
-
-        return address;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const registerCollection = async (
     tokenAddress:string,
     description: string,
@@ -336,7 +311,6 @@ export {
     bidItemOnAuction,
     settleAuction,
     unlistItem,
-    createCollection,
     registerCollection,
     updateCollectionInfo,
     updateCollectionRoyalties,

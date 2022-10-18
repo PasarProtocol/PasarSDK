@@ -1,11 +1,11 @@
 export class SocialLinks {
-    private website: string;
-    private profile: string;
-    private feeds: string;
-    private twitter: string;
-    private discord: string;
-    private telegram: string;
-    private medium: string;
+    private website: string = null;
+    private profile: string = null;
+    private feeds: string = null;
+    private twitter: string = null;
+    private discord: string = null;
+    private telegram: string = null;
+    private medium: string = null;
 
     public setWebsite(website: string): SocialLinks {
         this.website = website;
