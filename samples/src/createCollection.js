@@ -10,15 +10,12 @@ const CreateCollection = () => {
     const [collectionType, setCollectionType] = useState(Object.keys(ERCType)[0]);
     const [category, setCategory] = useState(Object.keys(Category)[0]);
 
-    // const myProfile = new MyProfile()
+    // 
     const socialLinks = new SocialLinks();
-    console.log(ERCType);
     const progress = {
         onProgress:(stage) => {console.log(stage)}
     }
-
-    const [socialInfo, setSocialInfo] = useState(socialLinks.toJson())
-    console.log(socialInfo);
+    
     const handleMint = async () => {
         let user = JSON.parse(localStorage.getItem("user"));
         let royalty = [{address: user['address'], rate: 10}];
@@ -29,8 +26,10 @@ const CreateCollection = () => {
         console.log(category);
         console.log(royalty);
         try {
-            // let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
-            // console.log(address);
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+
+            let address = await myProfile.createCollection(name, description, symbol, avatar, background, collectionType, category, socialLinks, royalty, progress);
+            console.log(address);
         } catch(err) {
             console.log(err);
         }

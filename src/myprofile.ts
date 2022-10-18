@@ -9,7 +9,6 @@ import { resizeImage, requestSigndataOnTokenID } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import { AppContext } from './appcontext';
 
-import { VerifiableCredential } from '@elastosfoundation/did-js-sdk';
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
 
@@ -21,61 +20,69 @@ export class MyProfile {
     private contractHelper: ContractHelper;
 
     private name: string;
-    private description: string;
     private did: string;
+    private description: string;
+    private avatar: string;
     private walletAddress: string;
-
-    private nameCredential: VerifiableCredential;
-    private descriptionCredential: VerifiableCredential;
-    private avatarCredential: VerifiableCredential;
 
     constructor(did: string,
         walletAddress: string,
-        nameCredential: VerifiableCredential,
-        bioCredential: VerifiableCredential,
-        avatarCredenital: VerifiableCredential,
-        appContext: AppContext) {
-
-        this.updateNameCredential(nameCredential);
-        this.updateDescriptionCredential(bioCredential);
-        this.updateAvatarCredential(avatarCredenital);
+        name: string,
+        description: string,
+        avatar: string) {
 
         this.did = did;
         this.walletAddress = walletAddress;
-        this.appContext = appContext;
-        this.contractHelper = new ContractHelper(this.walletAddress, appContext);
+        this.name = name;
+        this.description = description;
+        this.avatar = avatar;
+        this.appContext = AppContext.getAppContext();
+        this.contractHelper = new ContractHelper(this.walletAddress, AppContext.getAppContext());
     }
 
-    public updateNameCredential(nameCredential: VerifiableCredential): MyProfile {
-        if (nameCredential) {
-            this.nameCredential = nameCredential
-            this.name = nameCredential.getSubject().getProperty('name');
-        } else {
-            this.name = "";
-        }
+    public updateName(name: string): MyProfile {
+        this.name = name;
         return this;
     }
 
-    public updateDescriptionCredential(description: VerifiableCredential): MyProfile {
-        if (description) {
-            this.descriptionCredential = description;
-            this.description = description.getSubject().getProperty('description');
-        } else {
-            this.description = "";
-        }
+    public updateDescription(description: string): MyProfile {
+        this.description = description;
         return this;
     }
 
-    public updateAvatarCredential(avatar: VerifiableCredential) {
-        if (avatar) {
-            this.avatarCredential = avatar;
-        }
+    public updateAvatar(avatar: string): MyProfile {
+        this.avatar = avatar;
+        return this;
     }
 
     private getGasPrice = async(): Promise<string> => {
         return await this.appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
             return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
         })
+    }
+
+    public async createCollection (
+        name: string,
+        description: string,
+        symbol: string,
+        avatar: any,
+        background: any,
+        itemType: ERCType,
+        category: Category,
+        socialMedias: any,
+        royalties: RoyaltyRate[],
+        handleProgress: any = null
+    ) {
+        try {
+            let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
+            console.log(11111111);
+            let collectionAddress:string = await this.handleCreateCollection(name, symbol, resultIpfs, itemType);
+            console.log(222222222);
+            await this.registerCollection(collectionAddress, name, resultIpfs, royalties);
+            return collectionAddress;
+        } catch(err) {
+            throw new Error(err);
+        }
     }
 
     /**
@@ -87,11 +94,13 @@ export class MyProfile {
      * @param collectionUri The uri of NFT collection
      * @returns The deployed NFT collection contract address.
      */
-     public async createCollection(name: string,
+     public async handleCreateCollection(name: string,
         symbol: string,
-        collectionUri: string
+        collectionUri: string,
+        itemType: ERCType
     ): Promise<string> {
         return await this.getGasPrice().then (async gasPrice => {
+            console.log(itemType);
             return await this.contractHelper.createCollection(
                 name, symbol, collectionUri, ERCType.ERC721, gasPrice
             );
