@@ -10,7 +10,7 @@ import { StringIsNumber } from "./global";
 import { Profile } from "./profile";
 import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
-
+import { SocialLinks } from "./sociallinks";
 import { AppContext } from "./appcontext";
 
 let myProfileInfo, profileInfo;
@@ -343,6 +343,7 @@ export {
     getChainTypes,
     Category,
     ERCType,
+    SocialLinks,
     AppContext,
     Profile,
     MyProfile,

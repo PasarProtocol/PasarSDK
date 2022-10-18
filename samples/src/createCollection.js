@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, Category, ERCType } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, Category, ERCType, SocialLinks } from "@pasarprotocol/pasar-sdk-development";
 
 const CreateCollection = () => {
     const [name, setName] = useState('');
@@ -11,16 +11,14 @@ const CreateCollection = () => {
     const [category, setCategory] = useState(Object.keys(Category)[0]);
 
     // const myProfile = new MyProfile()
+    const socialLinks = new SocialLinks();
     console.log(ERCType);
     const progress = {
         onProgress:(stage) => {console.log(stage)}
     }
 
-    const [socialInfo, setSocialInfo] = useState()
-    useEffect(() => {
-        console.log(socialInfo);
-    }, [])
-
+    const [socialInfo, setSocialInfo] = useState(socialLinks.toJson())
+    console.log(socialInfo);
     const handleMint = async () => {
         let user = JSON.parse(localStorage.getItem("user"));
         let royalty = [{address: user['address'], rate: 10}];
