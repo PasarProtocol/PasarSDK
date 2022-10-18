@@ -8,10 +8,10 @@ import {
 function SigninEE() {
   const navigate = useNavigate();
   const [login, setLogin] = useState(checkSign());
-  let profile =  new Profile("0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+  let profile =  new Profile("", "0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
   let market = new Market();
   const handleGetListedItem = async () => {
-    let result = await market.queryItems("", 2, 10);
+    let result = await market.queryItems(2, 10);
     console.log(result);
   }
 
