@@ -1,7 +1,6 @@
 
 'use strict';
 
-import { signin, signout, checkSign } from "./signin";
 import { MyProfile } from "./myprofile";
 import { getListTypes, isOnAuction } from "./listtype";
 import { Category, getCategoryList } from "./collection/category";
@@ -320,22 +319,12 @@ const getChainTypes = () => {
     return _getChainTypes();
 }
 
-const signIn = async() => {
-    myProfileInfo = await signin();
-}
-
-const singOut = async() => {
-    await signout();
-}
 
 export {
     initialize,
     mintNft,
     deleteNft,
     transferNft,
-    signIn,
-    singOut,
-    checkSign,
     getCoinType,
     listItem,
     listItemonAuction,
