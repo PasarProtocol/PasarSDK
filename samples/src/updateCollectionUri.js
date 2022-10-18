@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCollectionCategories, updateCollectionInfo } from "@pasarprotocol/pasar-sdk-development";
+import { updateCollectionInfo } from "@pasarprotocol/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
@@ -7,7 +7,7 @@ const UpdateCollectionInfo = () => {
     const [avatar, setAvatar] = useState();
     const [background, setBackground] = useState();
     const [collectionAddress, setCollectionAddress] = useState("");
-    const [category, setCategory] = useState(getCollectionCategories()[0]);
+    const [category, setCategory] = useState();
     const [progress, setProgress] = useState(0);
     const [socialInfo, setSocialInfo] = useState();
     useEffect(() => {
@@ -52,9 +52,9 @@ const UpdateCollectionInfo = () => {
             <div>
                 <h3>Category</h3>
                 <select onChange={(e) => setCategory(e.target.value)}>
-                    {getCollectionCategories().map((cell) => {
+                    {/* {getCollectionCategories().map((cell) => {
                         return <option key={cell} value={cell}>{cell}</option>
-                    })}
+                    })} */}
                 </select>
             </div>
             <div>

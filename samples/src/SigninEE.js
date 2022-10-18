@@ -50,7 +50,7 @@ function SigninEE() {
   const handleSigninEE1 = async () => {
     let result = await signin();
     console.log(result);
-    localStorage.setItem("user", result);
+    localStorage.setItem("user", JSON.stringify(result));
     setLogin(checkSign());
   }
 
