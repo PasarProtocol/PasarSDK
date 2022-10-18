@@ -171,7 +171,8 @@ export default command => {
             'ipfs-http-client',
             'stream',
             '@elastosfoundation/essentials-connector-client-browser',
-            '@elastosfoundation/did-js-sdk'
+            '@elastosfoundation/did-js-sdk',
+            '@elastosfoundation/elastos-connectivity-sdk-js',
             //'browserfs'
             /* 'readable-stream',
             'readable-stream/transform' */
