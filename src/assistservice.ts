@@ -5,8 +5,8 @@ import { ERCType } from "./erctype";
 import { ItemInfo } from "./iteminfo";
 import { ItemPage } from "./itempage";
 
-const getAllListedItems = async (assistUrl: string, collectionAddr = '', pageNum = 1, pageSize = 10): Promise<ItemPage> => {
-    return await fetch(`${assistUrl}/api/v2/sticker/getDetailedCollectibles?collectionType=${collectionAddr}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`).then (async response => {
+const getAllListedItems = async (assistUrl: string, earilerThan:number, collectionAddr = '', pageNum = 1, pageSize = 10): Promise<ItemPage> => {
+    return await fetch(`${assistUrl}/api/v2/sticker/getDetailedCollectiblesListed?startTime=${earilerThan}&collectionType=${collectionAddr}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`).then (async response => {
         let data = await response.json();
         if (data['code'] != 200) {
             throw new Error("Call API to fetch collection info failed");

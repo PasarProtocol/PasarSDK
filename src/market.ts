@@ -1,4 +1,5 @@
 import { AppContext } from "./appcontext"
+import { getAllListedItems } from "./assistservice";
 import { Filter } from "./filters/filter";
 import { ItemPage } from "./itempage";
 
@@ -28,19 +29,12 @@ export class Market {
      * @param maximum
      * @param filter
      */
-    public queryItems(earilerThan: number = Date.now(),
-        maximum = 0,
-        filter = new Filter()
-    ): Promise<ItemPage> {
-        throw new Error("Method not implemented");
-    /*
-    public async queryItems(collectionAddr:string = "", pageNum:number = 1, pageSize:number = 10,): Promise<NftListInfo> {
+    public async queryItems(pageNum:number = 1, pageSize:number = 10,): Promise<ItemPage> {
         if(pageNum == 1) {
             this.earilerThan = Math.floor(Date.now() / 1000);
         }
-        return await this.assistService.getAllListedItems(collectionAddr, this.earilerThan, pageNum, pageSize).catch(error => {
+        return await getAllListedItems(this.assistUrl, this.earilerThan, "", pageNum, pageSize).catch(error => {
             throw new Error(error);
         })
-    */
     }
 }
