@@ -338,12 +338,13 @@ export {
     unlistItem,
     createCollection,
     registerCollection,
-    getCollectionType,
-    getCollectionCategories,
     updateCollectionInfo,
     updateCollectionRoyalties,
     getChainTypes,
+    Category,
+    ERCType,
     AppContext,
     Profile,
+    MyProfile,
     Market
 }

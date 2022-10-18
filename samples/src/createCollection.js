@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createCollection, getCollectionType, getCollectionCategories, getAccountInfo } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, Category, ERCType } from "@pasarprotocol/pasar-sdk-development";
 
 const CreateCollection = () => {
     const [name, setName] = useState('');
@@ -7,8 +7,11 @@ const CreateCollection = () => {
     const [symbol, setSymbol] = useState('');
     const [avatar, setAvatar] = useState();
     const [background, setBackground] = useState();
-    const [collectionType, setCollectionType] = useState(getCollectionType()[0]);
-    const [category, setCategory] = useState(getCollectionCategories()[0]);
+    const [collectionType, setCollectionType] = useState(Object.keys(ERCType)[0]);
+    const [category, setCategory] = useState(Object.keys(Category)[0]);
+
+    // const myProfile = new MyProfile()
+    console.log(ERCType);
     const progress = {
         onProgress:(stage) => {console.log(stage)}
     }
@@ -19,19 +22,20 @@ const CreateCollection = () => {
     }, [])
 
     const handleMint = async () => {
-        // let royalty = [{address: getAccountInfo().address, rate: 10}];
+        let user = JSON.parse(localStorage.getItem("user"));
+        let royalty = [{address: user['address'], rate: 10}];
 
-        // console.log(name);
-        // console.log(description);
-        // console.log(collectionType);
-        // console.log(category);
-        // console.log(royalty);
-        // try {
-        //     let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
-        //     console.log(address);
-        // } catch(err) {
-        //     console.log(err);
-        // }
+        console.log(name);
+        console.log(description);
+        console.log(collectionType);
+        console.log(category);
+        console.log(royalty);
+        try {
+            // let address = await createCollection(name, description, symbol, avatar, background, collectionType, category, null, royalty, progress);
+            // console.log(address);
+        } catch(err) {
+            console.log(err);
+        }
     }
 
     return (
@@ -39,8 +43,8 @@ const CreateCollection = () => {
             <div>
                 <h3>Collection Type</h3>
                 <select onChange={(e) => setCollectionType(e.target.value)}>
-                    {getCollectionType().map((cell) => {
-                        return <option key={cell} value={cell}>{cell}</option>
+                    {Object.keys(ERCType).map((key)=> {
+                        return <option key={ERCType[key]} value={ERCType[key]}>{ERCType[key]}</option>
                     })}
                 </select>
             </div>
@@ -68,8 +72,8 @@ const CreateCollection = () => {
             <div>
                 <h3>Category</h3>
                 <select onChange={(e) => setCategory(e.target.value)}>
-                    {getCollectionCategories().map((cell) => {
-                        return <option key={cell} value={cell}>{cell}</option>
+                    {Object.keys(Category).map((key) => {
+                        return <option key={Category[key]} value={Category[key]}>{Category[key]}</option>
                     })}
                 </select>
             </div>
