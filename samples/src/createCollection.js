@@ -18,7 +18,7 @@ const CreateCollection = () => {
     
     const handleMint = async () => {
         let user = JSON.parse(localStorage.getItem("user"));
-        let royalty = [{address: user['address'], rate: 10}];
+        let royalty = [{receiptAddr: user['address'], value: 10}];
 
         console.log(name);
         console.log(description);

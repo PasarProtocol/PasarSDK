@@ -1,6 +1,6 @@
 
 import React, {useEffect, useState} from 'react'
-import {Profile, Market } from '@pasarprotocol/pasar-sdk-development';
+import {Profile, Market, AppContext } from '@pasarprotocol/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
@@ -52,6 +52,7 @@ function SigninEE() {
     console.log(result);
     localStorage.setItem("user", JSON.stringify(result));
     setLogin(checkSign());
+    AppContext.createAppContext(true);
   }
 
   const handleSignout = async () => {

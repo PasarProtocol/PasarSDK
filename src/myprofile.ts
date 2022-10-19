@@ -11,6 +11,10 @@ import { AppContext } from './appcontext';
 
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
+import TOKEN_721_ABI from "./contracts/abis/token721ABI";
+import TOKEN_1155_ABI from "./contracts/abis/token1155ABI"; 
+import TOKEN_721_CODE from "./contracts/bytecode/token721Code";
+import TOKEN_1155_CODE from "./contracts/bytecode/token1155Code";
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -75,9 +79,7 @@ export class MyProfile {
     ) {
         try {
             let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            console.log(11111111);
             let collectionAddress:string = await this.handleCreateCollection(name, symbol, resultIpfs, itemType);
-            console.log(222222222);
             await this.registerCollection(collectionAddress, name, resultIpfs, royalties);
             return collectionAddress;
         } catch(err) {
@@ -100,9 +102,15 @@ export class MyProfile {
         itemType: ERCType
     ): Promise<string> {
         return await this.getGasPrice().then (async gasPrice => {
-            console.log(itemType);
+            const tokenStandard = {
+                "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
+                "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
+            }
+
+            const {abi: tokenABI, code: tokenCode} = tokenStandard[itemType]
+
             return await this.contractHelper.createCollection(
-                name, symbol, collectionUri, ERCType.ERC721, gasPrice
+                name, symbol, collectionUri, {abi: tokenABI, code: tokenCode}, gasPrice
             );
         }).catch (error => {
             throw new Error(error);
