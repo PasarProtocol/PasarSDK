@@ -65,6 +65,20 @@ export class MyProfile {
         })
     }
 
+    /**
+     * Create a NFT collection contract and deploy it on specific EVM blockchain.
+     *
+     * @param name The name of NFT collection
+     * @param description The description of NFT collection
+     * @param symbol The symbol of NFT collection
+     * @param avatar The avatar image of NFT collection
+     * @param background The background image of NFT collection
+     * @param category The category information of NFT collection
+     * @param socialMedias The social information of NFT collection
+     * @param royalties The royalty information of NFT collection
+     * @param handleProgress The progress of processing
+     * @returns The deployed NFT collection contract address.
+     */
     public async createCollection (
         name: string,
         description: string,
@@ -79,13 +93,18 @@ export class MyProfile {
     ) {
         try {
             let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
+            handleProgress(50);
             let collectionAddress:string = await this.handleCreateCollection(name, symbol, resultIpfs, itemType);
-            await this.registerCollection(collectionAddress, name, resultIpfs, royalties);
+            handleProgress(80);
+            await this.handleRegisterCollection(collectionAddress, name, resultIpfs, royalties);
+            handleProgress(100);
             return collectionAddress;
         } catch(err) {
             throw new Error(err);
         }
     }
+
+
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
@@ -96,7 +115,7 @@ export class MyProfile {
      * @param collectionUri The uri of NFT collection
      * @returns The deployed NFT collection contract address.
      */
-     public async handleCreateCollection(name: string,
+     private async handleCreateCollection(name: string,
         symbol: string,
         collectionUri: string,
         itemType: ERCType
@@ -127,7 +146,7 @@ export class MyProfile {
      * @param socialLinks The social media related to this NFT collection
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    public async createCollectionMetadata(description: string,
+    private async createCollectionMetadata(description: string,
         avatarPath: string,
         bannerPath: string,
         category: Category,
@@ -174,7 +193,7 @@ export class MyProfile {
      * @param royalties The roraylty rates for this NFT collection
      * @returns The result of whether this NFT collection contract is registered ont Pasar or not
      */
-    public async registerCollection(
+    private async handleRegisterCollection(
         tokenAddress: string,
         name: string,
         collectionUri: string,

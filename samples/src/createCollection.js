@@ -9,12 +9,13 @@ const CreateCollection = () => {
     const [background, setBackground] = useState();
     const [collectionType, setCollectionType] = useState(Object.keys(ERCType)[0]);
     const [category, setCategory] = useState(Object.keys(Category)[0]);
-
-    // 
+    const [progress, setProgress] = useState(0);
+    
     const socialLinks = new SocialLinks();
-    const progress = {
-        onProgress:(stage) => {console.log(stage)}
-    }
+    
+    useEffect(() => {
+        console.log(progress);
+    }, [progress]);
     
     const handleMint = async () => {
         let user = JSON.parse(localStorage.getItem("user"));
@@ -28,7 +29,7 @@ const CreateCollection = () => {
         try {
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
 
-            let address = await myProfile.createCollection(name, description, symbol, avatar, background, collectionType, category, socialLinks, royalty, progress);
+            let address = await myProfile.createCollection(name, description, symbol, avatar, background, collectionType, category, socialLinks, royalty, setProgress);
             console.log(address);
         } catch(err) {
             console.log(err);
