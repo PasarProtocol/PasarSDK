@@ -435,10 +435,11 @@ export class ContractHelper {
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
-            let diaAddress = "0x0000000000000000000000000000000000000000"; // TODO;
-            let diaValue = 0; // TODO;
+            const tokenConf = {diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000}
 
-            new this.web3.eth.Contract(contractData.abi).deploy({
+            let diaAddress = AppContext.getAppContext().getDiaAddress();
+            let diaValue = BigInt((10 ** tokenConf.diaDecimals * tokenConf.diaValue * tokenConf.nPPM) / tokenConf.PPM).toString();
+            let registeredContract = new this.web3.eth.Contract(contractData.abi).deploy({
                 data: `0x${contractData.code}`,
                 arguments: [
                     name,
@@ -454,16 +455,15 @@ export class ContractHelper {
                 'gasPrice': gasPrice,
                 "to": "",
             }
-/*
-            if(isInAppBrowser())
-              transactionParams['to'] = ""
-              registeredContract.send(transactionParams).then(newContractInstance=>{
+
+            if(AppContext.getAppContext().isInAppBrowser())
+                transactionParams['to'] = ""
+            registeredContract.send(transactionParams).then(newContractInstance=>{
                 console.log('Contract deployed at address: ', newContractInstance.options.address)
                 resolve(newContractInstance.options.address)
             }).catch((error) => {
                 reject(error);
             })
-*/
         })
 
     }
@@ -478,11 +478,10 @@ export class ContractHelper {
         return new Promise((resolve, reject) => {
             let addresses: string[] = [];
             let values: number[] = [];
-            let item: any;
 
-            for (item in royalties) {
-                addresses.push(item.receiptAddr);
-                values.push(item.value * 10000);
+            for (var i = 0; i < royalties.length; i++) {
+                addresses.push(royalties[i].receiptAddr);
+                values.push(royalties[i].value * 10000);
             }
 
             new this.web3.eth.Contract(RegistryABI, registryContract).methods.registerToken(
@@ -491,7 +490,7 @@ export class ContractHelper {
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
-                'value': gasPrice,
+                'value': 0,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {

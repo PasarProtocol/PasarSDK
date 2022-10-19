@@ -16,16 +16,16 @@ const getChainTypes = (): string[] => {
     return chainTypes;
 }
 
-const chainIdMapType = new Map<number, ChainType>([
-    [20,    ChainType.ESC],
-    [21,    ChainType.ESC],
-    [1,     ChainType.ETH],
-    [3,     ChainType.ETH],
-    [32659, ChainType.FSN],
-    [46688, ChainType.FSN]
-]);
+const chainIdMapType = {
+    20:     ChainType.ESC,
+    21:     ChainType.ESC,
+    1:      ChainType.ETH,
+    3:      ChainType.ETH,
+    32659:  ChainType.FSN,
+    46688:  ChainType.FSN,
+}
 
-const getChainTypeById = (chainId: number): ChainType => {
+const getChainTypeById = (chainId: number): string => {
     return chainIdMapType[chainId]
 }
 

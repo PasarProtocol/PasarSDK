@@ -24,16 +24,15 @@ export class AppContext {
         this.ipfsUrl    = this.env['ipfsUrl'];
         this.didResover = this.env['didResover'];
         this.appDID     = this.env['appDid'];
+
         this.walletConnector = new EssentialsConnector().getWalletConnectProvider();
         this.web3 =  new Web3(this.isInAppBrowser() ? window['elastos'].getWeb3Provider(): this.walletConnector);
     }
 
     static createAppContext(testnet: boolean) {
-        if(!this.appContext) {
-            this.appContext = new AppContext(
-                testnet ? valuesTestNet: valuesMainNet
-            );
-        }
+        this.appContext = new AppContext(
+            testnet ? valuesTestNet: valuesMainNet
+        );
     }
 
     static getAppContext(): AppContext {
@@ -50,6 +49,11 @@ export class AppContext {
 
     public getDidResolver(): string {
         return this.didResover
+    }
+
+    public getDiaAddress(): any {
+        let chainName = getChainTypeById(this.walletConnector.wc.chainId).toLowerCase();
+        return this.env["contracts"][chainName]["diaToken"];
     }
 
     public isInAppBrowser(): boolean {
