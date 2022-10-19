@@ -137,7 +137,7 @@ export class MyProfile {
             const client = create({ url: this.appContext.getIPFSNode()});
             const dataJson = {
                 avatar: `pasar:image:${(await client.add(avatarPath)).path}`,
-                banner: `pasar:image:${(await client.add(bannerPath)).path}`,
+                background: `pasar:image:${(await client.add(bannerPath)).path}`,
                 description,
                 category: category.toString().toLowerCase(),
                 socials: socialLinks.toJson(),
