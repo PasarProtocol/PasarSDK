@@ -104,7 +104,41 @@ export class MyProfile {
         }
     }
 
-
+    /**
+     *  Register a NFT collection contract and deploy it on specific EVM blockchain.
+     *
+     * @param tokenAddress The address of NFT collection
+     * @param name The name of NFT collection
+     * @param description The description of NFT collection
+     * @param symbol The symbol of NFT collection
+     * @param avatar The avatar image of NFT collection
+     * @param background The background image of NFT collection
+     * @param category The category information of NFT collection
+     * @param socialMedias The social information of NFT collection
+     * @param royalties The royalty information of NFT collection
+     * @param handleProgress The progress of processing
+     * @returns The deployed NFT collection contract address.
+     */
+    public async registerCollection (
+        tokenAddress:string,
+        name: string,
+        description: string,
+        avatar: any,
+        background: any,
+        category: Category,
+        socialMedias: any,
+        royalties: RoyaltyRate[],
+        handleProgress: any = null
+    ) {
+        try {
+            let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
+            handleProgress(50);
+            await this.handleRegisterCollection(tokenAddress, name, resultIpfs, royalties);
+            handleProgress(100);
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
