@@ -210,26 +210,6 @@ const unlistItem = async (
     }
 }
 
-const registerCollection = async (
-    tokenAddress:string,
-    description: string,
-    avatar: any,
-    background: any,
-    category: Category,
-    socialMedias: any,
-    royalties: RoyaltyRate[],
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-
-        let resultIpfs:string = await profile.createCollectionMetadata(description, avatar, background, category, socialMedias, handleProgress);
-        await profile.registerCollection(tokenAddress, resultIpfs, royalties, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const updateCollectionInfo = async (
     tokenAddress:string,
     name: string,
@@ -311,7 +291,6 @@ export {
     bidItemOnAuction,
     settleAuction,
     unlistItem,
-    registerCollection,
     updateCollectionInfo,
     updateCollectionRoyalties,
     getChainTypes,
