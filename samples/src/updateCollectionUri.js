@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { updateCollectionInfo } from "@pasarprotocol/pasar-sdk-development";
+import { Category, MyProfile, SocialLinks } from "@pasarprotocol/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
@@ -7,23 +7,26 @@ const UpdateCollectionInfo = () => {
     const [avatar, setAvatar] = useState();
     const [background, setBackground] = useState();
     const [collectionAddress, setCollectionAddress] = useState("");
-    const [category, setCategory] = useState();
+    const [category, setCategory] = useState(Object.keys(Category)[0]);
     const [progress, setProgress] = useState(0);
-    const [socialInfo, setSocialInfo] = useState();
+
+    const socialLinks = new SocialLinks();
+
     useEffect(() => {
         console.log(progress);
     }, [progress]);
 
     const handleMint = async () => {
+        let user = JSON.parse(localStorage.getItem("user"));
         try {
             console.log(name);
             console.log(description);
             console.log(category);
-            await updateCollectionInfo(collectionAddress, name, description, avatar, background, category, socialInfo, setProgress);
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            await myProfile.updateCollection(collectionAddress, name, description, avatar, background, category, socialLinks, setProgress);
         } catch(err) {
             console.log(err);
         }
-        
     }
 
     return (
@@ -52,9 +55,9 @@ const UpdateCollectionInfo = () => {
             <div>
                 <h3>Category</h3>
                 <select onChange={(e) => setCategory(e.target.value)}>
-                    {/* {getCollectionCategories().map((cell) => {
-                        return <option key={cell} value={cell}>{cell}</option>
-                    })} */}
+                    {Object.keys(Category).map((key) => {
+                        return <option key={Category[key]} value={Category[key]}>{Category[key]}</option>
+                    })}
                 </select>
             </div>
             <div>

@@ -105,7 +105,7 @@ export class MyProfile {
     }
 
     /**
-     *  Register a NFT collection contract and deploy it on specific EVM blockchain.
+     *  Register a NFT collection contract.
      *
      * @param tokenAddress The address of NFT collection
      * @param name The name of NFT collection
@@ -117,7 +117,7 @@ export class MyProfile {
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
      * @param handleProgress The progress of processing
-     * @returns The deployed NFT collection contract address.
+     * @returns 
      */
     public async registerCollection (
         tokenAddress:string,
@@ -134,6 +134,41 @@ export class MyProfile {
             let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
             handleProgress(50);
             await this.handleRegisterCollection(tokenAddress, name, resultIpfs, royalties);
+            handleProgress(100);
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+
+    /**
+     *  update a NFT collection
+     *
+     * @param tokenAddress The address of NFT collection
+     * @param name The name of NFT collection
+     * @param description The description of NFT collection
+     * @param symbol The symbol of NFT collection
+     * @param avatar The avatar image of NFT collection
+     * @param background The background image of NFT collection
+     * @param category The category information of NFT collection
+     * @param socialMedias The social information of NFT collection
+     * @param royalties The royalty information of NFT collection
+     * @param handleProgress The progress of processing
+     * @returns 
+     */
+    public async updateCollection (
+        tokenAddress:string,
+        name: string,
+        description: string,
+        avatar: any,
+        background: any,
+        category: Category,
+        socialMedias: any,
+        handleProgress: any = null
+    ) {
+        try {
+            let resultIpfs = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
+            handleProgress(50);
+            await this.updateCollectionURI(tokenAddress, name, resultIpfs);
             handleProgress(100);
         } catch(err) {
             throw new Error(err);
@@ -250,7 +285,7 @@ export class MyProfile {
      * @param collectionUri The new uri of NFT collection to metadata json file on IPFS storage
      * @returns The result of whether the NFT collection is updated or not.
      */
-    public async updateCollectionURI(tokenAddress: string,
+    private async updateCollectionURI(tokenAddress: string,
         name: string,
         collectionUri: string
     ): Promise<void> {
