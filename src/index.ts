@@ -210,19 +210,6 @@ const unlistItem = async (
     }
 }
 
-const updateCollectionRoyalties = async (
-    tokenAddress:string,
-    royalties: RoyaltyRate[],
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.updateCollectionRoyalties(tokenAddress, royalties, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const getCoinType = () => {
     //let coinType = new CoinType();
     //return coinType.getCoinTypeList();
@@ -271,7 +258,6 @@ export {
     bidItemOnAuction,
     settleAuction,
     unlistItem,
-    updateCollectionRoyalties,
     getChainTypes,
     Category,
     ERCType,

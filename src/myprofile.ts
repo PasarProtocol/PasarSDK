@@ -174,6 +174,27 @@ export class MyProfile {
             throw new Error(err);
         }
     }
+    
+    /**
+     * Update royalties for the NFT collection
+     * @param tokenAddress The NFT collection contract address
+     * @param royaltyRates The roraylty rates for this NFT collection
+     * @param handleProgress The progress of processing
+     * @result
+     */
+     public async updateCollectionRoyalties(tokenAddress: string,
+        royaltyRates: RoyaltyRate[],
+        handleProgress: any = null
+    ): Promise<void> {
+        return await this.getGasPrice().then(async gasPrice => {
+            await this.contractHelper.updateCollectionRoyalties(
+                this.appContext.getRegistryContract(), tokenAddress, royaltyRates, gasPrice
+            );
+            handleProgress(100);
+        }).catch(error => {
+            throw new Error(error);
+        })
+    }
 
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
@@ -204,6 +225,7 @@ export class MyProfile {
             throw new Error(error);
         })
     }
+
 
     /**
      * Generate a metadata json file of the NFT collection that is about to be registered.
@@ -292,24 +314,6 @@ export class MyProfile {
         return await this.getGasPrice().then(async gasPrice => {
             await this.contractHelper.updateCollectionInfo(
                 this.appContext.getRegistryContract(), tokenAddress, name, collectionUri, gasPrice
-            );
-        }).catch(error => {
-            throw new Error(error);
-        })
-    }
-
-    /**
-     * Update royalties for the NFT collection
-     * @param tokenAddress The NFT collection contract address
-     * @param royaltyRates The roraylty rates for this NFT collection
-     * @result
-     */
-    public async updateCollectionRoyalties(tokenAddress: string,
-        royaltyRates: RoyaltyRate[],
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.updateCollectionRoyalties(
-                this.appContext.getRegistryContract(), tokenAddress, royaltyRates, gasPrice
             );
         }).catch(error => {
             throw new Error(error);

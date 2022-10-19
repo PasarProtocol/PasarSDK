@@ -542,7 +542,7 @@ export class ContractHelper {
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
-                'value': gasPrice,
+                'value': 0,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error) => {
