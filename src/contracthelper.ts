@@ -74,17 +74,16 @@ export class ContractHelper {
         collectionAddr: string,
         tokenId: string,
         tokenURI: string,
-        didURI: string,
         gasPrice: string
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.mint(
-                tokenId, tokenURI, didURI
+                tokenId, tokenURI
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
-                'value': gasPrice,
+                'value': 0,
             }).on('receipt', (receipt) => {
                 resolve(receipt);
             }).on('error', (error: any) => {

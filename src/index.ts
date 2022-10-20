@@ -36,28 +36,6 @@ const initialize = (testnet = true) => {
     getProfileInfo();
 }
 
-const mintNft = async (
-    itemName: string,
-    itemDescription: string,
-    itemImage: any,
-    baseToken: string,
-    royaltyFee = 10,
-    properties: any = null,
-    sensitive = false,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        let tokenId:string;
-        let resultMetadata:string = await profile.createItemMetadata(itemName, itemDescription, itemImage, properties, sensitive, handleProgress);
-        tokenId = await profile.createItemWithRoyalties(baseToken, resultMetadata, royaltyFee, handleProgress);
-
-        return tokenId;
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const deleteNft = async (
     baseToken: string,
     tokenId: string,
@@ -244,7 +222,6 @@ const getChainTypes = () => {
 
 export {
     initialize,
-    mintNft,
     deleteNft,
     transferNft,
     getCoinType,
