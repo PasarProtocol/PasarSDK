@@ -294,6 +294,46 @@ export class MyProfile {
     }
 
     /**
+     * Delete exiting NFT item.
+     * Notice: the NFT item should be unlisted from marketplace first before deleting
+     *         the item.
+     *
+     * @param baseToken The collection contract where NFT items would be burned
+     * @param tokenId The tokenId of NFT item to be burned
+     * @returns The result of whether the NFT is deleted or not.
+     */
+     public async deleteItem(
+        baseToken: string,
+        tokenId: string,
+    ): Promise<void> {
+        return await this.getGasPrice().then (async gasPrice => {
+            await this.contractHelper.burnERC721Item(baseToken, tokenId, gasPrice);
+        }).catch (error => {
+            throw new Error(error);
+        })
+    }
+
+    public async deleteItemFromFeeds(
+        tokenId: string
+    ): Promise<void> {
+        return await this.getGasPrice().then (async gasPrice => {
+            await this.contractHelper.burnItemInFeeds(this.appContext.getFeedsCollectionAddress(), tokenId, gasPrice);
+        }).catch (error => {
+            throw new Error(error);
+        })
+    }
+
+    public async deleteItemInPasar(
+        tokenId: string
+    ): Promise<void> {
+        return await this.getGasPrice().then (async gasPrice => {
+            await this.contractHelper.burnItemInPasar(this.appContext.getPasarCollectionAddress(), tokenId, gasPrice);
+        }).catch (error => {
+            throw new Error(error);
+        })
+    }
+
+    /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      * Currently only ERC721 standard is supported.
      *
@@ -543,48 +583,6 @@ export class MyProfile {
                 this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee, gasPrice
             );
             return tokenId;
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
-
-    /**
-     * Delete exiting NFT item.
-     * Notice: the NFT item should be unlisted from marketplace first before deleting
-     *         the item.
-     *
-     * @param baseToken The collection contract where NFT items would be burned
-     * @param tokenId The tokenId of NFT item to be burned
-     * @returns The result of whether the NFT is deleted or not.
-     */
-    public async deleteItem(
-        baseToken: string,
-        tokenId: string,
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnERC721Item(baseToken, tokenId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
-
-    public async deleteItemFromFeeds(
-        baseToken: string,
-        tokenId: string
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnItemInFeeds(baseToken, tokenId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
-
-    public async deleteItemInPasar(
-        baseToken: string,
-        tokenId: string
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnItemInPasar(baseToken, tokenId, gasPrice);
         }).catch (error => {
             throw new Error(error);
         })
