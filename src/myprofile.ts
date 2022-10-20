@@ -220,7 +220,6 @@ export class MyProfile {
         try {
             let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
             handleProgress(50);
-            console.log(resultMetadata);
             let tokenId = await this.handleCreateItem(collectionAddr, resultMetadata);
             handleProgress(100)
             return tokenId;
@@ -253,7 +252,6 @@ export class MyProfile {
         try {
             let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
             handleProgress(50);
-            console.log(resultMetadata);
             let tokenId = await this.createItemFromPasar(resultMetadata, roylatyFee);
             handleProgress(100)
             return tokenId;
@@ -262,6 +260,39 @@ export class MyProfile {
         }
     }
     
+    /**
+     * Create a NFT from Feeds collection
+     *
+     * @param name The name of NFT
+     * @param description The description of NFT
+     * @param image The image of NFT
+     * @param collectionAddr The collection address of NFT
+     * @param royaltyFee The roalty fee of NFT
+     * @param properties The property of NFT
+     * @param sensitive The sensitive information of NFT
+     * @returns The token id of new NFT
+     */
+     public async mintItemFromFeeds (
+        name: string,
+        description: string,
+        image: any,
+        properties: any = null,
+        roylatyFee: number = 10,
+        sensitive = false,
+        handleProgress: any = null
+    ) {
+        try {
+            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive, true);
+            console.log(resultMetadata);
+            handleProgress(50);
+            let tokenId = await this.createItemFromFeeds(resultMetadata, roylatyFee);
+            handleProgress(100)
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      * Currently only ERC721 standard is supported.
@@ -402,7 +433,8 @@ export class MyProfile {
         itemDescription: string,
         itemImage: any,
         properties: any = null,
-        sensitive = false
+        sensitive = false,
+        feeds = false,
     ): Promise<string> {
         try {
             const client = create({ url: this.appContext.getIPFSNode() });
@@ -441,7 +473,7 @@ export class MyProfile {
 
             let metaData = await client.add(JSON.stringify(metaObj));
 
-            return `pasar:json:${metaData.path}`;
+            return feeds ? `Feeds:json:${metaData.path}` : `pasar:json:${metaData.path}`;
         } catch(err) {
             throw new Error(err);
         }
@@ -475,22 +507,18 @@ export class MyProfile {
      * on tokenURI string of metadata json file on IPFS sotrage.
      * Notice: This function should be used for minting NFTs from public collection.
      *
-     * @param baseToken The collection contract where NFT items would be minted
      * @param tokenURI The token uri to this new NFT item
-     * @param creatorURI
      * @param roylatyFee The royalty fee to the new NFT item
      * @returns The tokenId of being minted a nft
      */
-    public async createItemFromFeeds(
-        baseToken: string,
+    private async createItemFromFeeds(
         tokenURI: string,
-        creatorURI: string,
         roylatyFee: number
     ): Promise<string> {
         return await this.getGasPrice().then(async gasPrice => {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
+            let tokenId = `0x${sha256(tokenURI.replace("Feeds:json:", ""))}`;
             await this.contractHelper.mintFromFeedsCollection(
-                baseToken, tokenId, tokenURI, roylatyFee, creatorURI, gasPrice
+                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, this.did, gasPrice
             );
             return tokenId;
         }).catch (error => {

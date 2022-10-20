@@ -56,7 +56,20 @@ export class ContractHelper {
         didURI: string,
         gasPrice: string
     ):Promise<void> {
-        return this.mintERC1155Item(FeedsCollectionABI, collectionAddr, tokenId, tokenURI, royaltyRate, didURI, gasPrice);
+        return new Promise((resolve, reject) => {
+            new this.web3.eth.Contract(FeedsCollectionABI, collectionAddr).methods.mint(
+                tokenId, 1, tokenURI, royaltyRate * 10000, didURI
+            ).send({
+                'from': this.account,
+                'gasPrice': gasPrice,
+                'gas': gasLimit,
+                'value': 0,
+            }).on('receipt', (receipt) => {
+                resolve(receipt);
+            }).on('error', (error: any) => {
+                reject(error)
+            });
+        })
     }
 
     public mintFromPasarCollection(
@@ -80,7 +93,6 @@ export class ContractHelper {
                 reject(error)
             });
         })
-        // return this.mintERC1155Item(PasarCollectionABI, collectionAddr, tokenId, tokenURI, royaltyRate, didURI, gasPrice);
     }
 
     public mintERC721Item (

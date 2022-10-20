@@ -19,7 +19,7 @@ const MintNFT = () => {
             console.log(urlImage);
             let user = JSON.parse(localStorage.getItem("user"));
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
-            let tokenId = await myProfile.mintItemFromPasar(name, description, urlImage, 10, null, false, setProgress);
+            let tokenId = await myProfile.mintItemFromFeeds(name, description, urlImage, 10, null, false, setProgress);
             console.log(tokenId);
         } catch(err) {
             console.log(err);
