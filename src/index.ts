@@ -36,21 +36,6 @@ const initialize = (testnet = true) => {
     getProfileInfo();
 }
 
-const deleteNft = async (
-    baseToken: string,
-    tokenId: string,
-    ercType: ERCType,
-    totalSupply = 1,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.deleteItem(tokenId, baseToken, ercType, totalSupply, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const transferNft = async (
     baseToken: string,
     tokenId: string,
@@ -222,7 +207,6 @@ const getChainTypes = () => {
 
 export {
     initialize,
-    deleteNft,
     transferNft,
     getCoinType,
     listItem,
