@@ -78,4 +78,9 @@ export class AppContext {
         let chainName = getChainTypeById(this.walletConnector.wc.chainId).toLowerCase();
         return this.env["contracts"][chainName]["pasarNft"];
     }
+
+    public getFeedsCollectionAddress(): string {
+        let chainName = getChainTypeById(this.walletConnector.wc.chainId).toLowerCase();
+        return this.env["contracts"][chainName]["feedsNft"];
+    }
 }
