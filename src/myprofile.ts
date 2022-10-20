@@ -208,12 +208,11 @@ export class MyProfile {
      * @param sensitive The sensitive information of NFT
      * @returns The token id of new NFT
      */
-    public async createItem (
+    public async mintItem (
         name: string,
         description: string,
         image: any,
         collectionAddr: string,
-        royaltyFee = 10,
         properties: any = null,
         sensitive = false,
         handleProgress: any = null
@@ -230,6 +229,39 @@ export class MyProfile {
         }
     }
 
+    /**
+     * Create a NFT from Pasar collection
+     *
+     * @param name The name of NFT
+     * @param description The description of NFT
+     * @param image The image of NFT
+     * @param collectionAddr The collection address of NFT
+     * @param royaltyFee The roalty fee of NFT
+     * @param properties The property of NFT
+     * @param sensitive The sensitive information of NFT
+     * @returns The token id of new NFT
+     */
+    public async mintItemFromPasar (
+        name: string,
+        description: string,
+        image: any,
+        properties: any = null,
+        roylatyFee: number = 10,
+        sensitive = false,
+        handleProgress: any = null
+    ) {
+        try {
+            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
+            handleProgress(50);
+            console.log(resultMetadata);
+            let tokenId = await this.createItemFromPasar(resultMetadata, roylatyFee);
+            handleProgress(100)
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+    
     /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      * Currently only ERC721 standard is supported.
@@ -466,16 +498,21 @@ export class MyProfile {
         })
     }
 
-    public async createItemFromPasar(
-        baseToken: string,
+    /**
+     * Mint a nft on Pasar collection
+     *
+     * @param tokenURI The token uri to this new NFT item
+     * @param roylatyFee The royalty fee to the new NFT item
+     * @returns The tokenId of being minted a nft
+     */
+    private async createItemFromPasar(
         tokenURI: string,
-        creatorURI: string,
         roylatyFee: number,
     ): Promise<string> {
         return await this.getGasPrice().then(async gasPrice => {
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
             await this.contractHelper.mintFromPasarCollection(
-                baseToken, tokenId, tokenURI, roylatyFee, creatorURI, gasPrice
+                this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee, gasPrice
             );
             return tokenId;
         }).catch (error => {
