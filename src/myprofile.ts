@@ -197,6 +197,40 @@ export class MyProfile {
     }
 
     /**
+     * Create a NFT
+     *
+     * @param name The name of NFT
+     * @param description The description of NFT
+     * @param image The image of NFT
+     * @param collectionAddr The collection address of NFT
+     * @param royaltyFee The roalty fee of NFT
+     * @param properties The property of NFT
+     * @param sensitive The sensitive information of NFT
+     * @returns The token id of new NFT
+     */
+    public async createItem (
+        name: string,
+        description: string,
+        image: any,
+        collectionAddr: string,
+        royaltyFee = 10,
+        properties: any = null,
+        sensitive = false,
+        handleProgress: any = null
+    ) {
+        try {
+            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
+            handleProgress(50);
+            console.log(resultMetadata);
+            let tokenId = await this.handleCreateItem(collectionAddr, resultMetadata);
+            handleProgress(100)
+            return tokenId;
+        } catch(err) {
+            throw new Error(err);
+        }
+    }
+
+    /**
      * Create a NFT collection contract and deploy it on specific EVM blockchain.
      * Currently only ERC721 standard is supported.
      *
@@ -331,7 +365,7 @@ export class MyProfile {
      * @param sensitive Indicator whether the NFT item contains sensitive content or not
      * @returns The result is the did information.
      */
-    public async createItemMetadata(
+    private async createItemMetadata(
         itemName: string,
         itemDescription: string,
         itemImage: any,
@@ -391,13 +425,12 @@ export class MyProfile {
      * @param tokenURI The token uri to this new NFT item
      * @returns The tokenId of the new NFT.
      */
-    public async creatItem(collection: string,
+    private async handleCreateItem(collection: string,
         tokenURI: string,
-        creatorURI: string
     ): Promise<string> {
         return await this.getGasPrice().then(async gasPrice => {
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
-            await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI, creatorURI, gasPrice);
+            await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI, gasPrice);
             return tokenId;
         }).catch (error => {
             throw new Error(error);
