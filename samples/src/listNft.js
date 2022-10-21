@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, listItem, listItemonAuction, getListType, isAuction } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, ListType, Token } from "@pasarprotocol/pasar-sdk-development";
 
 const ListNFT = () => {
     const [tokenId, setTokenId] = useState("");
@@ -7,22 +7,13 @@ const ListNFT = () => {
     const [reservePrice, setReservePrice] = useState("");
     const [buyoutPrice, setBuyoutPrice] = useState("");
     const [exipirationTime, setExipirationTime] = useState("")
-    const [listPricingToken, setListPricingToken] = useState([]);
+    const [listPricingToken, setListPricingToken] = useState(Token.getToken());
     const [pricingToken, setPricingToken] = useState('');
     const [progress, setProgress] = useState(0);
-    const [listType, setListType] = useState([]);
-    const [currentListType, setCurrentListType] = useState("");
+    const [currentListType, setCurrentListType] = useState(Object.keys(ListType)[0]);
     const [addressCollection, setAddressCollection] = useState("");
-
+    console.log(listPricingToken);
     useEffect(() => {
-        let listTokens = getCoinType();
-        setListPricingToken(listTokens);
-        setPricingToken(listTokens[0].address);
-
-        let listType = getListType();
-        setListType(listType);
-        setCurrentListType(listType[0]);
-
         setExipirationTime(timestampToDatetimeInputString(Date.now()));
     }, []);
 
@@ -32,16 +23,18 @@ const ListNFT = () => {
 
     const handleList = async () => {
         try {
-            if(isAuction(currentListType)) {
+            // if(isAuction(currentListType)) {
                 console.log(exipirationTime);
+                console.log(currentListType);
+                console.log(pricingToken);
                 let dateTimeParts = exipirationTime.split('T');
                 let dateParts = dateTimeParts[0].split("-");
                 let timeParts = dateTimeParts[1].split(":");
                 let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
-                await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
-            } else {
-                await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
-            }
+                // await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
+            // } else {
+                // await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
+            // }
         } catch(err) {
             console.log(err);
         }
@@ -58,8 +51,8 @@ const ListNFT = () => {
     return (
         <div>
             <select onChange={(e) => setCurrentListType(e.target.value)}>
-                {listType.map((cell) => {
-                    return <option key={cell} value={cell}>{cell}</option>
+                {Object.keys(ListType).map((key) => {
+                    return <option key={ListType[key]} value={ListType[key]}>{ListType[key]}</option>
                 })}
             </select>
 
@@ -71,7 +64,7 @@ const ListNFT = () => {
                 <h3 className="sub_title">tokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
             </div>
-            {!isAuction(currentListType) ? <div>
+            {/* {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>
                     <input value={price} onChange={(e) => setPrice(e.target.value)}/>
                 </div> : <div>
@@ -92,12 +85,12 @@ const ListNFT = () => {
                         <input type="datetime-local" value={exipirationTime} onChange={(e) => setExipirationTime(e.target.value)}/>
                     </div> 
                 </div>
-            }
+            } */}
             <div>
                 <h3 className="sub_title">Pricing Type</h3>
                 <select onChange={(e) => setPricingToken(e.target.value)}>
-                    {listPricingToken.map((cell) => {
-                        return <option key={cell.address} value={cell.address}>{cell.name}</option>
+                    {Object.keys(listPricingToken).map((key) => {
+                        return <option key={listPricingToken[key]} value={listPricingToken[key]}>{key}</option>
                     })}
                 </select>
             </div>

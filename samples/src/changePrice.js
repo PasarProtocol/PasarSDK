@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, changePrice, changePriceOnAuction, getListType, isAuction } from "@pasarprotocol/pasar-sdk-development";
+import { ListType, MyProfile, Token } from "@pasarprotocol/pasar-sdk-development";
 
 const ChangePrice = () => {
     const [tokenId, setTokenId] = useState("");
@@ -7,22 +7,12 @@ const ChangePrice = () => {
     const [price, setPrice] = useState("");
     const [reservePrice, setReservePrice] = useState("");
     const [buyoutPrice, setBuyoutPrice] = useState("");
-    const [listPricingToken, setListPricingToken] = useState([]);
+    const [listPricingToken, setListPricingToken] = useState(Token.getToken());
     const [pricingToken, setPricingToken] = useState('');
     const [progress, setProgress] = useState(0);
     const [listType, setListType] = useState([]);
-    const [currentListType, setCurrentListType] = useState("");
+    const [currentListType, setCurrentListType] = useState(Object.keys(ListType)[0]);
 
-    useEffect(() => {
-        let listTokens = getCoinType();
-        setListPricingToken(listTokens);
-        setPricingToken(listTokens[0].address);
-
-        let listType = getListType();
-        setListType(listType);
-        setCurrentListType(listType[0]);
-
-    }, []);
 
     useEffect(() => {
         console.log(progress);
@@ -31,11 +21,11 @@ const ChangePrice = () => {
     const handleList = async () => {
         try {
             let orderId;
-            if(isAuction(currentListType)) {
-                orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
-            } else {
-                orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
-            }
+            // if(isAuction(currentListType)) {
+            //     orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
+            // } else {
+            //     orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
+            // }
             console.log(orderId);
         } catch(err) {
             console.log(err);  
@@ -45,8 +35,8 @@ const ChangePrice = () => {
     return (
         <div>
             <select onChange={(e) => setCurrentListType(e.target.value)}>
-                {listType.map((cell) => {
-                    return <option key={cell} value={cell}>{cell}</option>
+                {Object.keys(ListType).map((key) => {
+                    return <option key={ListType[key]} value={ListType[key]}>{ListType[key]}</option>
                 })}
             </select>
 
@@ -58,7 +48,7 @@ const ChangePrice = () => {
                 <h3 className="sub_title">Collection Address</h3>
                 <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
             </div>
-            {!isAuction(currentListType) ? <div>
+            {/* {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>
                     <input value={price} onChange={(e) => setPrice(e.target.value)}/>
                 </div> : <div>
@@ -75,12 +65,12 @@ const ChangePrice = () => {
                         <input value={buyoutPrice} onChange={(e) => setBuyoutPrice(e.target.value)}/>
                     </div>
                 </div>
-            }
+            } */}
             <div>
                 <h3 className="sub_title">Pricing Type</h3>
                 <select onChange={(e) => setPricingToken(e.target.value)}>
-                    {listPricingToken.map((cell) => {
-                        return <option key={cell.address} value={cell.address}>{cell.name}</option>
+                    {Object.keys(listPricingToken).map((key) => {
+                        return <option key={listPricingToken[key]} value={listPricingToken[key]}>{key}</option>
                     })}
                 </select>
             </div>

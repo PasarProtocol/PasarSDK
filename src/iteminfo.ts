@@ -86,9 +86,9 @@ export class ItemInfo {
         if(orderType == null || orderType == "") {
             this.orderType = null;
         } else if(parseInt(orderType) == 1) {
-            this.orderType = ListType.fixedPrice;
+            this.orderType = ListType.FixedPrice;
         } else if(parseInt(orderType) == 2) {
-            this.orderType = ListType.onAuction;
+            this.orderType = ListType.OnAuction;
         }
 
         switch(networkIndex) {

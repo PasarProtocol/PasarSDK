@@ -2,16 +2,15 @@
 'use strict';
 
 import { MyProfile } from "./myprofile";
-import { getListTypes, isOnAuction } from "./listtype";
-import { Category, getCategoryList } from "./collection/category";
+import { ListType } from "./listtype";
+import { Category } from "./collection/category";
 import { ERCType } from "./erctype";
-import { RoyaltyRate } from "./collection/RoyaltyRate";
-import { StringIsNumber } from "./global";
 import { Profile } from "./profile";
 import { Market } from "./market";
 import { getChainTypes as _getChainTypes} from "./chaintype";
 import { SocialLinks } from "./sociallinks";
 import { AppContext } from "./appcontext";
+import { Token } from "./token";
 
 let myProfileInfo, profileInfo;
 
@@ -20,35 +19,6 @@ const getMyProfileInfo = () => {
         myProfileInfo = new MyProfile('', '', null, null, null);
     }
     return myProfileInfo;
-}
-
-const getProfileInfo = () => {
-    if(!profileInfo) {
-        profileInfo = new Profile('', '');
-    }
-
-    return profileInfo;
-}
-
-const initialize = (testnet = true) => {
-    AppContext.createAppContext(testnet);
-    getMyProfileInfo();
-    getProfileInfo();
-}
-
-const listItem = async (
-    baseToken: string,
-    tokenId: string,
-    pricingToken: string,
-    price: string,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.listItem(baseToken, tokenId, pricingToken, parseFloat(price), handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
 }
 
 const listItemonAuction = async (
@@ -158,53 +128,18 @@ const unlistItem = async (
     }
 }
 
-const getCoinType = () => {
-    //let coinType = new CoinType();
-    //return coinType.getCoinTypeList();
-}
-
-const getListType = () => {
-    return getListTypes();
-}
-
-const isAuction = (type:string) => {
-    return isOnAuction(type);
-}
-
-const getCollectionType = () => {
-    let collectionType = [];
-
-    Object.keys(ERCType).filter(StringIsNumber).map((cell) => {
-        collectionType.push(cell);
-    })
-
-    return collectionType;
-}
-
-const getCollectionCategories = () => {
-    return getCategoryList();
-}
-
-const getChainTypes = () => {
-    return _getChainTypes();
-}
-
 export {
-    initialize,
-    getCoinType,
-    listItem,
     listItemonAuction,
-    getListType,
-    isAuction,
     changePrice,
     changePriceOnAuction,
     buyItem,
     bidItemOnAuction,
     settleAuction,
     unlistItem,
-    getChainTypes,
     Category,
     ERCType,
+    ListType,
+    Token,
     SocialLinks,
     AppContext,
     Profile,

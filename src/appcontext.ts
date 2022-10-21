@@ -51,6 +51,11 @@ export class AppContext {
         return this.didResover
     }
 
+    public getChainType(): string {
+        let chainName = getChainTypeById(this.walletConnector.wc.chainId);
+        return chainName;
+    }
+
     public getDiaAddress(): any {
         let chainName = getChainTypeById(this.walletConnector.wc.chainId).toLowerCase();
         return this.env["contracts"][chainName]["diaToken"];
