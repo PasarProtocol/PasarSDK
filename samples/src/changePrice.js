@@ -2,29 +2,26 @@ import { useState, useEffect } from "react";
 import { ListType, MyProfile, Token } from "@pasarprotocol/pasar-sdk-development";
 
 const ChangePrice = () => {
-    const [tokenId, setTokenId] = useState("");
-    const [baseToken, setBaseToken] = useState("");
+    const [orderId, setOrderId] = useState("");
     const [price, setPrice] = useState("");
     const [reservePrice, setReservePrice] = useState("");
     const [buyoutPrice, setBuyoutPrice] = useState("");
     const [listPricingToken, setListPricingToken] = useState(Token.getToken());
     const [pricingToken, setPricingToken] = useState('');
-    const [progress, setProgress] = useState(0);
     const [listType, setListType] = useState([]);
     const [currentListType, setCurrentListType] = useState(Object.keys(ListType)[0]);
 
-
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
-
     const handleList = async () => {
         try {
-            let orderId;
+            let user = JSON.parse(localStorage.getItem("user"));
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
             // if(isAuction(currentListType)) {
             //     orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
             // } else {
-            //     orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
+                console.log(orderId);
+                console.log(price);
+                console.log(pricingToken);
+                await myProfile.changePrice(orderId, pricingToken, price);
             // }
             console.log(orderId);
         } catch(err) {
@@ -41,12 +38,12 @@ const ChangePrice = () => {
             </select>
 
             <div>
-                <h3 className="sub_title">TokenId</h3>
-                <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
+                <h3 className="sub_title">OrderId</h3>
+                <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
             </div>
             <div>
-                <h3 className="sub_title">Collection Address</h3>
-                <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
+                <h3 className="Price">price</h3>
+                <input value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
             {/* {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>

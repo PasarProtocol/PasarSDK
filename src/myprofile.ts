@@ -765,7 +765,7 @@ export class MyProfile {
         sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
+            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForAuction(
                 this.appContext.getMarketContract(),
                 baseToken,
