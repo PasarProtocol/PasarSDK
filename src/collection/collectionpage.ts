@@ -6,7 +6,11 @@ export class CollectionPage {
     private capcity: number;
     private collections: CollectionInfo[];
 
-    public constructor(totalCount: number, earlierThan: number, capcity: number, collections: CollectionInfo[]) {
+    constructor(totalCount: number,
+        earlierThan: number,
+        capcity: number,
+        collections: CollectionInfo[]
+    ) {
         this.totalCount = totalCount;
         this.earlierThan = earlierThan;
         this.capcity = capcity;

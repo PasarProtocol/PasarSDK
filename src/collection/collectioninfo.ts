@@ -1,42 +1,50 @@
 import { Category } from "./category";
 import { ERCType } from "../erctype";
 import { ChainType } from "../chaintype";
+import { SocialLinks } from "../sociallinks";
 
 class CollectionInfo {
-    constractAddr: string;
-    network: ChainType;
-    createdDid: string;
-    createdAddr: string;
-    name: string;
-    symbol: string;
+    private constractAddr: string;
+    private network: ChainType;
+    private creatorDid: string;
+    private ownerAddress: string;
+    private name: string;
+    private symbol: string;
 
-    socialLinks: string[];
-    avatar: string;
-    description: string;
-    ercType: ERCType;
-    category: Category;
+    private socialLinks: SocialLinks;
+    private avatar: string;
+    private banner: string;
+    private description: string;
+    private ercType: ERCType;
+    private category: Category;
 
-    constructor(contractAddr: string, network: ChainType, creatorDid: string, creatorAddr: string, name: string, symbol: string) {
+    constructor(contractAddr: string,
+        network: ChainType,
+        creatorDid: string,
+        creatorAddr: string,
+        name: string,
+        symbol: string
+    ) {
         this.constractAddr = contractAddr;
         this.network = network;
-        this.createdDid = creatorDid;
-        this.createdAddr = creatorAddr;
+        this.creatorDid = creatorDid;
+        this.ownerAddress = creatorAddr;
         this.name = name;
         this.symbol = symbol;
     }
 
-    public appendSoicalLink(link: string): CollectionInfo {
-        this.socialLinks.push(link);
-        return this;
-    }
-
-    public setSocialLinks(links: string[]): CollectionInfo {
-        this.socialLinks = links;
+    public setSoicalLinks(soicalLinks: SocialLinks): CollectionInfo {
+        this.socialLinks = soicalLinks;
         return this;
     }
 
     public setAvatar(avatar: string): CollectionInfo {
         this.avatar = avatar;
+        return this;
+    }
+
+    public setBanner(banner: string): CollectionInfo {
+        this.banner = banner;
         return this;
     }
 
@@ -53,6 +61,54 @@ class CollectionInfo {
     public setCategory(category: Category): CollectionInfo {
         this.category = category;
         return this;
+    }
+
+    public getContractAddress(): string {
+        return this.constractAddr;
+    }
+
+    public getNetwork(): ChainType {
+        return this.network;
+    }
+
+    public getCreatorDid(): string {
+        return this.creatorDid;
+    }
+
+    public getOwnerAddress(): string {
+        return this.ownerAddress;
+    }
+
+    public getName(): string {
+        return this.name;
+    }
+
+    public getSymbol(): string {
+        return this.symbol;
+    }
+
+    public getSoicalLinks(): SocialLinks {
+        return this.socialLinks;
+    }
+
+    public getAvatar(): string {
+        return this.avatar;
+    }
+
+    public getBanner(): string {
+        return this.banner;
+    }
+
+    public getDescription(): string {
+        return this.description;
+    }
+
+    public getERCStandard(): ERCType {
+        return this.ercType;
+    }
+
+    public getCategory(): string {
+        return this.category;
     }
 }
 

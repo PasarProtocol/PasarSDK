@@ -6,14 +6,14 @@ import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
-import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
-import FEEDS_CONTRACT_ABI from './contracts/abis/feedsCollection';
+import PasarCollectionABI from './contracts/abis/pasarCollection';
+import FeedsCollectionABI from './contracts/abis/feedsCollection';
 import { AppContext } from './appcontext';
 
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
 import TOKEN_721_ABI from "./contracts/abis/token721ABI";
-import TOKEN_1155_ABI from "./contracts/abis/token1155ABI"; 
+import TOKEN_1155_ABI from "./contracts/abis/token1155ABI";
 import TOKEN_721_CODE from "./contracts/bytecode/token721Code";
 import TOKEN_1155_CODE from "./contracts/bytecode/token1155Code";
 
@@ -42,7 +42,7 @@ export class MyProfile {
         this.description = description;
         this.avatar = avatar;
         this.appContext = AppContext.getAppContext();
-        this.contractHelper = new ContractHelper(this.walletAddress, AppContext.getAppContext());
+        this.contractHelper = new ContractHelper(this.walletAddress, this.appContext);
     }
 
     public updateName(name: string): MyProfile {
@@ -118,7 +118,7 @@ export class MyProfile {
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
      * @param handleProgress The progress of processing
-     * @returns 
+     * @returns
      */
     public async registerCollection (
         tokenAddress:string,
@@ -154,7 +154,7 @@ export class MyProfile {
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
      * @param handleProgress The progress of processing
-     * @returns 
+     * @returns
      */
     public async updateCollection (
         tokenAddress:string,
@@ -175,7 +175,7 @@ export class MyProfile {
             throw new Error(err);
         }
     }
-    
+
     /**
      * Update royalties for the NFT collection
      * @param tokenAddress The NFT collection contract address
@@ -260,7 +260,7 @@ export class MyProfile {
             throw new Error(err);
         }
     }
-    
+
     /**
      * Create a NFT from Feeds collection
      *
@@ -614,7 +614,7 @@ export class MyProfile {
         toAddr: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(FEEDS_CONTRACT_ABI, AppContext.getAppContext().getFeedsCollectionAddress(), toAddr, gasPrice);
+            await this.contractHelper.approveItems(FeedsCollectionABI, AppContext.getAppContext().getFeedsCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInFeeds(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
@@ -626,7 +626,7 @@ export class MyProfile {
         toAddr: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, AppContext.getAppContext().getPasarCollectionAddress(), toAddr, gasPrice);
+            await this.contractHelper.approveItems(PasarCollectionABI, AppContext.getAppContext().getPasarCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInPasar(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
@@ -761,7 +761,7 @@ export class MyProfile {
         sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, baseToken, this.appContext.getMarketContract(), gasPrice);
+            await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForAuction(
                 this.appContext.getMarketContract(),
                 baseToken,

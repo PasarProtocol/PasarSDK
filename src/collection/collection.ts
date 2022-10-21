@@ -1,55 +1,66 @@
 import { Filter } from "../filters/filter";
 import { AppContext } from "../appcontext";
 import { CollectionInfo } from "./collectioninfo";
-import { ContractAddress } from "../contractaddress";
+import { SocialLinks } from "../sociallinks";
 import { ItemPage } from "../itempage";
+import { ChainType } from "../chaintype";
+import { ERCType } from "../erctype";
 
 class Collection {
-    private appContext: AppContext;
-    private info: CollectionInfo;
+    private assistURI: string;
+    private metadata: CollectionInfo;
 
-    constructor(collecionInfo: CollectionInfo) {
-        this.info = collecionInfo;
+    constructor(appContext: AppContext, collecionInfo: CollectionInfo) {
+        this.assistURI = appContext.getAssistNode();
+        this.metadata = collecionInfo;
     }
 
-    public getContractAddress(): ContractAddress {
-        return new ContractAddress(this.info.constractAddr, this.info.network);
+    public getContractAddress(): string {
+        return this.metadata.getContractAddress();
     }
 
-    public getOwnerdDid(): string {
-        return this.info.createdDid;
+    public getNetwork(): ChainType {
+        return this.metadata.getNetwork();
     }
 
-    public getOwnerAddr(): string {
-        return this.info.createdAddr;
+    public getCreatorDid(): string {
+        return this.metadata.getCreatorDid();
+    }
+
+    public getOwnerAddress(): string {
+        return this.metadata.getOwnerAddress();
     }
 
     public getName(): string {
-        return this.info.name;
+        return this.metadata.getName();
     }
 
     public getSymbol(): string {
-        return this.info.symbol;
+        return this.metadata.getSymbol();
+    }
+
+    public getSoicalLinks(): SocialLinks {
+        return this.metadata.getSoicalLinks();
     }
 
     public getAvatar(): string {
-        return this.info.avatar;
+        return this.metadata.getAvatar();
     }
 
-    public getDescritpion(): string {
-        return this.info.description;
+    public getBanner(): string {
+        return this.metadata.getBanner();
     }
 
-    public getErcType(): string {
-        return this.info.ercType;
+    public getDescription(): string {
+        return this.metadata.getDescription();
+    }
+
+    public getERCStandard(): ERCType {
+        return this.metadata.getERCStandard();
     }
 
     public getCategory(): string {
-        return this.info.category;
-    }
-
-    public getSocialLinks(): string[] {
-        return this.info.socialLinks;
+        return this.metadata.getCategory();
     }
 
     public queryItemCount(): Promise<number> {
@@ -64,9 +75,9 @@ class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryItems(earlierThen: number,
-        capcity = 0,
-        filter: Filter = new Filter()
+    public queryItems(_earlierThen: number,
+        _capcity = 0,
+        _filter: Filter = new Filter()
     ): Promise<ItemPage> {
         throw new Error("Method not implemented");
     }
