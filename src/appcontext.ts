@@ -60,6 +60,11 @@ export class AppContext {
         return window['elastos'] !== undefined && window['elastos'].name === 'essentialsiab';
     }
 
+    public getChainType(): string {
+        let chainName = getChainTypeById(this.walletConnector.wc.chainId);
+        return chainName;
+    }
+
     public getWeb3(): Web3 {
         return this.web3;
     }
