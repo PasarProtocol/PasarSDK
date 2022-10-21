@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { transferNft } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 
 const TransferNFT = () => {
     const [tokenId, setTokenId] = useState("");
@@ -7,11 +7,13 @@ const TransferNFT = () => {
 
     const handleTransfer = async () => {
         try {
-            await transferNft("0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0", tokenId, toAddress);
+            let user = JSON.parse(localStorage.getItem("user"));
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            await myProfile.transferItem("0x686D6cB8f81dF709564Ed0041A5d522716892c37", tokenId, toAddress);
         } catch(err) {
             console.log(err);
         }
-    }
+    }   
 
     return (
         <div>

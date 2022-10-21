@@ -7,6 +7,7 @@ import { RoyaltyRate } from "./collection/RoyaltyRate";
 import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
+import FEEDS_CONTRACT_ABI from './contracts/abis/feedsCollection';
 import { AppContext } from './appcontext';
 
 import { ContractHelper } from './contracthelper';
@@ -601,7 +602,7 @@ export class MyProfile {
         toAddr: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            //await this.callContract.approvalForAll(abiFile, baseToken, toAddr, gasPrice);
+            await this.contractHelper.approveItems(TOKEN_721_ABI, baseToken, toAddr, gasPrice);
             await this.contractHelper.transfer721Item(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
@@ -613,7 +614,7 @@ export class MyProfile {
         toAddr: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            //await this.contractHelper.approveItems(baseToken, toAddr, gasPrice);
+            await this.contractHelper.approveItems(FEEDS_CONTRACT_ABI, AppContext.getAppContext().getFeedsCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInFeeds(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
@@ -625,7 +626,7 @@ export class MyProfile {
         toAddr: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            //await this.contractHelper.approveItems(baseToken, toAddr, gasPrice);
+            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, AppContext.getAppContext().getPasarCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInPasar(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
