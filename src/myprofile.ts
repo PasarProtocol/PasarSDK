@@ -669,16 +669,20 @@ export class MyProfile {
         tokenId: string,
         pricingToken: string,
         price: number,
-        sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
+            let contractABI = TOKEN_721_ABI;
+            if(baseToken == this.appContext.getFeedsCollectionAddress() || baseToken == this.appContext.getPasarCollectionAddress()) {
+                contractABI = TOKEN_1155_ABI
+            }
+            await this.contractHelper.approveItems(contractABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForSale(
                 this.appContext.getMarketContract(),
                 tokenId,
                 baseToken,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                sellerURI,
+                this.did,
                 gasPrice
             );
         }).catch (error => {
