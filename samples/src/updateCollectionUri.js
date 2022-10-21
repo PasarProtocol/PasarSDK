@@ -9,9 +9,8 @@ const UpdateCollectionInfo = () => {
     const [collectionAddress, setCollectionAddress] = useState("");
     const [category, setCategory] = useState(Object.keys(Category)[0]);
     const [progress, setProgress] = useState(0);
-
     const socialLinks = new SocialLinks();
-
+    
     useEffect(() => {
         console.log(progress);
     }, [progress]);
