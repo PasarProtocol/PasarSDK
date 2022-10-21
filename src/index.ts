@@ -36,21 +36,6 @@ const initialize = (testnet = true) => {
     getProfileInfo();
 }
 
-const transferNft = async (
-    baseToken: string,
-    tokenId: string,
-    toAddr: string,
-    handleProgress: any = null
-) => {
-    let profile = getMyProfileInfo();
-    try {
-        await profile.transferItem(baseToken, tokenId, toAddr, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-
-}
-
 const listItem = async (
     baseToken: string,
     tokenId: string,
@@ -204,10 +189,8 @@ const getChainTypes = () => {
     return _getChainTypes();
 }
 
-
 export {
     initialize,
-    transferNft,
     getCoinType,
     listItem,
     listItemonAuction,
