@@ -9,7 +9,6 @@ import { resizeImage, requestSigndataOnTokenID } from "./global";
 import PASAR_CONTRACT_ABI from './contracts/abis/pasarCollection';
 import FEEDS_CONTRACT_ABI from './contracts/abis/feedsCollection';
 import { AppContext } from './appcontext';
-
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
 import TOKEN_721_ABI from "./contracts/abis/token721ABI";
@@ -42,7 +41,7 @@ export class MyProfile {
         this.description = description;
         this.avatar = avatar;
         this.appContext = AppContext.getAppContext();
-        this.contractHelper = new ContractHelper(this.walletAddress, AppContext.getAppContext());
+        this.contractHelper = new ContractHelper(this.walletAddress, this.appContext);
     }
 
     public updateName(name: string): MyProfile {
@@ -154,7 +153,7 @@ export class MyProfile {
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
      * @param handleProgress The progress of processing
-     * @returns 
+     * @returns
      */
     public async updateCollection (
         tokenAddress:string,
@@ -260,7 +259,7 @@ export class MyProfile {
             throw new Error(err);
         }
     }
-    
+
     /**
      * Create a NFT from Feeds collection
      *
@@ -761,7 +760,7 @@ export class MyProfile {
         sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PASAR_CONTRACT_ABI, baseToken, this.appContext.getMarketContract(), gasPrice);
+            await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForAuction(
                 this.appContext.getMarketContract(),
                 baseToken,
