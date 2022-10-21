@@ -33,7 +33,7 @@ class CollectionInfo {
         this.symbol = symbol;
     }
 
-    public setSoicalLinks(soicalLinks: SocialLinks): CollectionInfo {
+    public setSocialLinks(soicalLinks: SocialLinks): CollectionInfo {
         this.socialLinks = soicalLinks;
         return this;
     }
