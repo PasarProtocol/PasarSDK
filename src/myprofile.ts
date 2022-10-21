@@ -15,6 +15,7 @@ import TOKEN_721_ABI from "./contracts/abis/token721ABI";
 import TOKEN_1155_ABI from "./contracts/abis/token1155ABI"; 
 import TOKEN_721_CODE from "./contracts/bytecode/token721Code";
 import TOKEN_1155_CODE from "./contracts/bytecode/token1155Code";
+import { timeStamp } from 'console';
 
 /**
  * This class represent the Profile of current signed-in user.
@@ -668,16 +669,20 @@ export class MyProfile {
         tokenId: string,
         pricingToken: string,
         price: number,
-        sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
+            let contractABI = TOKEN_721_ABI;
+            if(baseToken == this.appContext.getFeedsCollectionAddress() || baseToken == this.appContext.getPasarCollectionAddress()) {
+                contractABI = TOKEN_1155_ABI
+            }
+            await this.contractHelper.approveItems(contractABI, baseToken, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForSale(
                 this.appContext.getMarketContract(),
                 tokenId,
                 baseToken,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                sellerURI,
+                this.did,
                 gasPrice
             );
         }).catch (error => {

@@ -23,6 +23,8 @@ const ListNFT = () => {
 
     const handleList = async () => {
         try {
+            let user = JSON.parse(localStorage.getItem("user"));
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
             // if(isAuction(currentListType)) {
                 console.log(exipirationTime);
                 console.log(currentListType);
@@ -33,7 +35,8 @@ const ListNFT = () => {
                 let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
                 // await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
             // } else {
-                // await listItem(addressCollection, tokenId, pricingToken, price, setProgress);
+                
+                await myProfile.listItem(addressCollection, tokenId, pricingToken, price);
             // }
         } catch(err) {
             console.log(err);
@@ -63,6 +66,10 @@ const ListNFT = () => {
             <div>
                 <h3 className="sub_title">tokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
+            </div>
+            <div>
+                <h3 className="Price">price</h3>
+                <input value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
             {/* {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>
