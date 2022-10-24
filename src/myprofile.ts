@@ -77,7 +77,6 @@ export class MyProfile {
      * @param category The category information of NFT collection
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
-     * @param handleProgress The progress of processing
      * @returns The deployed NFT collection contract address.
      */
     public async createCollection (
@@ -90,15 +89,11 @@ export class MyProfile {
         category: Category,
         socialMedias: any,
         royalties: RoyaltyRate[],
-        handleProgress: any = null
     ) {
         try {
             let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            handleProgress(50);
             let collectionAddress:string = await this.handleCreateCollection(name, symbol, resultIpfs, itemType);
-            handleProgress(80);
             await this.handleRegisterCollection(collectionAddress, name, resultIpfs, royalties);
-            handleProgress(100);
             return collectionAddress;
         } catch(err) {
             throw new Error(err);
@@ -117,7 +112,6 @@ export class MyProfile {
      * @param category The category information of NFT collection
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
-     * @param handleProgress The progress of processing
      * @returns
      */
     public async registerCollection (
@@ -129,13 +123,10 @@ export class MyProfile {
         category: Category,
         socialMedias: any,
         royalties: RoyaltyRate[],
-        handleProgress: any = null
     ) {
         try {
             let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            handleProgress(50);
             await this.handleRegisterCollection(tokenAddress, name, resultIpfs, royalties);
-            handleProgress(100);
         } catch(err) {
             throw new Error(err);
         }
@@ -153,7 +144,6 @@ export class MyProfile {
      * @param category The category information of NFT collection
      * @param socialMedias The social information of NFT collection
      * @param royalties The royalty information of NFT collection
-     * @param handleProgress The progress of processing
      * @returns
      */
     public async updateCollection (
@@ -164,13 +154,10 @@ export class MyProfile {
         background: any,
         category: Category,
         socialMedias: any,
-        handleProgress: any = null
     ) {
         try {
             let resultIpfs = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            handleProgress(50);
             await this.updateCollectionURI(tokenAddress, name, resultIpfs);
-            handleProgress(100);
         } catch(err) {
             throw new Error(err);
         }
@@ -180,18 +167,15 @@ export class MyProfile {
      * Update royalties for the NFT collection
      * @param tokenAddress The NFT collection contract address
      * @param royaltyRates The roraylty rates for this NFT collection
-     * @param handleProgress The progress of processing
      * @result
      */
      public async updateCollectionRoyalties(tokenAddress: string,
         royaltyRates: RoyaltyRate[],
-        handleProgress: any = null
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             await this.contractHelper.updateCollectionRoyalties(
                 this.appContext.getRegistryContract(), tokenAddress, royaltyRates, gasPrice
             );
-            handleProgress(100);
         }).catch(error => {
             throw new Error(error);
         })
@@ -216,13 +200,10 @@ export class MyProfile {
         collectionAddr: string,
         properties: any = null,
         sensitive = false,
-        handleProgress: any = null
     ) {
         try {
             let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
-            handleProgress(50);
             let tokenId = await this.handleCreateItem(collectionAddr, resultMetadata);
-            handleProgress(100)
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -248,13 +229,10 @@ export class MyProfile {
         properties: any = null,
         roylatyFee: number = 10,
         sensitive = false,
-        handleProgress: any = null
     ) {
         try {
             let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
-            handleProgress(50);
             let tokenId = await this.createItemFromPasar(resultMetadata, roylatyFee);
-            handleProgress(100)
             return tokenId;
         } catch(err) {
             throw new Error(err);
@@ -280,14 +258,11 @@ export class MyProfile {
         properties: any = null,
         roylatyFee: number = 10,
         sensitive = false,
-        handleProgress: any = null
     ) {
         try {
             let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive, true);
             console.log(resultMetadata);
-            handleProgress(50);
             let tokenId = await this.createItemFromFeeds(resultMetadata, roylatyFee);
-            handleProgress(100)
             return tokenId;
         } catch(err) {
             throw new Error(err);
