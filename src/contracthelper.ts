@@ -310,7 +310,7 @@ export class ContractHelper {
             ).send({'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
-                'value': gasPrice,
+                'value': 0,
             }).on('receipt', (receipt: any) => {
                 resolve(receipt);
             }).on('error', (error: Error) => {
