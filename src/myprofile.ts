@@ -67,37 +67,6 @@ export class MyProfile {
     }
 
     /**
-     *  update a NFT collection
-     *
-     * @param tokenAddress The address of NFT collection
-     * @param name The name of NFT collection
-     * @param description The description of NFT collection
-     * @param symbol The symbol of NFT collection
-     * @param avatar The avatar image of NFT collection
-     * @param background The background image of NFT collection
-     * @param category The category information of NFT collection
-     * @param socialMedias The social information of NFT collection
-     * @param royalties The royalty information of NFT collection
-     * @returns
-     */
-    public async updateCollection (
-        tokenAddress:string,
-        name: string,
-        description: string,
-        avatar: any,
-        background: any,
-        category: Category,
-        socialMedias: any,
-    ) {
-        try {
-            let resultIpfs = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            await this.updateCollectionURI(tokenAddress, name, resultIpfs);
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
      * Update royalties for the NFT collection
      * @param tokenAddress The NFT collection contract address
      * @param royaltyRates The roraylty rates for this NFT collection
@@ -265,7 +234,7 @@ export class MyProfile {
      * @param collectionUri The new uri of NFT collection to metadata json file on IPFS storage
      * @returns The result of whether the NFT collection is updated or not.
      */
-    private async updateCollectionURI(tokenAddress: string,
+    public async updateCollectionURI(tokenAddress: string,
         name: string,
         collectionUri: string
     ): Promise<void> {
