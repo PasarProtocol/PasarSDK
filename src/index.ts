@@ -24,29 +24,6 @@ const getMyProfileInfo = () => {
     return myProfileInfo;
 }
 
-const listItemonAuction = async (
-    baseToken: string,
-    tokenId: string,
-    pricingToken: string,
-    minPrice: string,
-    reservePrice: string,
-    buyoutPrice: string,
-    expirationTime: number,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        let current = new Date().getTime();
-        if(expirationTime <= current) {
-            throw new Error("The expiration time is wrong");
-        }
-
-        await profile.listItemOnAuction(baseToken, tokenId, pricingToken, parseFloat(minPrice), parseFloat(reservePrice), parseFloat(buyoutPrice), expirationTime, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const changePrice = async (
     orderId: string,
     newPrice: string,
@@ -132,7 +109,6 @@ const unlistItem = async (
 }
 
 export {
-    listItemonAuction,
     changePrice,
     changePriceOnAuction,
     buyItem,
