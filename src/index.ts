@@ -24,32 +24,6 @@ const getMyProfileInfo = () => {
     return myProfileInfo;
 }
 
-const buyItem = async (
-    orderId: string,
-    buyingPrice: number,
-    quoteToken: string,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.buyItem(orderId, buyingPrice, quoteToken, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
-const settleAuction = async (
-    orderId: string,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.settleAuction(orderId, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const unlistItem = async (
     orderId: string,
     handleProgress: any = null
@@ -63,7 +37,6 @@ const unlistItem = async (
 }
 
 export {
-    settleAuction,
     unlistItem,
     Category,
     ERCType,
