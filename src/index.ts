@@ -38,21 +38,6 @@ const buyItem = async (
     }
 }
 
-const bidItemOnAuction = async (
-    orderId: string,
-    quoteToken: string,
-    price: string,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-
-        await profile.bidItemOnAuction(orderId, quoteToken, parseFloat(price), handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 const settleAuction = async (
     orderId: string,
     handleProgress: any = null
@@ -78,7 +63,6 @@ const unlistItem = async (
 }
 
 export {
-    bidItemOnAuction,
     settleAuction,
     unlistItem,
     Category,
