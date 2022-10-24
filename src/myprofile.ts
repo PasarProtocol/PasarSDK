@@ -715,8 +715,7 @@ export class MyProfile {
      */
     public async bidItemOnAuction(orderId: string,
         quoteToken: string,
-        price: number,
-        bidderURI: string
+        price: number
     ): Promise<void> {
         return await this.getGasPrice().then (async gasPrice => {
             let priceValue = Number(BigInt(price*1e18));
@@ -729,7 +728,7 @@ export class MyProfile {
                 orderId,
                 priceValue,
                 quoteToken,
-                bidderURI,
+                this.did,
                 gasPrice);
         }).catch (error => {
             throw new Error(error);
