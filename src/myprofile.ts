@@ -182,94 +182,6 @@ export class MyProfile {
     }
 
     /**
-     * Create a NFT
-     *
-     * @param name The name of NFT
-     * @param description The description of NFT
-     * @param image The image of NFT
-     * @param collectionAddr The collection address of NFT
-     * @param royaltyFee The roalty fee of NFT
-     * @param properties The property of NFT
-     * @param sensitive The sensitive information of NFT
-     * @returns The token id of new NFT
-     */
-    public async mintItem (
-        name: string,
-        description: string,
-        image: any,
-        collectionAddr: string,
-        properties: any = null,
-        sensitive = false,
-    ) {
-        try {
-            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
-            let tokenId = await this.handleCreateItem(collectionAddr, resultMetadata);
-            return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
-     * Create a NFT from Pasar collection
-     *
-     * @param name The name of NFT
-     * @param description The description of NFT
-     * @param image The image of NFT
-     * @param collectionAddr The collection address of NFT
-     * @param royaltyFee The roalty fee of NFT
-     * @param properties The property of NFT
-     * @param sensitive The sensitive information of NFT
-     * @returns The token id of new NFT
-     */
-    public async mintItemFromPasar (
-        name: string,
-        description: string,
-        image: any,
-        properties: any = null,
-        roylatyFee: number = 10,
-        sensitive = false,
-    ) {
-        try {
-            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive);
-            let tokenId = await this.createItemFromPasar(resultMetadata, roylatyFee);
-            return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
-     * Create a NFT from Feeds collection
-     *
-     * @param name The name of NFT
-     * @param description The description of NFT
-     * @param image The image of NFT
-     * @param collectionAddr The collection address of NFT
-     * @param royaltyFee The roalty fee of NFT
-     * @param properties The property of NFT
-     * @param sensitive The sensitive information of NFT
-     * @returns The token id of new NFT
-     */
-     public async mintItemFromFeeds (
-        name: string,
-        description: string,
-        image: any,
-        properties: any = null,
-        roylatyFee: number = 10,
-        sensitive = false,
-    ) {
-        try {
-            let resultMetadata:string = await this.createItemMetadata(name, description, image, properties, sensitive, true);
-            console.log(resultMetadata);
-            let tokenId = await this.createItemFromFeeds(resultMetadata, roylatyFee);
-            return tokenId;
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
      * Delete exiting NFT item.
      * Notice: the NFT item should be unlisted from marketplace first before deleting
      *         the item.
@@ -444,7 +356,7 @@ export class MyProfile {
      * @param sensitive Indicator whether the NFT item contains sensitive content or not
      * @returns The result is the did information.
      */
-    private async createItemMetadata(
+    public async createItemMetadata(
         itemName: string,
         itemDescription: string,
         itemImage: any,
@@ -505,7 +417,7 @@ export class MyProfile {
      * @param tokenURI The token uri to this new NFT item
      * @returns The tokenId of the new NFT.
      */
-    private async handleCreateItem(collection: string,
+    public async createItem(collection: string,
         tokenURI: string,
     ): Promise<string> {
         return await this.getGasPrice().then(async gasPrice => {
@@ -527,7 +439,7 @@ export class MyProfile {
      * @param roylatyFee The royalty fee to the new NFT item
      * @returns The tokenId of being minted a nft
      */
-    private async createItemFromFeeds(
+    public async createItemFromFeeds(
         tokenURI: string,
         roylatyFee: number
     ): Promise<string> {
@@ -549,7 +461,7 @@ export class MyProfile {
      * @param roylatyFee The royalty fee to the new NFT item
      * @returns The tokenId of being minted a nft
      */
-    private async createItemFromPasar(
+    public async createItemFromPasar(
         tokenURI: string,
         roylatyFee: number,
     ): Promise<string> {
