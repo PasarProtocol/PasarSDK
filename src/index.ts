@@ -24,20 +24,7 @@ const getMyProfileInfo = () => {
     return myProfileInfo;
 }
 
-const unlistItem = async (
-    orderId: string,
-    handleProgress: any = null
-) => {
-    try {
-        let profile = getMyProfileInfo();
-        await profile.unlistItem(orderId, handleProgress);
-    } catch(err) {
-        throw new Error(err);
-    }
-}
-
 export {
-    unlistItem,
     Category,
     ERCType,
     SocialLinks,
