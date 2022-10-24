@@ -649,7 +649,6 @@ export class MyProfile {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        sellerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
@@ -662,7 +661,7 @@ export class MyProfile {
                 reservePrice,
                 buyoutPrice,
                 expirationTime,
-                sellerURI,
+                this.did,
                 gasPrice
             );
         }).catch(error => {
