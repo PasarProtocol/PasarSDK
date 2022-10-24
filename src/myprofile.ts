@@ -67,72 +67,6 @@ export class MyProfile {
     }
 
     /**
-     * Create a NFT collection contract and deploy it on specific EVM blockchain.
-     *
-     * @param name The name of NFT collection
-     * @param description The description of NFT collection
-     * @param symbol The symbol of NFT collection
-     * @param avatar The avatar image of NFT collection
-     * @param background The background image of NFT collection
-     * @param category The category information of NFT collection
-     * @param socialMedias The social information of NFT collection
-     * @param royalties The royalty information of NFT collection
-     * @returns The deployed NFT collection contract address.
-     */
-    public async createCollection (
-        name: string,
-        description: string,
-        symbol: string,
-        avatar: any,
-        background: any,
-        itemType: ERCType,
-        category: Category,
-        socialMedias: any,
-        royalties: RoyaltyRate[],
-    ) {
-        try {
-            let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            let collectionAddress:string = await this.handleCreateCollection(name, symbol, resultIpfs, itemType);
-            await this.handleRegisterCollection(collectionAddress, name, resultIpfs, royalties);
-            return collectionAddress;
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
-     *  Register a NFT collection contract.
-     *
-     * @param tokenAddress The address of NFT collection
-     * @param name The name of NFT collection
-     * @param description The description of NFT collection
-     * @param symbol The symbol of NFT collection
-     * @param avatar The avatar image of NFT collection
-     * @param background The background image of NFT collection
-     * @param category The category information of NFT collection
-     * @param socialMedias The social information of NFT collection
-     * @param royalties The royalty information of NFT collection
-     * @returns
-     */
-    public async registerCollection (
-        tokenAddress:string,
-        name: string,
-        description: string,
-        avatar: any,
-        background: any,
-        category: Category,
-        socialMedias: any,
-        royalties: RoyaltyRate[],
-    ) {
-        try {
-            let resultIpfs:string = await this.createCollectionMetadata(description, avatar, background, category, socialMedias);
-            await this.handleRegisterCollection(tokenAddress, name, resultIpfs, royalties);
-        } catch(err) {
-            throw new Error(err);
-        }
-    }
-
-    /**
      *  update a NFT collection
      *
      * @param tokenAddress The address of NFT collection
@@ -230,7 +164,7 @@ export class MyProfile {
      * @param collectionUri The uri of NFT collection
      * @returns The deployed NFT collection contract address.
      */
-     private async handleCreateCollection(name: string,
+     public async createCollection(name: string,
         symbol: string,
         collectionUri: string,
         itemType: ERCType
@@ -251,7 +185,6 @@ export class MyProfile {
         })
     }
 
-
     /**
      * Generate a metadata json file of the NFT collection that is about to be registered.
      *
@@ -262,7 +195,7 @@ export class MyProfile {
      * @param socialLinks The social media related to this NFT collection
      * @returns The URI to this collection metadata json file on IPFS storage.
      */
-    private async createCollectionMetadata(description: string,
+    public async createCollectionMetadata(description: string,
         avatarPath: string,
         bannerPath: string,
         category: Category,
@@ -309,7 +242,7 @@ export class MyProfile {
      * @param royalties The roraylty rates for this NFT collection
      * @returns The result of whether this NFT collection contract is registered ont Pasar or not
      */
-    private async handleRegisterCollection(
+    public async registerCollection(
         tokenAddress: string,
         name: string,
         collectionUri: string,
