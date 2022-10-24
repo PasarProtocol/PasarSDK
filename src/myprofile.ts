@@ -613,7 +613,6 @@ export class MyProfile {
     public async buyItem(orderId: string,
         buyingPrice: number,
         quoteToken: string,
-        buyerURI: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             if(quoteToken != defaultAddress) {
@@ -623,7 +622,7 @@ export class MyProfile {
             }
             await this.contractHelper.buyItem(
                 this.appContext.getMarketContract(),
-                orderId, buyingPrice, quoteToken, buyerURI,  gasPrice
+                orderId, buyingPrice, quoteToken, this.did,  gasPrice
             );
         }).catch(error => {
             throw new Error(error);

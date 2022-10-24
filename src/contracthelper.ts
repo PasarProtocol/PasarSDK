@@ -582,12 +582,12 @@ export class ContractHelper {
     ): Promise<any> {
         let erc20Contract = new this.web3.eth.Contract(Token20ABI, quoteToken);
         let approvedAmount = BigInt(await erc20Contract.methods.allowance(this.account, marketContract).call())
-        if (approvedAmount >= amount) {
+        if (approvedAmount <= amount) {
             await erc20Contract.methods.approve(marketContract, amount.toString()).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
-                'value': gasPrice
+                'value': 0
             });
         }
     }

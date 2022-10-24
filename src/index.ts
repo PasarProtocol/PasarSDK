@@ -78,7 +78,6 @@ const unlistItem = async (
 }
 
 export {
-    buyItem,
     bidItemOnAuction,
     settleAuction,
     unlistItem,
