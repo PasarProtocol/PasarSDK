@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, changePrice, changePriceOnAuction, getListType, isAuction } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 
 const ChangePrice = () => {
     const [tokenId, setTokenId] = useState("");
@@ -14,13 +14,13 @@ const ChangePrice = () => {
     const [currentListType, setCurrentListType] = useState("");
 
     useEffect(() => {
-        let listTokens = getCoinType();
-        setListPricingToken(listTokens);
-        setPricingToken(listTokens[0].address);
+        // let listTokens = getCoinType();
+        // setListPricingToken(listTokens);
+        // setPricingToken(listTokens[0].address);
 
-        let listType = getListType();
-        setListType(listType);
-        setCurrentListType(listType[0]);
+        // let listType = getListType();
+        // setListType(listType);
+        // setCurrentListType(listType[0]);
 
     }, []);
 
@@ -31,11 +31,11 @@ const ChangePrice = () => {
     const handleList = async () => {
         try {
             let orderId;
-            if(isAuction(currentListType)) {
-                orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
-            } else {
-                orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
-            }
+            // if(isAuction(currentListType)) {
+            //     orderId = await changePriceOnAuction(tokenId, baseToken, price, reservePrice, buyoutPrice, pricingToken, setProgress);
+            // } else {
+            //     orderId = await changePrice(tokenId, baseToken, price, pricingToken, setProgress);
+            // }
             console.log(orderId);
         } catch(err) {
             console.log(err);  
@@ -58,7 +58,7 @@ const ChangePrice = () => {
                 <h3 className="sub_title">Collection Address</h3>
                 <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
             </div>
-            {!isAuction(currentListType) ? <div>
+            {/* {!isAuction(currentListType) ? <div>
                 <h3 className="Price">price</h3>
                     <input value={price} onChange={(e) => setPrice(e.target.value)}/>
                 </div> : <div>
@@ -75,7 +75,7 @@ const ChangePrice = () => {
                         <input value={buyoutPrice} onChange={(e) => setBuyoutPrice(e.target.value)}/>
                     </div>
                 </div>
-            }
+            } */}
             <div>
                 <h3 className="sub_title">Pricing Type</h3>
                 <select onChange={(e) => setPricingToken(e.target.value)}>

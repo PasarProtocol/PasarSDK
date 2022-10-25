@@ -29,8 +29,11 @@ const CreateCollection = () => {
         try {
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
 
-            let address = await myProfile.createCollection(name, description, symbol, avatar, background, collectionType, category, socialLinks, royalty, setProgress);
+            let metaData = await myProfile.createCollectionMetadata(description, avatar, background, category, socialLinks);
+            console.log(metaData);
+            let address = await myProfile.createCollection(name, symbol, metaData, collectionType);
             console.log(address);
+            await myProfile.registerCollection(address, name, metaData, royalty)
         } catch(err) {
             console.log(err);
         }
