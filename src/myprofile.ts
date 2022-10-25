@@ -343,12 +343,13 @@ export class MyProfile {
      */
     public async createItemFromFeeds(
         tokenURI: string,
-        roylatyFee: number
+        roylatyFee: number,
+        creatorUri: string
     ): Promise<string> {
         return await this.getGasPrice().then(async gasPrice => {
             let tokenId = `0x${sha256(tokenURI.replace("Feeds:json:", ""))}`;
             await this.contractHelper.mintFromFeedsCollection(
-                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, this.did, gasPrice
+                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, creatorUri, gasPrice
             );
             return tokenId;
         }).catch (error => {
@@ -458,6 +459,7 @@ export class MyProfile {
         tokenId: string,
         pricingToken: string,
         price: number,
+        listerUri: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             let contractABI = TOKEN_721_ABI;
@@ -471,7 +473,7 @@ export class MyProfile {
                 baseToken,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                this.did,
+                listerUri,
                 gasPrice
             );
         }).catch (error => {
@@ -515,6 +517,7 @@ export class MyProfile {
     public async buyItem(orderId: string,
         buyingPrice: number,
         quoteToken: string,
+        buyerUri: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             if(quoteToken != defaultAddress) {
@@ -524,7 +527,7 @@ export class MyProfile {
             }
             await this.contractHelper.buyItem(
                 this.appContext.getMarketContract(),
-                orderId, buyingPrice, quoteToken, this.did,  gasPrice
+                orderId, buyingPrice, quoteToken, buyerUri,  gasPrice
             );
         }).catch(error => {
             throw new Error(error);
@@ -550,6 +553,7 @@ export class MyProfile {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
+        listerUri: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
             await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
@@ -562,7 +566,7 @@ export class MyProfile {
                 reservePrice,
                 buyoutPrice,
                 expirationTime,
-                this.did,
+                listerUri,
                 gasPrice
             );
         }).catch(error => {
@@ -617,7 +621,8 @@ export class MyProfile {
      */
     public async bidItemOnAuction(orderId: string,
         quoteToken: string,
-        price: number
+        price: number,
+        bidderUri: string
     ): Promise<void> {
         return await this.getGasPrice().then (async gasPrice => {
             let priceValue = Number(BigInt(price*1e18));
@@ -630,7 +635,7 @@ export class MyProfile {
                 orderId,
                 priceValue,
                 quoteToken,
-                this.did,
+                bidderUri,
                 gasPrice);
         }).catch (error => {
             throw new Error(error);
