@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, bidItemOnAuction} from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 import { useNavigate } from "react-router-dom";
 
 const BidNFT = () => {
@@ -15,8 +15,8 @@ const BidNFT = () => {
 
     const handleList = async () => {
         try {
-            let orderId = await bidItemOnAuction(tokenId, collectionAddr, price, setProgress);
-            console.log(orderId);
+            // let orderId = await bidItemOnAuction(tokenId, collectionAddr, price, setProgress);
+            // console.log(orderId);
         } catch(err) {
             console.log(err);
         }

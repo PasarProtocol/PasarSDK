@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { buyItem } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 import { useNavigate } from "react-router-dom";
 
 const BuyNFT = () => {
@@ -14,8 +14,8 @@ const BuyNFT = () => {
 
     const handleBuy = async () => {
         try {
-            let orderId = await buyItem(tokenId, baseToken, setProgress);
-            console.log(orderId);
+            // let orderId = await MyProfile.buyItem(tokenId, baseToken);
+            // console.log(orderId);
         } catch(err) {
             console.log(err);
         }

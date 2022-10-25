@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { unlistItem } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 import { useNavigate } from "react-router-dom";
 
 const UnlistNFT = () => {
@@ -14,7 +14,7 @@ const UnlistNFT = () => {
 
     const handleSettle = async () => {
         try {        
-            await unlistItem(tokenId, baseToken, setProgress);
+            // await unlistItem(tokenId, baseToken, setProgress);
         } catch(err) {
             console.log(err);
         }

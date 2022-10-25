@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCoinType, settleAuction} from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile} from "@pasarprotocol/pasar-sdk-development";
 import { useNavigate } from "react-router-dom";
 
 const SettleAuction = () => {
@@ -14,8 +14,8 @@ const SettleAuction = () => {
 
     const handleSettle = async () => {
         try {
-            let orderId = await settleAuction(tokenId, setProgress);
-            console.log(orderId);
+            // let orderId = await settleAuction(tokenId, setProgress);
+            // console.log(orderId);
         } catch(err) {
             console.log(err);
         }
