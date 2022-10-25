@@ -22,7 +22,8 @@ const UpdateCollectionInfo = () => {
             console.log(description);
             console.log(category);
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
-            await myProfile.updateCollection(collectionAddress, name, description, avatar, background, category, socialLinks, setProgress);
+            let metaData = await myProfile.createCollectionMetadata(description, avatar, background, category, socialLinks);
+            await myProfile.updateCollectionURI(collectionAddress, name, metaData);
         } catch(err) {
             console.log(err);
         }
