@@ -4,19 +4,23 @@ import { useNavigate } from "react-router-dom";
 
 const BidNFT = () => {
     const navigate = useNavigate();
-    const [tokenId, setTokenId] = useState("");
-    const [collectionAddr, setCollectionAddr] = useState("");
+    const [orderId, setOrderId] = useState("");
     const [price, setPrice] = useState("");
-    const [progress, setProgress] = useState(0);
+    const [quoteToken, setQuoteToken] = useState("");
 
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
-
-    const handleList = async () => {
+    const handleBid = async () => {
         try {
-            // let orderId = await bidItemOnAuction(tokenId, collectionAddr, price, setProgress);
-            // console.log(orderId);
+            let user = JSON.parse(localStorage.getItem("user"));
+            let userURI = localStorage.getItem("user_uri");
+
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+
+            if(!userURI) {
+                userURI = await myProfile.createTraderMetadata();
+                localStorage.setItem("user_uri", userURI);
+            }
+
+            await myProfile.bidItemOnAuction(orderId, quoteToken, price, userURI);
         } catch(err) {
             console.log(err);
         }
@@ -25,18 +29,18 @@ const BidNFT = () => {
     return (
         <div>
             <div>
-                <h3 className="sub_title">tokenId</h3>
-                <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
+                <h3 className="sub_title">OrderId</h3>
+                <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
             </div>
             <div>
-                <h3 className="sub_title">Collection Address</h3>
-                <input value={collectionAddr} onChange={(e) => setCollectionAddr(e.target.value)}/>
+                <h3 >Quote Token</h3>
+                <input value={quoteToken} onChange={(e) => setQuoteToken(e.target.value)}/>
             </div>
             <div>
                 <h3 className="Price">Price</h3>
                 <input value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
-            <button className="button" onClick={handleList}>Bid</button>
+            <button className="button" onClick={handleBid}>Bid</button>
         </div>
     );
 }
