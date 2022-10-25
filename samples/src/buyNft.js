@@ -4,18 +4,22 @@ import { useNavigate } from "react-router-dom";
 
 const BuyNFT = () => {
     const navigate = useNavigate();
-    const [tokenId, setTokenId] = useState("");
-    const [baseToken, setBaseToken] = useState("");
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
+    const [orderId, setOrderId] = useState("");
+    const [quoteToken, setQuoteToken] = useState("");
+    const [price, setPrice] = useState("");
 
     const handleBuy = async () => {
         try {
-            // let orderId = await MyProfile.buyItem(tokenId, baseToken);
-            // console.log(orderId);
+            let user = JSON.parse(localStorage.getItem("user"));
+            let userURI = localStorage.getItem("user_uri");
+
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+
+            if(!userURI) {
+                userURI = await myProfile.createTraderMetadata();
+                localStorage.setItem("user_uri", userURI);
+            }
+            await myProfile.buyItem(orderId, price, quoteToken, userURI);
         } catch(err) {
             console.log(err);
         }
@@ -24,12 +28,16 @@ const BuyNFT = () => {
     return (
         <div>
             <div>
-                <h3 className="sub_title">TokenId</h3>
-                <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
+                <h3 className="sub_title">OrderId</h3>
+                <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
             </div>
             <div>
-                <h3 className="sub_title">BaseToken</h3>
-                <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
+                <h3 className="sub_title">QuoteToken</h3>
+                <input value={quoteToken} onChange={(e) => setQuoteToken(e.target.value)}/>
+            </div>
+            <div>
+                <h3 className="sub_title">Price</h3>
+                <input value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
             <button className="button" onClick={handleBuy}>Buy</button>
         </div>
