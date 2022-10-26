@@ -461,7 +461,7 @@ export class ContractHelper {
         return new Promise((resolve, reject) => {
             const tokenConf = {diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000}
 
-            let diaAddress = AppContext.getAppContext().getDiaAddress();
+            let diaAddress = AppContext.getInstance().getDiaAddress();
             let diaValue = BigInt((10 ** tokenConf.diaDecimals * tokenConf.diaValue * tokenConf.nPPM) / tokenConf.PPM).toString();
             let registeredContract = new this.web3.eth.Contract(contractData.abi).deploy({
                 data: `0x${contractData.code}`,
@@ -480,7 +480,7 @@ export class ContractHelper {
                 "to": "",
             }
 
-            if(AppContext.getAppContext().isInAppBrowser())
+            if(AppContext.getInstance().isInAppBrowser())
                 transactionParams['to'] = ""
             registeredContract.send(transactionParams).then(newContractInstance=>{
                 console.log('Contract deployed at address: ', newContractInstance.options.address)
