@@ -454,8 +454,8 @@ export class ContractHelper {
     public createCollection (
         name: string,
         symbol: string,
-        collectionUri: string,
-        contractData: any,
+        abi: any,
+        byteCode: any,
         gasPrice: string
     ): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -463,12 +463,11 @@ export class ContractHelper {
 
             let diaAddress = AppContext.getInstance().getDiaAddress();
             let diaValue = BigInt((10 ** tokenConf.diaDecimals * tokenConf.diaValue * tokenConf.nPPM) / tokenConf.PPM).toString();
-            let registeredContract = new this.web3.eth.Contract(contractData.abi).deploy({
-                data: `0x${contractData.code}`,
+            let registeredContract = new this.web3.eth.Contract(abi).deploy({
+                data: `0x${byteCode}`,
                 arguments: [
                     name,
                     symbol,
-                    collectionUri,
                     diaAddress,
                     diaValue
                 ],
