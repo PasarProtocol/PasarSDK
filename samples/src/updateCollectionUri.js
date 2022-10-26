@@ -8,12 +8,7 @@ const UpdateCollectionInfo = () => {
     const [background, setBackground] = useState();
     const [collectionAddress, setCollectionAddress] = useState("");
     const [category, setCategory] = useState(Object.keys(Category)[0]);
-    const [progress, setProgress] = useState(0);
     const socialLinks = new SocialLinks();
-    
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
 
     const handleMint = async () => {
         let user = JSON.parse(localStorage.getItem("user"));
