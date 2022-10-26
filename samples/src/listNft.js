@@ -10,7 +10,7 @@ const ListNFT = () => {
     const [buyoutPrice, setBuyoutPrice] = useState("");
     const [exipirationTime, setExipirationTime] = useState("")
     const [pricingToken, setPricingToken] = useState(listPricingToken[Object.keys(listPricingToken)[0]]);
-    const [currentListType, setCurrentListType] = useState(ListType(Object.keys(ListType)[0]));
+    const [currentListType, setCurrentListType] = useState(ListType[Object.keys(ListType)[0]]);
 
     useEffect(() => {
         setExipirationTime(timestampToDatetimeInputString(Date.now()));
