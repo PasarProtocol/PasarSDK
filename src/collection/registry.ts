@@ -6,19 +6,20 @@ class Registry {
     private assistURL: string;
 
     constructor(appContext: AppContext) {
-        this.assistURL = appContext.getAssistNode();
+        this.assistURL = appContext.getAssistNode()
     }
 
     public queryCollectionCount(): Promise<number> {
-        throw new Error("Method not implemented");
+        throw new Error("Method not implemented")
     }
 
-    public queryCollections(
-        _earierThan: number,
-        _capcity: number,
-        _queryFilter: Filter = new Filter()
+    public queryCollections(beforeTime: number, _capcity: number, _queryFilter = new Filter()
     ): Promise<CollectionPage> {
-        throw new Error("Method not implemented");
+        throw new Error("Method not implemented")
+    }
+
+    public getLatestCollection(queryFilter = new Filter()) {
+        throw new Error("Method not implemented")
     }
 }
 

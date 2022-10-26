@@ -9,11 +9,9 @@ import { ItemPage } from "./itempage";
 export class Market {
     private assistUrl: string;
 
-    public constructor() {
-        this.assistUrl = AppContext.getAppContext().getAssistNode();
+    public constructor(appContext: AppContext) {
+        this.assistUrl = appContext.getAssistNode();
     }
-
-    private earilerThan: number = Math.floor(Date.now() / 1000);
 
     /**
      * Get the number of total listed NFT items from remote assist service.
@@ -25,16 +23,24 @@ export class Market {
 
     /**
      * Query listed items on marketplace.
-     * @param earilerThan
-     * @param maximum
-     * @param filter
      */
-    public async queryItems(pageNum:number = 1, pageSize:number = 10,): Promise<ItemPage> {
-        if(pageNum == 1) {
-            this.earilerThan = Math.floor(Date.now() / 1000);
+    public async queryItems(beforeTime: number, pageNum = 1, pageSize = 10,): Promise<ItemPage> {
+        try {
+            return await getAllListedItems(this.assistUrl, beforeTime, "", pageNum, pageSize)
+        } catch (error) {
+            throw new Error(`Query Items from marketplace error ${error}`)
         }
-        return await getAllListedItems(this.assistUrl, this.earilerThan, "", pageNum, pageSize).catch(error => {
-            throw new Error(error);
-        })
+    }
+
+    public queryItemsOfficial(beforeTime: number, capacity: number, filter = new Filter()) {
+        throw new Error("TODO: method not implemented")
+    }
+
+    public queryLatestItem(filter = new Filter()) {
+        throw new Error("TODO: method not implmented");
+    }
+
+    public queryPopularItem(filter = new Filter()) {
+        throw new Error("TODO: method not implemented");
     }
 }
