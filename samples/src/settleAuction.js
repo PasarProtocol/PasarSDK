@@ -1,21 +1,14 @@
 import { useState, useEffect } from "react";
 import { MyProfile} from "@pasarprotocol/pasar-sdk-development";
-import { useNavigate } from "react-router-dom";
 
 const SettleAuction = () => {
-    const navigate = useNavigate();
-    const [tokenId, setTokenId] = useState("");
-    const [baseToken, setBaseToken] = useState("");
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
+    const [orderId, setOrderId] = useState("");
 
     const handleSettle = async () => {
         try {
-            // let orderId = await settleAuction(tokenId, setProgress);
-            // console.log(orderId);
+            let user = JSON.parse(localStorage.getItem("user"));
+            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            await myProfile.settleAuction(orderId);
         } catch(err) {
             console.log(err);
         }
@@ -25,12 +18,8 @@ const SettleAuction = () => {
     return (
         <div>
             <div>
-                <h3 className="sub_title">TokenId</h3>
-                <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
-            </div>
-            <div>
-                <h3 className="sub_title">Collection Address</h3>
-                <input value={baseToken} onChange={(e) => setBaseToken(e.target.value)}/>
+                <h3 className="sub_title">OrderId</h3>
+                <input value={orderId} onChange={(e) => setOrderId(e.target.value)}/>
             </div>
             <button className="button" onClick={handleSettle}>Settle</button>
         </div>
