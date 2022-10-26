@@ -6,11 +6,6 @@ const MintNFT = () => {
     const [description, setDescription] = useState('');
     const [collectionAddress, setCollectionAddress] = useState("");
     const [urlImage, setUrlImage] = useState('');
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
 
     const handleMint = async () => {
         try {
@@ -19,7 +14,8 @@ const MintNFT = () => {
             console.log(urlImage);
             let user = JSON.parse(localStorage.getItem("user"));
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
-            let tokenId = await myProfile.mintItemFromFeeds(name, description, urlImage, 10, null, false, setProgress);
+            let metaData = await myProfile.createItemMetadata(name, description, urlImage, null, false, false);
+            let tokenId = await myProfile.createItemFromPasar(metaData, 10)
             console.log(tokenId);
         } catch(err) {
             console.log(err);
