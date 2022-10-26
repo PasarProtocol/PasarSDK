@@ -17,9 +17,9 @@ const ChangePrice = () => {
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
 
             if(currentListType == ListType.OnAuction) {
-                await myProfile.changePriceOnAuction(orderId, pricingToken, parseInt(price), parseInt(reservePrice), parseInt(buyoutPrice));
+                await myProfile.changePriceOnAuction(orderId, pricingToken, parseFloat(price), parseFloat(reservePrice), parseFloat(buyoutPrice));
             } else {
-                await myProfile.changePrice(orderId, pricingToken, parseInt(price));
+                await myProfile.changePrice(orderId, pricingToken, parseFloat(price));
             }
         } catch(err) {
             console.log(err);  

@@ -34,9 +34,9 @@ const ListNFT = () => {
                 let dateParts = dateTimeParts[0].split("-");
                 let timeParts = dateTimeParts[1].split(":");
                 let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
-                await myProfile.listItemOnAuction(collectionAddr, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, userURI);
+                await myProfile.listItemOnAuction(collectionAddr, tokenId, pricingToken, parseFloat(price), parseFloat(reservePrice), parseFloat(buyoutPrice), expire, userURI);
             } else {
-                await myProfile.listItem(collectionAddr, tokenId, pricingToken, price, userURI);
+                await myProfile.listItem(collectionAddr, tokenId, pricingToken, parseFloat(price), userURI);
             }
         } catch(err) {
             console.log(err);
