@@ -2,39 +2,42 @@ import { useState, useEffect } from "react";
 import { MyProfile, ListType, Token } from "@pasarprotocol/pasar-sdk-development";
 
 const ListNFT = () => {
+    const listPricingToken = Token.getToken();
+    const [collectionAddr, setCollectionAddr] = useState("");
     const [tokenId, setTokenId] = useState("");
     const [price, setPrice] = useState("");
     const [reservePrice, setReservePrice] = useState("");
     const [buyoutPrice, setBuyoutPrice] = useState("");
     const [exipirationTime, setExipirationTime] = useState("")
-    const [listPricingToken, setListPricingToken] = useState(Token.getToken());
-    const [pricingToken, setPricingToken] = useState('');
-    const [progress, setProgress] = useState(0);
-    const [currentListType, setCurrentListType] = useState(Object.keys(ListType)[0]);
-    const [addressCollection, setAddressCollection] = useState("");
+    const [pricingToken, setPricingToken] = useState(listPricingToken[Object.keys(listPricingToken)[0]]);
+    const [currentListType, setCurrentListType] = useState(ListType(Object.keys(ListType)[0]));
 
     useEffect(() => {
         setExipirationTime(timestampToDatetimeInputString(Date.now()));
     }, []);
 
-    useEffect(() => {
-        console.log(progress);
-    }, [progress]);
-
     const handleList = async () => {
         try {
             let user = JSON.parse(localStorage.getItem("user"));
+            let userURI = localStorage.getItem("user_uri");
+
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
-            // if(isAuction(currentListType)) {
-            //     console.log(exipirationTime);
-            //     let dateTimeParts = exipirationTime.split('T');
-            //     let dateParts = dateTimeParts[0].split("-");
-            //     let timeParts = dateTimeParts[1].split(":");
-            //     let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
-            //     await listItemonAuction(addressCollection, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, setProgress);
-            // } else {
-                await myProfile.listItem(addressCollection, tokenId, pricingToken, price);
-            // }
+
+            if(!userURI) {
+                userURI = await myProfile.createTraderMetadata();
+                localStorage.setItem("user_uri", userURI);
+            }
+
+            if(currentListType == ListType.OnAuction) {
+                console.log(exipirationTime);
+                let dateTimeParts = exipirationTime.split('T');
+                let dateParts = dateTimeParts[0].split("-");
+                let timeParts = dateTimeParts[1].split(":");
+                let expire = new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]).getTime();
+                await myProfile.listItemOnAuction(collectionAddr, tokenId, pricingToken, price, reservePrice, buyoutPrice, expire, userURI);
+            } else {
+                await myProfile.listItem(collectionAddr, tokenId, pricingToken, price, userURI);
+            }
         } catch(err) {
             console.log(err);
         }
@@ -55,20 +58,15 @@ const ListNFT = () => {
                     return <option key={ListType[key]} value={ListType[key]}>{ListType[key]}</option>
                 })}
             </select>
-
             <div>
                 <h3 className="sub_title">Collection Address</h3>
-                <input value={addressCollection} onChange={(e) => setAddressCollection(e.target.value)}/>
+                <input value={collectionAddr} onChange={(e) => setCollectionAddr(e.target.value)}/>
             </div>
             <div>
-                <h3 className="sub_title">tokenId</h3>
+                <h3 className="sub_title">TokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
             </div>
-            <div>
-                <h3 className="Price">price</h3>
-                <input value={price} onChange={(e) => setPrice(e.target.value)}/>
-            </div>
-            {/* {!isAuction(currentListType) ? <div>
+            {currentListType == ListType.FixedPrice ? <div>
                 <h3 className="Price">price</h3>
                     <input value={price} onChange={(e) => setPrice(e.target.value)}/>
                 </div> : <div>
@@ -89,7 +87,7 @@ const ListNFT = () => {
                         <input type="datetime-local" value={exipirationTime} onChange={(e) => setExipirationTime(e.target.value)}/>
                     </div> 
                 </div>
-            } */}
+            }
             <div>
                 <h3 className="sub_title">Pricing Type</h3>
                 <select onChange={(e) => setPricingToken(e.target.value)}>
