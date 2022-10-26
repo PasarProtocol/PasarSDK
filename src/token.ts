@@ -19,7 +19,7 @@ enum TokenETH {
 
 export class Token {
   static getToken() {
-    let chainType = AppContext.getAppContext().getChainType();
+    let chainType = AppContext.getInstance().getChainType();
     switch(chainType) {
       case ChainType.ESC:
         return TokenELA;

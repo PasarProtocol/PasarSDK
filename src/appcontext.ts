@@ -6,9 +6,9 @@ import valuesTestNet from "./contracts/deploy/testnet.json";
 import valuesMainNet from "./contracts/deploy/mainnet.json";
 
 export class AppContext {
+    private env: any;
     private appDID: string;
 
-    private env: any;
     private assistUrl: string;
     private ipfsUrl: string;
     private didResover: string;
@@ -29,13 +29,13 @@ export class AppContext {
         this.web3 =  new Web3(this.isInAppBrowser() ? window['elastos'].getWeb3Provider(): this.walletConnector);
     }
 
-    static createAppContext(testnet: boolean) {
+    static createInstance(testnet: boolean) {
         this.appContext = new AppContext(
             testnet ? valuesTestNet: valuesMainNet
         );
     }
 
-    static getAppContext(): AppContext {
+    static getInstance(): AppContext {
        return this.appContext;
     }
 

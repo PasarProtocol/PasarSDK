@@ -41,7 +41,7 @@ export class MyProfile {
         this.name = name;
         this.description = description;
         this.avatar = avatar;
-        this.appContext = AppContext.getAppContext();
+        this.appContext = AppContext.getInstance();
         this.contractHelper = new ContractHelper(this.walletAddress, this.appContext);
     }
 
@@ -403,7 +403,7 @@ export class MyProfile {
         toAddr: string,
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(FeedsCollectionABI, AppContext.getAppContext().getFeedsCollectionAddress(), toAddr, gasPrice);
+            await this.contractHelper.approveItems(FeedsCollectionABI, AppContext.getInstance().getFeedsCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInFeeds(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);
@@ -415,7 +415,7 @@ export class MyProfile {
         toAddr: string
     ): Promise<void> {
         return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PasarCollectionABI, AppContext.getAppContext().getPasarCollectionAddress(), toAddr, gasPrice);
+            await this.contractHelper.approveItems(PasarCollectionABI, AppContext.getInstance().getPasarCollectionAddress(), toAddr, gasPrice);
             await this.contractHelper.transferItemInPasar(toAddr, tokenId, baseToken, gasPrice);
         }).catch (error => {
             throw new Error(error);

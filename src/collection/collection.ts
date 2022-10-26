@@ -75,10 +75,7 @@ class Collection {
         throw new Error("Method not implemented");
     }
 
-    public queryItems(_earlierThen: number,
-        _capcity = 0,
-        _filter: Filter = new Filter()
-    ): Promise<ItemPage> {
+    public queryItems(_beforeTime: number, _capcity = 0, _filter = new Filter()): Promise<ItemPage> {
         throw new Error("Method not implemented");
     }
 }
