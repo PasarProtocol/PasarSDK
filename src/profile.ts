@@ -9,10 +9,18 @@ export class Profile {
     private walletAddr: string;
     private assistUrl: string;
 
-    constructor(userDid: string, walletAddr: string) {
-        this.assistUrl = AppContext.getAppContext().getAssistNode();
-        this.userDid = userDid;
-        this.walletAddr = walletAddr;
+    constructor(appContext: AppContext, userDid: string, walletAddr: string) {
+        this.assistUrl = appContext.getAssistNode();
+        this.userDid = userDid
+        this.walletAddr = walletAddr
+    }
+
+    public getUserDid(): string {
+        return this.userDid
+    }
+
+    public getWalletAddress(): string {
+        return this.walletAddr
     }
 
     /**
@@ -28,9 +36,11 @@ export class Profile {
         _capacity = 0,
         _filter = new Filter()
     ): Promise<ItemPage> {
-        return await getOwnedItems(this.assistUrl, this.walletAddr).catch(error => {
-            throw new Error(error);
-        })
+        try {
+            return await getOwnedItems(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query owned item errors: ${error}`)
+        }
     }
 
     /**
@@ -45,9 +55,11 @@ export class Profile {
         _capacity = 0,
         _filter = new Filter()
     ): Promise<ItemPage> {
-        return await getListedItems(this.assistUrl, this.walletAddr).catch((error) => {
-            throw new Error(error);
-        })
+        try {
+            return await getListedItems(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query listed items error: ${error}`)
+        }
     }
 
     /**
@@ -62,9 +74,11 @@ export class Profile {
         _capacity = 0,
         _filter = new Filter()
     ): Promise<ItemPage> {
-        return await getBiddingItems(this.assistUrl, this.walletAddr).catch(error => {
-            throw new Error(error);
-        });
+        try {
+            return await getBiddingItems(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query bidding items error: ${error}`)
+        }
     }
 
     /**
@@ -79,9 +93,11 @@ export class Profile {
         _capacity = 0,
         _filter = new Filter()
     ): Promise<ItemPage> {
-        return await getCreatedItems(this.assistUrl, this.walletAddr).catch(error => {
-            throw new Error(error);
-        })
+        try {
+            return await getCreatedItems(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query created items error: ${error}`)
+        }
     }
 
     /**
@@ -96,9 +112,11 @@ export class Profile {
         _capacity = 0,
         _filter = new Filter()
     ): Promise<ItemPage> {
-        return await getSoldItems(this.assistUrl, this.walletAddr).catch (error => {
-            throw new Error(error);
-        })
+        try {
+            return await getSoldItems(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query sold items error: ${error}`)
+        }
     }
 
     /**
@@ -108,13 +126,15 @@ export class Profile {
      * @param _filter: A query filter
      * @returns: A list of NFT items.
      */
-     public async queryCollections(
+     public async queryOwnedCollections(
         _ealierThen: number = Date.now(),
         _capacity = 0,
         _filter = new Filter()
     ): Promise<CollectionPage> {
-        return await getOwnedCollections(this.assistUrl, this.walletAddr).catch(error => {
-            throw new Error(error);
-        })
+        try {
+            return await getOwnedCollections(this.assistUrl, this.walletAddr)
+        } catch (error) {
+            throw new Error(`Query owned qcollections error: ${error}`)
+        }
     }
 }
