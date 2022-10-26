@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
 
 const TransferNFT = () => {
+    const [collectionAddr, setCollectionAddr] = useState("");
     const [tokenId, setTokenId] = useState("");
     const [toAddress, setToAddress] = useState("");
 
@@ -9,7 +10,7 @@ const TransferNFT = () => {
         try {
             let user = JSON.parse(localStorage.getItem("user"));
             const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
-            await myProfile.transferItem("0x686D6cB8f81dF709564Ed0041A5d522716892c37", tokenId, toAddress);
+            await myProfile.transferItem(collectionAddr, tokenId, toAddress);
         } catch(err) {
             console.log(err);
         }
@@ -17,6 +18,10 @@ const TransferNFT = () => {
 
     return (
         <div>
+            <div>
+                <h3 className="sub_title">Collection Address</h3>
+                <input value={collectionAddr} onChange={(e) => setCollectionAddr(e.target.value)}/>
+            </div>
             <div>
                 <h3 className="sub_title">tokenId</h3>
                 <input value={tokenId} onChange={(e) => setTokenId(e.target.value)}/>
