@@ -2,47 +2,56 @@ import { create } from 'ipfs-http-client';
 import sha256 from 'crypto-js/sha256';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
-import { ERCType } from "./erctype";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
-import { defaultAddress } from "./constant";
 import { resizeImage, requestSigndataOnTokenID } from "./global";
 import PasarCollectionABI from './contracts/abis/pasarCollection';
 import FeedsCollectionABI from './contracts/abis/feedsCollection';
+import Token721ABI from "./contracts/abis/token721ABI"
+import Token721Code from "./contracts/bytecode/token721Code";
+import Token1155ABI from "./contracts/abis/token1155ABI"
 import { AppContext } from './appcontext';
 
 import { ContractHelper } from './contracthelper';
 import { SocialLinks } from './sociallinks';
-import TOKEN_721_ABI from "./contracts/abis/token721ABI";
-import TOKEN_1155_ABI from "./contracts/abis/token1155ABI";
-import TOKEN_721_CODE from "./contracts/bytecode/token721Code";
-import TOKEN_1155_CODE from "./contracts/bytecode/token1155Code";
+
+const getGasPrice = async(appContext: AppContext): Promise<string> => {
+    return await appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
+        return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
+    })
+}
+
+const isNativeToken = (address: string): boolean => {
+    return address === "0x0000000000000000000000000000000000000000";
+}
 
 /**
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile {
     private appContext: AppContext;
+    private assistUrl: string;
     private contractHelper: ContractHelper;
 
     private name: string;
-    private did: string;
+    private userDid: string;
     private description: string;
     private avatar: string;
     private walletAddress: string;
 
-    constructor(did: string,
+    constructor(appContext: AppContext, userDid: string,
         walletAddress: string,
         name: string,
         description: string,
         avatar: string) {
 
-        this.did = did;
+        this.appContext = appContext;
+        this.assistUrl = appContext.getAssistNode();
+        this.userDid = userDid;
         this.walletAddress = walletAddress;
-        this.name = name;
-        this.description = description;
+        this.name = name || "";
+        this.description = description || "";
         this.avatar = avatar;
-        this.appContext = AppContext.getInstance();
-        this.contractHelper = new ContractHelper(this.walletAddress, this.appContext);
+        this.contractHelper = new ContractHelper(walletAddress, appContext);
     }
 
     public updateName(name: string): MyProfile {
@@ -60,68 +69,55 @@ export class MyProfile {
         return this;
     }
 
-    private getGasPrice = async(): Promise<string> => {
-        return await this.appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
-            return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
-        })
-    }
-
     /**
-     * Update royalties for the NFT collection
-     * @param tokenAddress The NFT collection contract address
-     * @param royaltyRates The roraylty rates for this NFT collection
-     * @result
-     */
-     public async updateCollectionRoyalties(tokenAddress: string,
-        royaltyRates: RoyaltyRate[],
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.updateCollectionRoyalties(
-                this.appContext.getRegistryContract(), tokenAddress, royaltyRates, gasPrice
-            );
-        }).catch(error => {
-            throw new Error(error);
-        })
-    }
-
-    /**
-     * Delete exiting NFT item.
-     * Notice: the NFT item should be unlisted from marketplace first before deleting
-     *         the item.
+     * Generate a metadata json file of the NFT collection that is about to be registered.
      *
-     * @param baseToken The collection contract where NFT items would be burned
-     * @param tokenId The tokenId of NFT item to be burned
-     * @returns The result of whether the NFT is deleted or not.
+     * @param category The category of NFT collection
+     * @param description The brief description of NFT collection
+     * @param avatarPath The avatar image path
+     * @param bannerPath The background image path
+     * @param socialLinks The social media related to this NFT collection
+     * @returns The URI to this collection metadata json file on IPFS storage.
      */
-     public async deleteItem(
-        baseToken: string,
-        tokenId: string,
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnERC721Item(baseToken, tokenId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
+    public async createCollectionURI(category: Category,
+        description: string,
+        avatarPath: string,
+        bannerPath: string,
+        socialLinks: SocialLinks) {
 
-    public async deleteItemFromFeeds(
-        tokenId: string
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnItemInFeeds(this.appContext.getFeedsCollectionAddress(), tokenId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
+        try {
+            let client = create({ url: this.assistUrl })
+            let avatarCid = await client.add(avatarPath)
+            let bannerCid = await client.add(bannerPath)
 
-    public async deleteItemInPasar(
-        tokenId: string
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            await this.contractHelper.burnItemInPasar(this.appContext.getPasarCollectionAddress(), tokenId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+            let data = {
+                avatar: `pasar:image:${avatarCid.path}`,
+                background: `pasar:image:${bannerCid.path}`,
+                description,
+                category: category.toString(),
+                socials: socialLinks.toJson(),
+            }
+
+            let plainData = bs58.encode(Buffer.from(JSON.stringify(data)))
+            let signedData = await requestSigndataOnTokenID(plainData);
+            let creatorJson = {
+                did: this.userDid,
+                name: this.name,
+                description: this.description,
+                signature: signedData && signedData.signature ? signedData.signature : ""
+            }
+
+            let metadata = {
+                "version": "1",
+                "creator": creatorJson,
+                "data": data
+            }
+
+            let cid = await client.add(JSON.stringify(metadata))
+            return `pasar:json:${cid.path}`
+        }catch(error) {
+            throw new Error(`Create collection metadata error: ${error}`);
+        }
     }
 
     /**
@@ -130,73 +126,16 @@ export class MyProfile {
      *
      * @param name The name of NFT collection
      * @param symbol The symbol of NFT collection
-     * @param collectionUri The uri of NFT collection
      * @returns The deployed NFT collection contract address.
      */
-     public async createCollection(name: string,
-        symbol: string,
-        collectionUri: string,
-        itemType: ERCType
-    ): Promise<string> {
-        return await this.getGasPrice().then (async gasPrice => {
-            const tokenStandard = {
-                "ERC721": {abi: TOKEN_721_ABI, code: TOKEN_721_CODE},
-                "ERC1155": {abi: TOKEN_1155_ABI, code: TOKEN_1155_CODE}
-            }
-
-            const {abi: tokenABI, code: tokenCode} = tokenStandard[itemType]
-
-            return await this.contractHelper.createCollection(
-                name, symbol, collectionUri, {abi: tokenABI, code: tokenCode}, gasPrice
-            );
-        }).catch (error => {
-            throw new Error(error);
-        })
-    }
-
-    /**
-     * Generate a metadata json file of the NFT collection that is about to be registered.
-     *
-     * @param description The brief description of NFT collection
-     * @param avatarPath The avatar image path
-     * @param bannerPath The background image path
-     * @param category The category of NFT collection
-     * @param socialLinks The social media related to this NFT collection
-     * @returns The URI to this collection metadata json file on IPFS storage.
-     */
-    public async createCollectionMetadata(description: string,
-        avatarPath: string,
-        bannerPath: string,
-        category: Category,
-        socialLinks: SocialLinks) {
-
+     public async createCollection(name: string, symbol: string): Promise<string> {
         try {
-            const client = create({ url: this.appContext.getIPFSNode()});
-            const dataJson = {
-                avatar: `pasar:image:${(await client.add(avatarPath)).path}`,
-                background: `pasar:image:${(await client.add(bannerPath)).path}`,
-                description,
-                category: category.toString().toLowerCase(),
-                socials: socialLinks.toJson(),
-            }
-            const plainText = bs58.encode(Buffer.from(JSON.stringify(dataJson)))
-            const signature = await requestSigndataOnTokenID(plainText);
-            const creatorJson = {
-                did: this.did,
-                name: this.name || "",
-                description: this.description || "",
-                signature: signature && signature.signature ? signature.signature : ""
-            }
-
-            const metadataJson = {
-                "version": "1",
-                "creator": creatorJson,
-                "data": dataJson
-            }
-
-            return `pasar:json:${(await client.add(JSON.stringify(metadataJson))).path}`;
-        }catch(error) {
-            throw new Error(error);
+            let gasPrice = await getGasPrice(this.appContext)
+            return await this.contractHelper.createCollection(
+                name, symbol, Token721ABI, Token721Code, gasPrice // TODO: contractURI
+            )
+        } catch (error) {
+            throw new Error(`Deploy a new collection error ${error}`)
         }
     }
 
@@ -205,46 +144,64 @@ export class MyProfile {
      * Once the collection is registered to Pasar marketplace, the NFTs in this collection can
      * be listed onto market for trading.
      *
-     * @param tokenAddress The NFT collection contract address
-     * @param collectionUri The uri of the NFT collection referring to the metadata json file on
+     * @param collection The NFT collection contract address
+     * @param collectionURI The uri of the NFT collection referring to the metadata json file on
      *        IPFS storage
      * @param royalties The roraylty rates for this NFT collection
      * @returns The result of whether this NFT collection contract is registered ont Pasar or not
      */
-    public async registerCollection(
-        tokenAddress: string,
+    public async registerCollection(collection: string,
         name: string,
-        collectionUri: string,
-        royalties: RoyaltyRate[]
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
+        collectionURI: string,
+        royalties: RoyaltyRate[]) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.registerCollection(
-                this.appContext.getRegistryContract(), tokenAddress, name, collectionUri, royalties, gasPrice
+                this.appContext.getRegistryContract(), collection, name, collectionURI,
+                royalties, gasPrice
             );
-        }).catch (error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`Register collection onto Pasar error: ${error}`)
+        }
     }
 
     /**
      * Update collection URI or name for the NFT collection
      * Notice: the current wallet address should be the owner of this NFT collection.
-     * @param tokenAddress The NFT collection contract address
+     * @param collection The NFT collection contract address
      * @param name The new name of NFT collection
-     * @param collectionUri The new uri of NFT collection to metadata json file on IPFS storage
+     * @param collectionURI The new uri of NFT collection to metadata json file on IPFS storage
      * @returns The result of whether the NFT collection is updated or not.
      */
-    public async updateCollectionURI(tokenAddress: string,
+    public async updateCollectionUri(collection: string,
         name: string,
-        collectionUri: string
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
+        collectionURI: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.updateCollectionInfo(
-                this.appContext.getRegistryContract(), tokenAddress, name, collectionUri, gasPrice
+                this.appContext.getRegistryContract(), collection, name, collectionURI, gasPrice
+            )
+        } catch (error) {
+            throw new Error(`Update collection uri error: ${error}`)
+        }
+    }
+
+    /**
+     * Update royalties for the NFT collection
+     * @param collection The NFT collection contract address
+     * @param royaltyRates The roraylty rates for this NFT collection
+     * @result
+     */
+     public async updateCollectionRoyalty(collection: string,
+        royaltyRates: RoyaltyRate[]) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            await this.contractHelper.updateCollectionRoyalties(
+                this.appContext.getRegistryContract(), collection, royaltyRates, gasPrice
             );
-        }).catch(error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`Update collection royalty error: ${error}`)
+        }
     }
 
     /**
@@ -253,41 +210,39 @@ export class MyProfile {
      * @param itemName The name of NFT item to be minted
      * @param itemDescription The brief description of an NFT item
      * @param itemImage The actual image of an NFT item
-     * @param version The version of nft
      * @param properties properties of nft
      * @param sensitive Indicator whether the NFT item contains sensitive content or not
      * @returns The result is the did information.
      */
-    public async createItemMetadata(
-        itemName: string,
+    public async createTokenURI(itemName: string,
         itemDescription: string,
         itemImage: any,
-        properties: any = null,
-        sensitive = false,
-        feeds = false,
+        properties: any = null, // TODO: Must be json
+        sensitive = false
     ): Promise<string> {
         try {
-            const client = create({ url: this.appContext.getIPFSNode() });
-            let image_add = await client.add(itemImage);
+            const client = create({ url: this.assistUrl });
+            let imageCID  = await client.add(itemImage)
+            let thumbnail = await resizeImage(itemImage, 300, 300) as any
 
-            let thumbnail:any = await resizeImage(itemImage, 300, 300);
-
-            let thumbnail_add = image_add;
+            let thumbnailCID: any
             if(thumbnail['success'] === 0) {
-                thumbnail_add = await client.add(thumbnail.fileContent);
+                thumbnailCID = await client.add(thumbnail.fileContent)
+            } else {
+                thumbnailCID = imageCID
             }
 
             const creatorObject = {
-                "did": this.did,
+                "did": this.userDid,
                 "name": this.name,
-                "description": this.description,
+                "description": this.description, // TODO: need signed data on tokenID here.
             }
 
             const imageObject = {
-                "image": `pasar:image:${image_add.path}`,
+                "image": `pasar:image:${imageCID.path}`,
                 "kind": itemImage.type.replace('image/', ''),
                 "size": itemImage.size,
-                "thumbnail": `pasar:image:${thumbnail_add.path}`,
+                "thumbnail": `pasar:image:${thumbnailCID.path}`,
             }
 
             const metaObj = {
@@ -302,10 +257,9 @@ export class MyProfile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-
-            return feeds ? `Feeds:json:${metaData.path}` : `pasar:json:${metaData.path}`;
-        } catch(err) {
-            throw new Error(err);
+            return `pasar:json:${metaData.path}`
+        } catch(error) {
+            throw new Error(`Create token URI error: ${error}`);
         }
     }
 
@@ -319,16 +273,15 @@ export class MyProfile {
      * @param tokenURI The token uri to this new NFT item
      * @returns The tokenId of the new NFT.
      */
-    public async createItem(collection: string,
-        tokenURI: string,
-    ): Promise<string> {
-        return await this.getGasPrice().then(async gasPrice => {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
+    public async createItem(collection: string, tokenURI: string): Promise<string> {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI, gasPrice);
-            return tokenId;
-        }).catch (error => {
-            throw new Error(error);
-        })
+            return tokenId
+        } catch (error) {
+            throw new Error(`Create NFT item error: ${error}`)
+        }
     }
 
     /**
@@ -341,19 +294,17 @@ export class MyProfile {
      * @param roylatyFee The royalty fee to the new NFT item
      * @returns The tokenId of being minted a nft
      */
-    public async createItemFromFeeds(
-        tokenURI: string,
-        roylatyFee: number,
-    ): Promise<string> {
-        return await this.getGasPrice().then(async gasPrice => {
-            let tokenId = `0x${sha256(tokenURI.replace("Feeds:json:", ""))}`;
+    public async createItemFromFeeds(tokenURI: string,roylatyFee: number): Promise<string> {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromFeedsCollection(
-                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, this.did, gasPrice
-            );
-            return tokenId;
-        }).catch (error => {
-            throw new Error(error);
-        })
+                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, this.userDid, gasPrice
+            ); // TODO: creatorURI
+            return tokenId
+        } catch (error) {
+            throw new Error(`Create item from Feeds collection error: ${error}`)
+        }
     }
 
     /**
@@ -363,63 +314,95 @@ export class MyProfile {
      * @param roylatyFee The royalty fee to the new NFT item
      * @returns The tokenId of being minted a nft
      */
-    public async createItemFromPasar(
-        tokenURI: string,
-        roylatyFee: number,
-    ): Promise<string> {
-        return await this.getGasPrice().then(async gasPrice => {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
+    public async createItemFromPasar(tokenURI: string,roylatyFee: number): Promise<string> {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromPasarCollection(
                 this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee, gasPrice
-            );
-            return tokenId;
-        }).catch (error => {
-            throw new Error(error);
-        })
+            ); // TODO: creatorURI
+            return tokenId
+        } catch (error) {
+            throw new Error(`Create item from Pasar collection error: ${error}`)
+        }
     }
 
     /**
      * Transfer NFT item to another address.
      *
-     * @param baseToken the collection of this NFT item
+     * @param collection the collection of this NFT item
      * @param tokenId The tokenId of NFT item
      * @param toAddr the target wallet address to recieve the NFT item
      * @returns
      */
-    public async transferItem(baseToken: string,
-        tokenId: string,
-        toAddr: string,
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(TOKEN_721_ABI, baseToken, toAddr, gasPrice);
-            await this.contractHelper.transfer721Item(toAddr, tokenId, baseToken, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+    public async transferItem(collection: string, tokenId: string, toAddr: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            await this.contractHelper.approveItems(Token721ABI, collection, toAddr, gasPrice);
+            await this.contractHelper.transfer721Item(toAddr, tokenId, collection, gasPrice);
+        } catch (error) {
+            throw new Error(`Transfer NFT item error: ${error}`)
+        }
     }
 
-    public async transferItemInFeeds(baseToken: string,
-        tokenId: string,
-        toAddr: string,
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(FeedsCollectionABI, AppContext.getInstance().getFeedsCollectionAddress(), toAddr, gasPrice);
-            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, baseToken, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+    public async transferItemInFeeds(tokenId: string, toAddr: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let collection = this.appContext.getFeedsCollectionAddress()
+            await this.contractHelper.approveItems(FeedsCollectionABI, collection, toAddr, gasPrice);
+            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection, gasPrice);
+        } catch (error) {
+            throw new Error(`Transfer NFT item in Feeds collection error: ${error}`)
+        }
     }
 
-    public async transferItemInPasar(baseToken: string,
-        tokenId: string,
-        toAddr: string
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PasarCollectionABI, AppContext.getInstance().getPasarCollectionAddress(), toAddr, gasPrice);
-            await this.contractHelper.transferItemInPasar(toAddr, tokenId, baseToken, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+    public async transferItemInPasar(tokenId: string, toAddr: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let collection = this.appContext.getPasarCollectionAddress()
+            await this.contractHelper.approveItems(PasarCollectionABI, collection, toAddr, gasPrice);
+            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection, gasPrice);
+        } catch (error) {
+            throw new Error(`Transfer NFT item in Pasar collection error: ${error}`)
+        }
+    }
+
+     /**
+     * Delete exiting NFT item.
+     * Notice: the NFT item should be unlisted from marketplace first before deleting
+     *         the item.
+     *
+     * @param collection The collection contract where NFT items would be burned
+     * @param tokenId The tokenId of NFT item to be burned
+     * @returns The result of whether the NFT is deleted or not.
+     */
+    public async deleteItem(collection: string, tokenId: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            await this.contractHelper.burnERC721Item(collection, tokenId, gasPrice);
+        } catch (error) {
+            throw new Error(`Delete item tokenId ${tokenId} from collection ${collection}`);
+        }
+    }
+
+    public async deleteItemFromFeeds(tokenId: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let collection = this.appContext.getFeedsCollectionAddress()
+            await this.contractHelper.burnItemInFeeds(collection, tokenId, gasPrice);
+        } catch (error) {
+            throw new Error(`Delete item tokenId ${tokenId} from Feeds collection`);
+        }
+    }
+
+    public async deleteItemInPasar(tokenId: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let collection = this.appContext.getPasarCollectionAddress()
+            await this.contractHelper.burnItemInPasar(collection, tokenId, gasPrice);
+        } catch (error) {
+            throw new Error(`Delete item tokenId ${tokenId} from Pasar collection`);
+        }
     }
 
     /**
@@ -427,19 +410,16 @@ export class MyProfile {
      *
      * @eturns The uri of metadata json file pushed onto IPFS storage.
      */
-    public async createTraderMetadata() {
+    public async createUserURI() {
         try {
-            const client = create({
-                 url: this.appContext.getIPFSNode()
-            });
-
-            let result = await client.add(JSON.stringify({
-                "did": this.did,
+            let client = create({url: this.assistUrl });
+            let userCID = await client.add(JSON.stringify({
+                "did": this.userDid,
                 "name": this.name,
                 "description": this.description
             }));
 
-            return `pasar:json:${result.path}`;
+            return `pasar:json:${userCID.path}`;
         } catch (error) {
             throw new Error(error);
         }
@@ -448,36 +428,73 @@ export class MyProfile {
     /**
      * List an specific NFT item onto marketplace for rading with fixed price.
      *
-     * @param baseToken The collection of this NFT item
+     * @param collection The collection of this NFT item
      * @param tokenId The tokenId of NFT item
      * @param pricingToken The token address of pricing token
      * @param price The price value to sell
      * @param sellerURI:
      */
-    public async listItem(baseToken: string,
+    public async listItem(collection: string,
         tokenId: string,
-        pricingToken: string,
+        pricingToken:string,
         price: number,
-        listerURI: string
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            let contractABI = TOKEN_721_ABI;
-            if(baseToken == this.appContext.getFeedsCollectionAddress() || baseToken == this.appContext.getPasarCollectionAddress()) {
-                contractABI = TOKEN_1155_ABI
-            }
-            await this.contractHelper.approveItems(contractABI, baseToken, this.appContext.getMarketContract(), gasPrice);
+        sellerURI: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            await this.contractHelper.approveItems(Token721ABI, collection, this.appContext.getMarketContract(), gasPrice);
             await this.contractHelper.createOrderForSale(
                 this.appContext.getMarketContract(),
                 tokenId,
-                baseToken,
+                collection,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                listerURI,
+                sellerURI,
                 gasPrice
             );
-        }).catch (error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`List item on market error: ${error}`)
+        }
+    }
+
+    private async listItem1155(collection: string,
+        tokenId: string,
+        pricingToken: string,
+        price: number,
+        sellerURI: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let marketContract = this.appContext.getMarketContract()
+            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract, gasPrice);
+            await this.contractHelper.createOrderForSale(
+                marketContract,
+                tokenId,
+                collection,
+                BigInt(price*1e18).toString(),
+                pricingToken,
+                sellerURI,
+                gasPrice
+            );
+        } catch (error) {
+            throw new Error(`List item on market error: ${error}`)
+        }
+    }
+
+    public async listItemFromFeeds(tokenId: string,
+        pricingToken: string,
+        price: number,
+        sellerURI: string) {
+
+        let collection = this.appContext.getFeedsCollectionAddress()
+        return await this.listItem1155(collection, tokenId, pricingToken, price, sellerURI)
+    }
+
+    public async listItemFromPasar(tokenId: string,
+        pricingToken: string,
+        price: number,
+        sellerURI: string) {
+
+        let collection = this.appContext.getPasarCollectionAddress()
+        return await this.listItem1155(collection, tokenId, pricingToken, price, sellerURI)
     }
 
     /**
@@ -491,19 +508,20 @@ export class MyProfile {
      */
     public async changePrice(orderId: string,
         newPricingToken: string,
-        newPrice: number,
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
+        newPrice: number) {
+
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.changePrice(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
                 BigInt(newPrice*1e18).toString(),
                 newPricingToken,
                 gasPrice
-            );
-        }).catch (error => {
-            throw new Error(error);
-        })
+            )
+        } catch (error) {
+            throw new Error(`Change fixed price error: ${error}`)
+        }
     }
 
     /**
@@ -515,28 +533,29 @@ export class MyProfile {
      */
     public async buyItem(orderId: string,
         buyingPrice: number,
-        quoteToken: string,
-        buyerURI: string
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            if(quoteToken != defaultAddress) {
+        buyingToken: string,
+        buyerURI: string) {
+
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            if (!isNativeToken(buyingToken)) {
                 await this.contractHelper.approveToken(
-                    buyingPrice, quoteToken, this.appContext.getMarketContract(), gasPrice
+                    buyingPrice, buyingToken, this.appContext.getMarketContract(), gasPrice
                 );
             }
             await this.contractHelper.buyItem(
                 this.appContext.getMarketContract(),
-                orderId, buyingPrice, quoteToken, buyerURI,  gasPrice
+                orderId, buyingPrice, buyingToken, buyerURI,  gasPrice
             );
-        }).catch(error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`Buying item ${orderId} error: ${error}`)
+        }
     }
 
     /**
      * List an specific NFT item onto marketplace for rading on auction.
      *
-     * @param baseToken The collection of this NFT item
+     * @param collection The collection of this NFT item
      * @param tokenId The tokenId of NFT item
      * @param pricingToken The contract address of ERC20 token as pricing token
      * @param minPrice The minimum starting price for bidding on the auction
@@ -545,32 +564,90 @@ export class MyProfile {
      * @param expirationTime: The time for ending the auction
      * @param sellerURI The uri of seller information on IPFS storage
      */
-    public async listItemOnAuction(baseToken: string,
+    public async listItemOnAuction(collection: string,
         tokenId: string,
         pricingToken: string,
         minPrice: number,
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        listerURI: string,
-    ): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.approveItems(PasarCollectionABI, baseToken, this.appContext.getMarketContract(), gasPrice);
+        sellerURI: string) {
+
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let marketContract = this.appContext.getMarketContract()
+
+            await this.contractHelper.approveItems(Token721ABI, collection, marketContract , gasPrice);
             await this.contractHelper.createOrderForAuction(
-                this.appContext.getMarketContract(),
-                baseToken,
+                marketContract,
+                collection,
                 tokenId,
                 pricingToken,
                 minPrice,
                 reservePrice,
                 buyoutPrice,
                 expirationTime,
-                listerURI,
+                sellerURI,
                 gasPrice
             );
-        }).catch(error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`List item on Auction from collection ${collection} error: ${error}`)
+        }
+    }
+
+    private async listItemERC1155OnAuction(collection: string,
+        tokenId: string,
+        pricingToken: string,
+        minPrice: number,
+        reservePrice: number,
+        buyoutPrice: number,
+        expirationTime: number,
+        sellerURI: string) {
+
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let marketContract = this.appContext.getMarketContract()
+
+            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract, gasPrice);
+            await this.contractHelper.createOrderForAuction(
+                marketContract,
+                collection,
+                tokenId,
+                pricingToken,
+                minPrice,
+                reservePrice,
+                buyoutPrice,
+                expirationTime,
+                sellerURI,
+                gasPrice
+            );
+        } catch (error) {
+            throw new Error(`List item on Auction from collection ${collection} error: ${error}`)
+        }
+    }
+
+    public async listItemOnAuctionFromFeeds(tokenId: string,
+        pricingToken: string,
+        minPrice: number,
+        reservePrice: number,
+        buyoutPrice: number,
+        expirationTime: number,
+        sellerURI: string) {
+
+        return await this.listItemERC1155OnAuction(this.appContext.getFeedsCollectionAddress(),
+            tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI)
+    }
+
+    public async listItemOnAuctionFromPasar(tokenId: string,
+        pricingToken: string,
+        minPrice: number,
+        reservePrice: number,
+        buyoutPrice: number,
+        expirationTime: number,
+        sellerURI: string) {
+
+        return await this.listItemERC1155OnAuction(this.appContext.getPasarCollectionAddress(),
+            tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI)
     }
 
     /**
@@ -589,56 +666,54 @@ export class MyProfile {
         newPricingToken: string,
         newMinPrice: number,
         newReservedPrice: number,
-        newBuyoutPrice: number
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            let priceValue = BigInt(newMinPrice*1e18).toString();
-            let reservePriceValue = BigInt(newReservedPrice*1e18).toString();
-            let buyoutPriceValue = BigInt(newBuyoutPrice*1e18).toString();
+        newBuyoutPrice: number) {
 
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.changePriceOnAuction(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
-                priceValue,
-                reservePriceValue,
-                buyoutPriceValue,
+                BigInt(newMinPrice*1e18).toString(),
+                BigInt(newReservedPrice*1e18).toString(),
+                BigInt(newBuyoutPrice*1e18).toString(),
                 newPricingToken,
                 gasPrice
-            );
-        }).catch (error => {
-            throw new Error(error);
-        })
+            )
+        } catch (error) {
+            throw new Error(`Change price on auction error: ${error}`);
+        }
     }
 
     /**
      * Offer a bidding price on list item that is being on auciton on marketplace.
      *
      * @param orderId The orderId of NFT item listed on auciton.
+     * @param pricingToken
      * @param price The price offered by bidder
-     * @param bidderUri The uri of bidder information on IPFS storage
+     * @param bidderURI The uri of bidder information on IPFS storage
      * @returns The result of bidding action.
      */
     public async bidItemOnAuction(orderId: string,
-        quoteToken: string,
+        pricingToken: string,
         price: number,
-        bidderURI: string
-    ): Promise<void> {
-        return await this.getGasPrice().then (async gasPrice => {
-            let priceValue = Number(BigInt(price*1e18));
-            if(quoteToken != defaultAddress) {
-                await this.contractHelper.approveToken(priceValue, quoteToken, this.appContext.getMarketContract(), gasPrice);
+        bidderURI: string) {
+
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            let marketContract = this.appContext.getMarketContract()
+            if (!isNativeToken(pricingToken)) {
+                await this.contractHelper.approveToken(price, pricingToken, marketContract, gasPrice);
             }
 
-            await this.contractHelper.bidItemOnAuction(
-                this.appContext.getMarketContract(),
+            await this.contractHelper.bidItemOnAuction(marketContract,
                 orderId,
-                priceValue,
-                quoteToken,
+                price,
+                pricingToken,
                 bidderURI,
-                gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+                gasPrice)
+        } catch (error) {
+            throw new Error(`Bidding item on auction error: ${error}`)
+        }
     }
 
     /**
@@ -646,12 +721,13 @@ export class MyProfile {
      *
      * @param orderId The orderId of NFT item listed on auciton.
      */
-    public async settleAuction(orderId: string): Promise<void> {
-        return await this.getGasPrice().then(async gasPrice => {
+    public async settleAuction(orderId: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.settleAuction(this.appContext.getMarketContract(), orderId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+        } catch (error) {
+            throw new Error(`Settle auction on order ${orderId} error: ${error}`)
+        }
     }
 
     /**
@@ -662,11 +738,12 @@ export class MyProfile {
      * @param orderId The orderId of NFT item listed on marketplace
      * @returns
      */
-    public async unlistItem(orderId: string): Promise<void> {
-        await this.getGasPrice().then(async gasPrice => {
-            await this.contractHelper.unlistItem(this.appContext.getMarketContract(), orderId, gasPrice);
-        }).catch (error => {
-            throw new Error(error);
-        })
+    public async unlistItem(orderId: string) {
+        try {
+            let gasPrice = await getGasPrice(this.appContext)
+            await this.contractHelper.unlistItem(this.appContext.getMarketContract(), orderId, gasPrice)
+        } catch (error) {
+            throw new Error(`Unlist item error: ${error}`)
+        }
     }
 }
