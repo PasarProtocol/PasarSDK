@@ -31,6 +31,7 @@ export class MyProfile {
     private appContext: AppContext;
     private assistUrl: string;
     private contractHelper: ContractHelper;
+    private ipfsUrl: string;
 
     private name: string;
     private userDid: string;
@@ -46,6 +47,7 @@ export class MyProfile {
 
         this.appContext = appContext;
         this.assistUrl = appContext.getAssistNode();
+        this.ipfsUrl = appContext.getIPFSNode()
         this.userDid = userDid;
         this.walletAddress = walletAddress;
         this.name = name || "";
@@ -86,7 +88,7 @@ export class MyProfile {
         socialLinks: SocialLinks) {
 
         try {
-            let client = create({ url: this.assistUrl })
+            let client = create({ url: this.ipfsUrl })
             let avatarCid = await client.add(avatarPath)
             let bannerCid = await client.add(bannerPath)
 
@@ -221,7 +223,7 @@ export class MyProfile {
         sensitive = false
     ): Promise<string> {
         try {
-            const client = create({ url: this.assistUrl });
+            const client = create({ url: this.ipfsUrl });
             let imageCID  = await client.add(itemImage)
             let thumbnail = await resizeImage(itemImage, 300, 300) as any
 
@@ -412,7 +414,7 @@ export class MyProfile {
      */
     public async createUserURI() {
         try {
-            let client = create({url: this.assistUrl });
+            let client = create({url: this.ipfsUrl });
             let userCID = await client.add(JSON.stringify({
                 "did": this.userDid,
                 "name": this.name,

@@ -24,7 +24,7 @@ const ListNFT = () => {
             const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
             if(!userURI) {
-                userURI = await myProfile.createTraderMetadata();
+                userURI = await myProfile.createUserURI();
                 localStorage.setItem("user_uri", userURI);
             }
 
