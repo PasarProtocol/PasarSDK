@@ -10,15 +10,20 @@ import {signin, signout, checkSign} from "./connect/connectors";
 function SigninEE() {
   const navigate = useNavigate();
   const [login, setLogin] = useState(checkSign());
-  let profile =  new Profile("", "0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
-  let market = new Market();
+  let appContext = AppContext.getInstance();
+  let profile =  new Profile(appContext, "", "0xD47e14d54C6B3C5993b7074e6Ec50aBee7C7Fc10");
+  let market = new Market(appContext);
+  let now = (Date.now() / 1000).toFixed();
+
   const handleGetListedItem = async () => {
-    let result = await market.queryItems(2, 10);
+    now = (Date.now() / 1000).toFixed();
+    console.log(now);
+    let result = await market.queryItems(now, 1, 10);
     console.log(result);
   }
 
   const handleGetOwnedCollection = async () => {
-    let result = await profile.queryCollections();
+    let result = await profile.queryOwnedCollections();
     console.log(result);
   }
 
@@ -52,7 +57,7 @@ function SigninEE() {
     console.log(result);
     localStorage.setItem("user", JSON.stringify(result));
     setLogin(checkSign());
-    AppContext.createAppContext(true);
+    AppContext.createInstance(true);
   }
 
   const handleSignout = async () => {

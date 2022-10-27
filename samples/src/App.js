@@ -2,7 +2,7 @@ import SigninEE from './SigninEE'
 import { AppContext } from '@pasarprotocol/pasar-sdk-development';
 
 function App() {
-  AppContext.createAppContext(true)
+  AppContext.createInstance(true)
 
   return (
     <div className="App">

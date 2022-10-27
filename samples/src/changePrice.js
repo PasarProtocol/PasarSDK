@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, ListType, Token } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, ListType, Token, AppContext } from "@pasarprotocol/pasar-sdk-development";
 
 const ChangePrice = () => {
     const listPricingToken = Token.getToken();
@@ -14,7 +14,7 @@ const ChangePrice = () => {
     const handleChangePrice = async () => {
         try {
             let user = JSON.parse(localStorage.getItem("user"));
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
             if(currentListType == ListType.OnAuction) {
                 await myProfile.changePriceOnAuction(orderId, pricingToken, parseFloat(price), parseFloat(reservePrice), parseFloat(buyoutPrice));
