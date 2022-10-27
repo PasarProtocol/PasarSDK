@@ -16,11 +16,11 @@ const BidNFT = () => {
             const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
             if(!userURI) {
-                userURI = await myProfile.createTraderMetadata();
+                userURI = await myProfile.createUserURI();
                 localStorage.setItem("user_uri", userURI);
             }
 
-            await myProfile.bidItemOnAuction(orderId, quoteToken, price, userURI);
+            await myProfile.bidItemOnAuction(orderId, quoteToken, parseFloat(price), userURI);
         } catch(err) {
             console.log(err);
         }

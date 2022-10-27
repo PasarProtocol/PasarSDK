@@ -12,11 +12,6 @@ module.exports = [
         "type": "string"
       },
       {
-        "internalType": "string",
-        "name": "_contractUri",
-        "type": "string"
-      },
-      {
         "internalType": "address",
         "name": "_diaToken",
         "type": "address"

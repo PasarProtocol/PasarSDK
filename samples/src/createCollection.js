@@ -7,7 +7,6 @@ const CreateCollection = () => {
     const [symbol, setSymbol] = useState('');
     const [avatar, setAvatar] = useState();
     const [background, setBackground] = useState();
-    const [collectionType, setCollectionType] = useState(Object.keys(ERCType)[0]);
     const [category, setCategory] = useState(Object.keys(Category)[0]);
     const [progress, setProgress] = useState(0);
     
@@ -23,15 +22,14 @@ const CreateCollection = () => {
 
         console.log(name);
         console.log(description);
-        console.log(collectionType);
         console.log(category);
         console.log(royalty);
         try {
             const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
-            let metaData = await myProfile.createCollectionMetadata(description, avatar, background, category, socialLinks);
+            let metaData = await myProfile.createCollectionURI(category, description, avatar, background, socialLinks);
             console.log(metaData);
-            let address = await myProfile.createCollection(name, symbol, metaData, collectionType);
+            let address = await myProfile.createCollection(name, symbol);
             console.log(address);
             await myProfile.registerCollection(address, name, metaData, royalty)
         } catch(err) {
@@ -41,15 +39,6 @@ const CreateCollection = () => {
 
     return (
         <div>
-            <div>
-                <h3>Collection Type</h3>
-                <select onChange={(e) => setCollectionType(e.target.value)}>
-                    {Object.keys(ERCType).map((key)=> {
-                        return <option key={ERCType[key]} value={ERCType[key]}>{ERCType[key]}</option>
-                    })}
-                </select>
-            </div>
-            
             <div>
                 <h3 className="sub_title">Avatar</h3>
                 <input type="file" onChange={e => setAvatar(e.target.files[0])}/>
