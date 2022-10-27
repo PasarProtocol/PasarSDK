@@ -460,7 +460,6 @@ export class ContractHelper {
     ): Promise<any> {
         return new Promise((resolve, reject) => {
             const tokenConf = {diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000}
-
             let diaAddress = AppContext.getInstance().getDiaAddress();
             let diaValue = BigInt((10 ** tokenConf.diaDecimals * tokenConf.diaValue * tokenConf.nPPM) / tokenConf.PPM).toString();
             let registeredContract = new this.web3.eth.Contract(abi).deploy({
@@ -476,7 +475,6 @@ export class ContractHelper {
                 'from': this.account,
                 'gas': gasLimit,
                 'gasPrice': gasPrice,
-                "to": "",
             }
 
             if(AppContext.getInstance().isInAppBrowser())
