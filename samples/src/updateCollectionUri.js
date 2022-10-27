@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Category, MyProfile, SocialLinks } from "@pasarprotocol/pasar-sdk-development";
+import { Category, MyProfile, SocialLinks, AppContext } from "@pasarprotocol/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');
@@ -16,7 +16,7 @@ const UpdateCollectionInfo = () => {
             console.log(name);
             console.log(description);
             console.log(category);
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
             let metaData = await myProfile.createCollectionMetadata(description, avatar, background, category, socialLinks);
             await myProfile.updateCollectionURI(collectionAddress, name, metaData);
         } catch(err) {

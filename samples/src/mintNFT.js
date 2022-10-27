@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, AppContext } from "@pasarprotocol/pasar-sdk-development";
 
 const MintNFT = () => {
     const [name, setName] = useState('');
@@ -13,7 +13,7 @@ const MintNFT = () => {
             console.log(description);
             console.log(urlImage);
             let user = JSON.parse(localStorage.getItem("user"));
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
             let metaData = await myProfile.createItemMetadata(name, description, urlImage, null, false, false);
             let tokenId = await myProfile.createItemFromPasar(metaData, 10)
             console.log(tokenId);

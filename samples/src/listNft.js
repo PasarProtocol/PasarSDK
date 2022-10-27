@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, ListType, Token } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, ListType, Token, AppContext } from "@pasarprotocol/pasar-sdk-development";
 
 const ListNFT = () => {
     const listPricingToken = Token.getToken();
@@ -21,7 +21,7 @@ const ListNFT = () => {
             let user = JSON.parse(localStorage.getItem("user"));
             let userURI = localStorage.getItem("user_uri");
 
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
             if(!userURI) {
                 userURI = await myProfile.createTraderMetadata();

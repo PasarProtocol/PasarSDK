@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, AppContext } from "@pasarprotocol/pasar-sdk-development";
 import { useNavigate } from "react-router-dom";
 
 const BidNFT = () => {
@@ -13,7 +13,7 @@ const BidNFT = () => {
             let user = JSON.parse(localStorage.getItem("user"));
             let userURI = localStorage.getItem("user_uri");
 
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
 
             if(!userURI) {
                 userURI = await myProfile.createTraderMetadata();

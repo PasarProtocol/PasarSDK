@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MyProfile } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, AppContext } from "@pasarprotocol/pasar-sdk-development";
 
 const BurnNFT = () => {
     const [tokenId, setTokenId] = useState("");
@@ -7,7 +7,7 @@ const BurnNFT = () => {
     const handleBurn = async () => {
         try {
             let user = JSON.parse(localStorage.getItem("user"));
-            const myProfile = new MyProfile(user['did'], user['address'], user['name'], user['bio'], null);
+            const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
             await myProfile.deleteItemFromFeeds(tokenId);
         } catch(err) {
             console.log(err);
