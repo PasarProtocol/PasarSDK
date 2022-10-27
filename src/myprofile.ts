@@ -134,7 +134,7 @@ export class MyProfile {
         try {
             let gasPrice = await getGasPrice(this.appContext)
             return await this.contractHelper.createCollection(
-                name, symbol, Token721ABI, Token721Code, gasPrice // TODO: contractURI
+                name, symbol, Token721ABI, Token721Code, gasPrice
             )
         } catch (error) {
             throw new Error(`Deploy a new collection error ${error}`)
