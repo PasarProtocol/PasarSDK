@@ -1,9 +1,9 @@
 import { ChainType, getChainIndexByType } from "./chaintype";
 import { CollectionInfo } from "./collection/collectioninfo";
 import { CollectionPage } from "./collection/collectionpage";
-import { ERCType } from "./erctype";
 import { ItemInfo } from "./iteminfo";
 import { ItemPage } from "./itempage";
+import { ERCType } from "./erctype";
 
 const getAllListedItems = async (assistUrl: string, earilerThan:number, collectionAddr = '', pageNum = 1, pageSize = 10): Promise<ItemPage> => {
     try {

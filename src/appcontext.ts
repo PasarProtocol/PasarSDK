@@ -1,7 +1,7 @@
 import Web3 from "web3";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import { getChainTypeById } from "./chaintype";
 import WalletConnectProvider  from "@walletconnect/web3-provider";
+import { getChainTypeById } from "./chaintype";
 import valuesTestNet from "./contracts/deploy/testnet.json";
 import valuesMainNet from "./contracts/deploy/mainnet.json";
 
