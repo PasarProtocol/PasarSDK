@@ -14,12 +14,6 @@ import Token721ABI from "./contracts/abis/token721ABI"
 import Token721Code from "./contracts/bytecode/token721Code";
 import Token1155ABI from "./contracts/abis/token1155ABI"
 
-const getGasPrice = async(appContext: AppContext): Promise<string> => {
-    return await appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
-        return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
-    })
-}
-
 /**
  * This class represent the Profile of current signed-in user.
  */
@@ -158,9 +152,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             return await this.contractHelper.createCollection(
-                name, symbol, Token721ABI, Token721Code, gasPrice
+                name, symbol, Token721ABI, Token721Code
             )
         } catch (error) {
             throw new Error(`Deploy a new collection error ${error}`)
@@ -190,10 +183,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.registerCollection(
                 this.appContext.getRegistryContract(), collection, name, collectionURI,
-                royalties, gasPrice
+                royalties
             )
         } catch (error) {
             throw new Error(`Register collection onto Pasar error: ${error}`)
@@ -219,9 +211,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.updateCollectionInfo(
-                this.appContext.getRegistryContract(), collection, name, collectionURI, gasPrice
+                this.appContext.getRegistryContract(), collection, name, collectionURI
             )
         } catch (error) {
             throw new Error(`Update collection uri error: ${error}`)
@@ -242,9 +233,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.updateCollectionRoyalties(
-                this.appContext.getRegistryContract(), collection, royaltyRates, gasPrice
+                this.appContext.getRegistryContract(), collection, royaltyRates
             );
         } catch (error) {
             throw new Error(`Update collection royalty error: ${error}`)
@@ -332,9 +322,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
-            await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI, gasPrice);
+            await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI);
             return tokenId
         } catch (error) {
             throw new Error(`Create NFT item error: ${error}`)
@@ -357,10 +346,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromFeedsCollection(
-                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, "", gasPrice
+                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, ""
             );
             return tokenId
         } catch (error) {
@@ -381,10 +369,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromPasarCollection(
-                this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee, gasPrice
+                this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee
             );
             return tokenId
         } catch (error) {
@@ -408,9 +395,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
-            await this.contractHelper.approveItems(Token721ABI, collection, toAddr, gasPrice);
-            await this.contractHelper.transfer721Item(toAddr, tokenId, collection, gasPrice);
+            await this.contractHelper.approveItems(Token721ABI, collection, toAddr);
+            await this.contractHelper.transfer721Item(toAddr, tokenId, collection);
         } catch (error) {
             throw new Error(`Transfer NFT item error: ${error}`)
         }
@@ -423,10 +409,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getFeedsCollectionAddress()
-            await this.contractHelper.approveItems(FeedsCollectionABI, collection, toAddr, gasPrice);
-            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection, gasPrice);
+            await this.contractHelper.approveItems(FeedsCollectionABI, collection, toAddr);
+            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection);
         } catch (error) {
             throw new Error(`Transfer NFT item in Feeds collection error: ${error}`)
         }
@@ -439,10 +424,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getPasarCollectionAddress()
-            await this.contractHelper.approveItems(PasarCollectionABI, collection, toAddr, gasPrice);
-            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection, gasPrice);
+            await this.contractHelper.approveItems(PasarCollectionABI, collection, toAddr);
+            await this.contractHelper.transferItemInFeeds(toAddr, tokenId, collection);
         } catch (error) {
             throw new Error(`Transfer NFT item in Pasar collection error: ${error}`)
         }
@@ -464,8 +448,7 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
-            await this.contractHelper.burnERC721Item(collection, tokenId, gasPrice);
+            await this.contractHelper.burnERC721Item(collection, tokenId);
         } catch (error) {
             throw new Error(`Delete item tokenId ${tokenId} from collection ${collection}`);
         }
@@ -476,9 +459,8 @@ export class MyProfile {
             throw new Error("Parameters invalid with empty values")
         }
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getFeedsCollectionAddress()
-            await this.contractHelper.burnItemInFeeds(collection, tokenId, gasPrice);
+            await this.contractHelper.burnItemInFeeds(collection, tokenId);
         } catch (error) {
             throw new Error(`Delete item tokenId ${tokenId} from Feeds collection`);
         }
@@ -490,9 +472,8 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getPasarCollectionAddress()
-            await this.contractHelper.burnItemInPasar(collection, tokenId, gasPrice);
+            await this.contractHelper.burnItemInPasar(collection, tokenId);
         } catch (error) {
             throw new Error(`Delete item tokenId ${tokenId} from Pasar collection`);
         }
@@ -541,16 +522,14 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
-            await this.contractHelper.approveItems(Token721ABI, collection, this.appContext.getMarketContract(), gasPrice);
+            await this.contractHelper.approveItems(Token721ABI, collection, this.appContext.getMarketContract());
             await this.contractHelper.createOrderForSale(
                 this.appContext.getMarketContract(),
                 tokenId,
                 collection,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                sellerURI,
-                gasPrice
+                sellerURI
             );
         } catch (error) {
             throw new Error(`List item on market error: ${error}`)
@@ -563,17 +542,15 @@ export class MyProfile {
         price: number,
         sellerURI: string) {
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let marketContract = this.appContext.getMarketContract()
-            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract, gasPrice);
+            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract);
             await this.contractHelper.createOrderForSale(
                 marketContract,
                 tokenId,
                 collection,
                 BigInt(price*1e18).toString(),
                 pricingToken,
-                sellerURI,
-                gasPrice
+                sellerURI
             );
         } catch (error) {
             throw new Error(`List item on market error: ${error}`)
@@ -629,13 +606,11 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.changePrice(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
                 BigInt(newPrice*1e18).toString(),
-                newPricingToken,
-                gasPrice
+                newPricingToken
             )
         } catch (error) {
             throw new Error(`Change fixed price error: ${error}`)
@@ -661,15 +636,14 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             if (!isNativeToken(buyingToken)) {
                 await this.contractHelper.approveToken(
-                    buyingPrice, buyingToken, this.appContext.getMarketContract(), gasPrice
+                    buyingPrice, buyingToken, this.appContext.getMarketContract()
                 );
             }
             await this.contractHelper.buyItem(
                 this.appContext.getMarketContract(),
-                orderId, buyingPrice, buyingToken, buyerURI,  gasPrice
+                orderId, buyingPrice, buyingToken, buyerURI
             );
         } catch (error) {
             throw new Error(`Buying item ${orderId} error: ${error}`)
@@ -705,10 +679,9 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let marketContract = this.appContext.getMarketContract()
 
-            await this.contractHelper.approveItems(Token721ABI, collection, marketContract , gasPrice);
+            await this.contractHelper.approveItems(Token721ABI, collection, marketContract);
             await this.contractHelper.createOrderForAuction(
                 marketContract,
                 collection,
@@ -718,8 +691,7 @@ export class MyProfile {
                 reservePrice,
                 buyoutPrice,
                 expirationTime,
-                sellerURI,
-                gasPrice
+                sellerURI
             );
         } catch (error) {
             throw new Error(`List item on Auction from collection ${collection} error: ${error}`)
@@ -736,10 +708,9 @@ export class MyProfile {
         sellerURI: string) {
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let marketContract = this.appContext.getMarketContract()
 
-            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract, gasPrice);
+            await this.contractHelper.approveItems(Token1155ABI, collection, marketContract);
             await this.contractHelper.createOrderForAuction(
                 marketContract,
                 collection,
@@ -749,8 +720,7 @@ export class MyProfile {
                 reservePrice,
                 buyoutPrice,
                 expirationTime,
-                sellerURI,
-                gasPrice
+                sellerURI
             );
         } catch (error) {
             throw new Error(`List item on Auction from collection ${collection} error: ${error}`)
@@ -817,15 +787,13 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.changePriceOnAuction(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
                 BigInt(newMinPrice*1e18).toString(),
                 BigInt(newReservedPrice*1e18).toString(),
                 BigInt(newBuyoutPrice*1e18).toString(),
-                newPricingToken,
-                gasPrice
+                newPricingToken
             )
         } catch (error) {
             throw new Error(`Change price on auction error: ${error}`);
@@ -853,18 +821,16 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
             let marketContract = this.appContext.getMarketContract()
             if (!isNativeToken(pricingToken)) {
-                await this.contractHelper.approveToken(price, pricingToken, marketContract, gasPrice);
+                await this.contractHelper.approveToken(price, pricingToken, marketContract);
             }
 
             await this.contractHelper.bidItemOnAuction(marketContract,
                 orderId,
                 price,
                 pricingToken,
-                bidderURI,
-                gasPrice)
+                bidderURI)
         } catch (error) {
             throw new Error(`Bidding item on auction error: ${error}`)
         }
@@ -881,8 +847,7 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
-            await this.contractHelper.settleAuction(this.appContext.getMarketContract(), orderId, gasPrice);
+            await this.contractHelper.settleAuction(this.appContext.getMarketContract(), orderId);
         } catch (error) {
             throw new Error(`Settle auction on order ${orderId} error: ${error}`)
         }
@@ -902,8 +867,7 @@ export class MyProfile {
         }
 
         try {
-            let gasPrice = await getGasPrice(this.appContext)
-            await this.contractHelper.unlistItem(this.appContext.getMarketContract(), orderId, gasPrice)
+            await this.contractHelper.unlistItem(this.appContext.getMarketContract(), orderId)
         } catch (error) {
             throw new Error(`Unlist item error: ${error}`)
         }
