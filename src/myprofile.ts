@@ -3,16 +3,16 @@ import sha256 from 'crypto-js/sha256';
 import bs58 from 'bs58';
 import { Category } from "./collection/category";
 import { RoyaltyRate } from "./collection/RoyaltyRate";
-import { resizeImage, requestSigndataOnTokenID } from "./global";
+import { resizeImage, requestSigndataOnTokenID, isNativeToken, checkParams } from "./utils";
+import { AppContext } from './appcontext';
+import { ContractHelper } from './contracthelper';
+import { SocialLinks } from './sociallinks';
+
 import PasarCollectionABI from './contracts/abis/pasarCollection';
 import FeedsCollectionABI from './contracts/abis/feedsCollection';
 import Token721ABI from "./contracts/abis/token721ABI"
 import Token721Code from "./contracts/bytecode/token721Code";
 import Token1155ABI from "./contracts/abis/token1155ABI"
-import { AppContext } from './appcontext';
-
-import { ContractHelper } from './contracthelper';
-import { SocialLinks } from './sociallinks';
 
 const getGasPrice = async(appContext: AppContext): Promise<string> => {
     return await appContext.getWeb3().eth.getGasPrice().then((_gasPrice: any) => {
@@ -20,16 +20,11 @@ const getGasPrice = async(appContext: AppContext): Promise<string> => {
     })
 }
 
-const isNativeToken = (address: string): boolean => {
-    return address === "0x0000000000000000000000000000000000000000";
-}
-
 /**
  * This class represent the Profile of current signed-in user.
  */
 export class MyProfile {
     private appContext: AppContext;
-    private assistUrl: string;
     private contractHelper: ContractHelper;
     private ipfsUrl: string;
 
@@ -45,30 +40,51 @@ export class MyProfile {
         description: string,
         avatar: string) {
 
+        if (!appContext ||
+            !checkParams(userDid) ||
+            !checkParams(walletAddress)){
+            throw new Error("appContext, userDid and walletAddress can not be empty values")
+        }
+
         this.appContext = appContext;
-        this.assistUrl = appContext.getAssistNode();
         this.ipfsUrl = appContext.getIPFSNode()
         this.userDid = userDid;
         this.walletAddress = walletAddress;
-        this.name = name || "";
+        this.name = name || this.userDid;
         this.description = description || "";
         this.avatar = avatar;
         this.contractHelper = new ContractHelper(walletAddress, appContext);
     }
 
     public updateName(name: string): MyProfile {
-        this.name = name;
+        this.name = name || this.userDid
         return this;
     }
 
     public updateDescription(description: string): MyProfile {
-        this.description = description;
+        this.description = description
         return this;
     }
 
     public updateAvatar(avatar: string): MyProfile {
         this.avatar = avatar;
         return this;
+    }
+
+    public getUserDid(): string {
+        return this.userDid
+    }
+
+    public getWalletAddress(): string {
+        return this.walletAddress
+    }
+
+    public getName(): string {
+        return this.name
+    }
+
+    public getDescription(): string {
+        return this.description
     }
 
     /**
@@ -86,6 +102,12 @@ export class MyProfile {
         avatarPath: string,
         bannerPath: string,
         socialLinks: SocialLinks) {
+
+        if (!checkParams(description) ||
+            !checkParams(avatarPath) ||
+            !checkParams(bannerPath)) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         try {
             let client = create({ url: this.ipfsUrl })
@@ -131,6 +153,10 @@ export class MyProfile {
      * @returns The deployed NFT collection contract address.
      */
      public async createCollection(name: string, symbol: string): Promise<string> {
+        if (!checkParams(name) || !checkParams(symbol)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             return await this.contractHelper.createCollection(
@@ -156,12 +182,19 @@ export class MyProfile {
         name: string,
         collectionURI: string,
         royalties: RoyaltyRate[]) {
+
+        if (!checkParams(collection) ||
+            !checkParams(name) ||
+            !checkParams(collectionURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.registerCollection(
                 this.appContext.getRegistryContract(), collection, name, collectionURI,
                 royalties, gasPrice
-            );
+            )
         } catch (error) {
             throw new Error(`Register collection onto Pasar error: ${error}`)
         }
@@ -178,6 +211,13 @@ export class MyProfile {
     public async updateCollectionUri(collection: string,
         name: string,
         collectionURI: string) {
+
+        if (!checkParams(collection) ||
+            !checkParams(name) ||
+            !checkParams(collectionURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.updateCollectionInfo(
@@ -196,6 +236,11 @@ export class MyProfile {
      */
      public async updateCollectionRoyalty(collection: string,
         royaltyRates: RoyaltyRate[]) {
+
+        if (!checkParams(collection) || !royaltyRates) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.updateCollectionRoyalties(
@@ -222,6 +267,12 @@ export class MyProfile {
         properties: any = null, // TODO: Must be json
         sensitive = false
     ): Promise<string> {
+        if (!checkParams(itemName) ||
+            !checkParams(itemDescription) ||
+            !checkParams(itemImage)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             const client = create({ url: this.ipfsUrl });
             let imageCID  = await client.add(itemImage)
@@ -276,6 +327,10 @@ export class MyProfile {
      * @returns The tokenId of the new NFT.
      */
     public async createItem(collection: string, tokenURI: string): Promise<string> {
+        if (!checkParams(collection) || !checkParams(tokenURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
@@ -297,12 +352,16 @@ export class MyProfile {
      * @returns The tokenId of being minted a nft
      */
     public async createItemFromFeeds(tokenURI: string,roylatyFee: number): Promise<string> {
+        if (!checkParams(tokenURI) || !checkParams(roylatyFee)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromFeedsCollection(
-                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, this.userDid, gasPrice
-            ); // TODO: creatorURI
+                this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, "", gasPrice
+            );
             return tokenId
         } catch (error) {
             throw new Error(`Create item from Feeds collection error: ${error}`)
@@ -317,12 +376,16 @@ export class MyProfile {
      * @returns The tokenId of being minted a nft
      */
     public async createItemFromPasar(tokenURI: string,roylatyFee: number): Promise<string> {
+        if (!checkParams(tokenURI) || !checkParams(roylatyFee)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromPasarCollection(
                 this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee, gasPrice
-            ); // TODO: creatorURI
+            );
             return tokenId
         } catch (error) {
             throw new Error(`Create item from Pasar collection error: ${error}`)
@@ -338,6 +401,12 @@ export class MyProfile {
      * @returns
      */
     public async transferItem(collection: string, tokenId: string, toAddr: string) {
+        if (!checkParams(collection) ||
+            !checkParams(tokenId) ||
+            !checkParams(toAddr)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.approveItems(Token721ABI, collection, toAddr, gasPrice);
@@ -348,6 +417,11 @@ export class MyProfile {
     }
 
     public async transferItemInFeeds(tokenId: string, toAddr: string) {
+        if (!checkParams(tokenId) ||
+            !checkParams(toAddr)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getFeedsCollectionAddress()
@@ -359,6 +433,11 @@ export class MyProfile {
     }
 
     public async transferItemInPasar(tokenId: string, toAddr: string) {
+        if (!checkParams(tokenId) ||
+            !checkParams(toAddr)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getPasarCollectionAddress()
@@ -379,6 +458,11 @@ export class MyProfile {
      * @returns The result of whether the NFT is deleted or not.
      */
     public async deleteItem(collection: string, tokenId: string) {
+        if (!checkParams(collection) ||
+            !checkParams(tokenId) ) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.burnERC721Item(collection, tokenId, gasPrice);
@@ -388,6 +472,9 @@ export class MyProfile {
     }
 
     public async deleteItemFromFeeds(tokenId: string) {
+        if (!checkParams(tokenId)) {
+            throw new Error("Parameters invalid with empty values")
+        }
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getFeedsCollectionAddress()
@@ -398,6 +485,10 @@ export class MyProfile {
     }
 
     public async deleteItemInPasar(tokenId: string) {
+        if (!checkParams(tokenId)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let collection = this.appContext.getPasarCollectionAddress()
@@ -441,6 +532,14 @@ export class MyProfile {
         pricingToken:string,
         price: number,
         sellerURI: string) {
+
+        if (!checkParams(collection) ||
+            !checkParams(tokenId) ||
+            !checkParams(pricingToken) ||
+            !checkParams(sellerURI) || price > 0) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.approveItems(Token721ABI, collection, this.appContext.getMarketContract(), gasPrice);
@@ -486,6 +585,12 @@ export class MyProfile {
         price: number,
         sellerURI: string) {
 
+        if (!checkParams(tokenId) ||
+            !checkParams(pricingToken) ||
+            !checkParams(sellerURI) || price > 0) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         let collection = this.appContext.getFeedsCollectionAddress()
         return await this.listItem1155(collection, tokenId, pricingToken, price, sellerURI)
     }
@@ -494,6 +599,12 @@ export class MyProfile {
         pricingToken: string,
         price: number,
         sellerURI: string) {
+
+        if (!checkParams(tokenId) ||
+            !checkParams(pricingToken) ||
+            !checkParams(sellerURI) || price > 0) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         let collection = this.appContext.getPasarCollectionAddress()
         return await this.listItem1155(collection, tokenId, pricingToken, price, sellerURI)
@@ -511,6 +622,11 @@ export class MyProfile {
     public async changePrice(orderId: string,
         newPricingToken: string,
         newPrice: number) {
+
+        if (!checkParams(orderId) ||
+            !checkParams(newPricingToken) || newPrice > 0) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         try {
             let gasPrice = await getGasPrice(this.appContext)
@@ -537,6 +653,12 @@ export class MyProfile {
         buyingPrice: number,
         buyingToken: string,
         buyerURI: string) {
+
+        if (!checkParams(orderId) ||
+            !checkParams(buyingToken) || buyingPrice > 0 ||
+            !checkParams(buyerURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         try {
             let gasPrice = await getGasPrice(this.appContext)
@@ -574,6 +696,13 @@ export class MyProfile {
         buyoutPrice: number,
         expirationTime: number,
         sellerURI: string) {
+
+        if (!checkParams(collection) ||
+            !checkParams(tokenId) ||
+            !checkParams(pricingToken) || minPrice > 0 ||
+            !checkParams(sellerURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         try {
             let gasPrice = await getGasPrice(this.appContext)
@@ -636,6 +765,12 @@ export class MyProfile {
         expirationTime: number,
         sellerURI: string) {
 
+        if (!checkParams(tokenId) ||
+            !checkParams(pricingToken) || minPrice > 0 ||
+            !checkParams(sellerURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         return await this.listItemERC1155OnAuction(this.appContext.getFeedsCollectionAddress(),
             tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI)
     }
@@ -647,6 +782,12 @@ export class MyProfile {
         buyoutPrice: number,
         expirationTime: number,
         sellerURI: string) {
+
+        if (!checkParams(tokenId) ||
+            !checkParams(pricingToken) || minPrice > 0 ||
+            !checkParams(sellerURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         return await this.listItemERC1155OnAuction(this.appContext.getPasarCollectionAddress(),
             tokenId, pricingToken, minPrice, reservePrice, buyoutPrice, expirationTime, sellerURI)
@@ -669,6 +810,11 @@ export class MyProfile {
         newMinPrice: number,
         newReservedPrice: number,
         newBuyoutPrice: number) {
+
+        if (!checkParams(orderId) ||
+            !checkParams(newPricingToken) || newMinPrice > 0) {
+            throw new Error("Parameters invalid with empty values")
+        }
 
         try {
             let gasPrice = await getGasPrice(this.appContext)
@@ -700,6 +846,12 @@ export class MyProfile {
         price: number,
         bidderURI: string) {
 
+        if (!checkParams(orderId) ||
+            !checkParams(pricingToken) || price > 0 ||
+            !checkParams(bidderURI)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             let marketContract = this.appContext.getMarketContract()
@@ -724,6 +876,10 @@ export class MyProfile {
      * @param orderId The orderId of NFT item listed on auciton.
      */
     public async settleAuction(orderId: string) {
+        if (!checkParams(orderId)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.settleAuction(this.appContext.getMarketContract(), orderId, gasPrice);
@@ -741,6 +897,10 @@ export class MyProfile {
      * @returns
      */
     public async unlistItem(orderId: string) {
+        if (!checkParams(orderId)) {
+            throw new Error("Parameters invalid with empty values")
+        }
+
         try {
             let gasPrice = await getGasPrice(this.appContext)
             await this.contractHelper.unlistItem(this.appContext.getMarketContract(), orderId, gasPrice)

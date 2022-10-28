@@ -10,15 +10,11 @@ export class Market {
     private assistUrl: string;
 
     public constructor(appContext: AppContext) {
-        this.assistUrl = appContext.getAssistNode();
-    }
+        if (!appContext) {
+            throw new Error("Parameter appContext is invalid with empty value")
+        }
 
-    /**
-     * Get the number of total listed NFT items from remote assist service.
-     * @returns The promise object contain the total number of listed NFT items.
-     */
-    public queryItemCount(_filter = new Filter()): Promise<number> {
-        throw new Error("Method not implemnted");
+        this.assistUrl = appContext.getAssistNode();
     }
 
     /**
