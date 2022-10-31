@@ -99,7 +99,7 @@ export class MyProfile {
                 category: category.toString(),
                 socials: socialLinks.toJson(),
             }
-
+            
             let plainData = bs58.encode(Buffer.from(JSON.stringify(data)))
             let signedData = await requestSigndataOnTokenID(plainData);
             let creatorJson = {
