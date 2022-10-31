@@ -114,8 +114,18 @@ const requestSigndataOnTokenID = async (tokenId:string) =>  {
 
 const StringIsNumber = value => isNaN(Number(value)) === true;
 
+const isNativeToken = (address: string): boolean => {
+    return address === "0x0000000000000000000000000000000000000000";
+}
+
+const checkParams = (param: any): boolean => {
+    return (param && param !== '')
+}
+
 export {
     resizeImage,
     requestSigndataOnTokenID,
     StringIsNumber,
+    isNativeToken,
+    checkParams
 }

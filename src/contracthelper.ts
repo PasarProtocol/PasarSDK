@@ -10,6 +10,12 @@ import { AppContext } from './appcontext';
 
 const gasLimit = 5000000;
 
+const getGasPrice = async(web3: Web3): Promise<string> => {
+    return await web3.eth.getGasPrice().then((_gasPrice: any) => {
+        return _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice
+    })
+}
+
 /**
  * This class is to call the contract functions
  */
@@ -23,39 +29,14 @@ export class ContractHelper {
         this.web3 = appContext.getWeb3();
     }
 
-    private mintERC1155Item = (
-        collectionABI: any,
-        collectionAddress: string,
-        tokenId: string,
-        tokenURI: string,
-        royaltyRate: number,
-        didURI: string,
-        gasPrice: string
-    ): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            new this.web3.eth.Contract(collectionABI, collectionAddress).methods.mint(
-                tokenId, 1, tokenURI, royaltyRate * 10000, didURI
-            ).send({
-                'from': this.account,
-                'gasPrice': gasPrice,
-                'gas': gasLimit,
-                'value': gasPrice,
-            }).on('receipt', (receipt) => {
-                resolve(receipt);
-            }).on('error', (error: any) => {
-                reject(error)
-            });
-        })
-    }
-
-    public mintFromFeedsCollection(
+    async mintFromFeedsCollection(
         collectionAddr: string,
         tokenId: string,
         tokenURI: string,
         royaltyRate: number,
-        didURI: string,
-        gasPrice: string
-    ):Promise<void> {
+        didURI: string
+    ) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(FeedsCollectionABI, collectionAddr).methods.mint(
                 tokenId, 1, tokenURI, royaltyRate * 10000, didURI
@@ -72,13 +53,13 @@ export class ContractHelper {
         })
     }
 
-    public mintFromPasarCollection(
+    async mintFromPasarCollection(
         collectionAddr: string,
         tokenId: string,
         tokenURI: string,
-        royaltyRate: number,
-        gasPrice: string
-    ): Promise<void> {
+        royaltyRate: number
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(PasarCollectionABI, collectionAddr).methods.mint(
                 tokenId, 1, tokenURI, royaltyRate * 10000
@@ -95,12 +76,12 @@ export class ContractHelper {
         })
     }
 
-    public mintERC721Item (
+    async mintERC721Item (
         collectionAddr: string,
         tokenId: string,
-        tokenURI: string,
-        gasPrice: string
-    ): Promise<void> {
+        tokenURI: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.mint(
                 tokenId, tokenURI
@@ -117,12 +98,12 @@ export class ContractHelper {
         })
     }
 
-    private burnERC1155Item = (
+    private burnERC1155Item = async (
         collectionABI: any,
         collectionAddr: string,
-        tokenId: string,
-        gasPrice: string
-    ): Promise<void> => {
+        tokenId: string
+    ) => {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(collectionABI, collectionAddr).methods.burn(tokenId, 1).send({
                 'from': this.account,
@@ -137,27 +118,23 @@ export class ContractHelper {
         })
     }
 
-    public burnItemInFeeds(
+    async burnItemInFeeds(
         collectionAddr: string,
-        tokenId: string,
-        gasPrice: string
-    ): Promise<void> {
-        return this.burnERC1155Item(FeedsCollectionABI, collectionAddr, tokenId, gasPrice);
+        tokenId: string){
+        return await this.burnERC1155Item(FeedsCollectionABI, collectionAddr, tokenId);
     }
 
-    public burnItemInPasar(
+    async burnItemInPasar(
         collectionAddr: string,
-        tokenId: string,
-        gasPrice: string
-    ): Promise<void> {
-        return this.burnERC1155Item(PasarCollectionABI, collectionAddr, tokenId, gasPrice);
+        tokenId: string){
+        return await this.burnERC1155Item(PasarCollectionABI, collectionAddr, tokenId);
     }
 
-    public burnERC721Item(
+    async burnERC721Item(
         collectionAddr: string,
-        tokenId: string,
-        gasPrice: string
-    ): Promise<void> {
+        tokenId: string)
+    {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(Token721ABI, collectionAddr).methods.burn(tokenId).send({
                 'from': this.account,
@@ -172,13 +149,12 @@ export class ContractHelper {
         })
     }
 
-    // Approve the NFT item on collection can be sold on market.
-    public approveItems (
+    async approveItems (
         contractABI: any,
         baseToken: string,
-        approvalAddress: any,
-        gasPrice: string
-    ): Promise<void> {
+        approvalAddress: any
+    ) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(contractABI, baseToken).methods.setApprovalForAll(
                 approvalAddress, true
@@ -195,13 +171,13 @@ export class ContractHelper {
         })
     }
 
-    private transferERC1155Item = (
+    private transferERC1155Item = async (
         contractABI: any,
         toAddress: string,
         tokenId: string,
-        baseToken: string,
-        gasPrice: string
-    ): Promise<void> => {
+        baseToken: string
+    ) => {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(contractABI, baseToken).methods.safeTransferFrom(
                 this.account, toAddress, tokenId, 1
@@ -218,30 +194,26 @@ export class ContractHelper {
         })
     }
 
-    public transferItemInFeeds(
+    async transferItemInFeeds(
         to: string,
         tokenId: string,
-        baseToken: string,
-        gasPrice: string
-    ): Promise<void> {
-        return this.transferERC1155Item(FeedsCollectionABI, to, tokenId, baseToken, gasPrice);
+        baseToken: string) {
+        return await this.transferERC1155Item(FeedsCollectionABI, to, tokenId, baseToken);
     }
 
-    public transferItemInPasar(
+    async transferItemInPasar(
         to: string,
         tokenId: string,
-        baseToken: string,
-        gasPrice: string
-    ): Promise<void> {
-        return this.transferERC1155Item(PasarCollectionABI, to, tokenId, baseToken, gasPrice);
+        baseToken: string) {
+        return await this.transferERC1155Item(PasarCollectionABI, to, tokenId, baseToken);
     }
 
-    public transfer721Item = (
+    async transfer721Item (
         toAddress: string,
         tokenId: string,
-        baseToken: string,
-        gasPrice: string
-    ): Promise<void> => {
+        baseToken: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(Token721ABI, baseToken).methods.safeTransferFrom(
                 this.account, toAddress, tokenId
@@ -258,15 +230,15 @@ export class ContractHelper {
         })
     }
 
-    public createOrderForSale (
+    async createOrderForSale (
         marketContract: string,
         tokenId: string,
         baseToken: string,
         price: number,
         quoteToken: string,
-        sellerURI: string,
-        gasPrice: string
-    ): Promise<void> {
+        sellerURI: string
+     ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             let startTime = (new Date().getTime()/1000).toFixed();
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.createOrderForSale(
@@ -284,7 +256,7 @@ export class ContractHelper {
         })
     }
 
-    public createOrderForAuction (
+    async createOrderForAuction (
         marketContract: string,
         baseToken: string,
         tokenId: string,
@@ -293,9 +265,9 @@ export class ContractHelper {
         reservePrice: number,
         buyoutPrice: number,
         expirationTime: number,
-        sellerURI: string,
-        gasPrice: string
-    ): Promise<void> {
+        sellerURI: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.createOrderForAuction(
                 baseToken,
@@ -319,12 +291,12 @@ export class ContractHelper {
         })
     }
 
-    public changePrice (contractMarket: string,
+    async changePrice (contractMarket: string,
         orderId: number,
         newPrice: number,
-        quoteToken: string,
-        gasPrice: string
-    ): Promise<void> {
+        quoteToken: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, contractMarket).methods.changeSaleOrderPrice(
                 orderId, BigInt(newPrice*1e18).toString(), quoteToken
@@ -341,14 +313,14 @@ export class ContractHelper {
         })
     }
 
-    public changePriceOnAuction (marketContract: string,
+    async changePriceOnAuction (marketContract: string,
         orderId: number,
         newMinPrice: number,
         newReservedPrice: number,
         newBuyoutPrice: number,
-        quoteToken: string,
-        gasPrice: string
-    ): Promise<void> {
+        quoteToken: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.changeAuctionOrderPrice(
                 orderId, BigInt(newMinPrice*1e18).toString(), BigInt(newReservedPrice*1e18).toString(), BigInt(newBuyoutPrice*1e18).toString(), quoteToken
@@ -365,13 +337,13 @@ export class ContractHelper {
         })
     }
 
-    public buyItem (marketContract: string,
+    async buyItem (marketContract: string,
         orderId: string,
         price: number,
         quoteToken: string,
-        did: string,
-        gasPrice: string
+        did: string
     ): Promise<void> {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.buyOrder(
                 orderId, did
@@ -388,13 +360,13 @@ export class ContractHelper {
         })
     }
 
-    public bidItemOnAuction (marketContract: string,
+    async bidItemOnAuction (marketContract: string,
         orderId: string,
         price: number,
         quoteToken: string,
-        bidderURI: string,
-        gasPrice: string
+        bidderURI: string
     ): Promise<void> {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.bidForOrder(
                 orderId, price.toString(), bidderURI,
@@ -411,10 +383,8 @@ export class ContractHelper {
         })
     }
 
-    public settleAuction (marketContract: string,
-        orderId: string,
-        gasPrice: string
-    ): Promise<void> {
+    async settleAuction (marketContract: string, orderId: string) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.settleAuctionOrder(
                 orderId
@@ -431,10 +401,8 @@ export class ContractHelper {
         })
     }
 
-    public unlistItem (marketContract: string,
-        orderId: string,
-        gasPrice: string
-    ): Promise<void> {
+    async unlistItem (marketContract: string, orderId: string) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.cancelOrder(
                 orderId
@@ -451,13 +419,13 @@ export class ContractHelper {
         })
     }
 
-    public createCollection (
+    async createCollection (
         name: string,
         symbol: string,
         abi: any,
-        byteCode: any,
-        gasPrice: string
-    ): Promise<any> {
+        byteCode: any
+    ): Promise<string> {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             const tokenConf = {diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000}
             let diaAddress = AppContext.getInstance().getDiaAddress();
@@ -489,13 +457,13 @@ export class ContractHelper {
 
     }
 
-    public registerCollection (registryContract: string,
+    async registerCollection (registryContract: string,
         collectionAddr: string,
         name: string,
         collectionUri: string,
-        royalties: RoyaltyRate[],
-        gasPrice: string
-    ): Promise<void> {
+        royalties: RoyaltyRate[]
+    ) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             let addresses: string[] = [];
             let values: number[] = [];
@@ -520,12 +488,12 @@ export class ContractHelper {
         })
     }
 
-    public updateCollectionInfo(registryContract: string,
+    async updateCollectionInfo(registryContract: string,
         collectionAddr: string,
         name: string,
-        collectionUri: string,
-        gasPrice: string
-    ): Promise<void> {
+        collectionUri: string
+    ) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(RegistryABI, registryContract).methods.updateTokenInfo(
                 collectionAddr, name, collectionUri
@@ -542,11 +510,11 @@ export class ContractHelper {
         })
     }
 
-    public updateCollectionRoyalties (registryContract: string,
+    async updateCollectionRoyalties (registryContract: string,
         collectionAddr: string,
-        royalties: RoyaltyRate[],
-        gasPrice: string
-    ): Promise<any> {
+        royalties: RoyaltyRate[]
+    ) {
+        let gasPrice = await getGasPrice(this.web3)
         return new Promise((resolve, reject) => {
             let addresses: string[] = [];
             let values: number[] = [];
@@ -564,19 +532,19 @@ export class ContractHelper {
                 'gasPrice': gasPrice,
                 'gas': gasLimit,
                 'value': 0,
-            }).on('receipt', (receipt) => {
+            }).on('receipt', (receipt: any) => {
                 resolve(receipt);
-            }).on('error', (error) => {
+            }).on('error', (error:Error) => {
                 reject(error)
             });
         })
     }
 
-    public async approveToken (amount: number,
+    async approveToken (amount: number,
         quoteToken: string,
-        marketContract: string,
-        gasPrice: string,
-    ): Promise<any> {
+        marketContract: string
+    ){
+        let gasPrice = await getGasPrice(this.web3)
         let erc20Contract = new this.web3.eth.Contract(Token20ABI, quoteToken);
         let approvedAmount = BigInt(await erc20Contract.methods.allowance(this.account, marketContract).call())
         if (approvedAmount <= amount) {
