@@ -262,7 +262,7 @@ export class ContractHelper {
         marketContract: string,
         tokenId: string,
         baseToken: string,
-        price: string,
+        price: number,
         quoteToken: string,
         sellerURI: string,
         gasPrice: string
@@ -321,7 +321,7 @@ export class ContractHelper {
 
     public changePrice (contractMarket: string,
         orderId: number,
-        newPrice: string,
+        newPrice: number,
         quoteToken: string,
         gasPrice: string
     ): Promise<void> {
@@ -343,9 +343,9 @@ export class ContractHelper {
 
     public changePriceOnAuction (marketContract: string,
         orderId: number,
-        newMinPrice: string,
-        newReservedPrice: string,
-        newBuyoutPrice: string,
+        newMinPrice: number,
+        newReservedPrice: number,
+        newBuyoutPrice: number,
         quoteToken: string,
         gasPrice: string
     ): Promise<void> {
