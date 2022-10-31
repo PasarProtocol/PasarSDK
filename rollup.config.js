@@ -31,7 +31,7 @@ export function emitModulePackageFile() {
 //     }
 // })();
 
-const prodBuild = process.env.prodbuild || false;
+const prodBuild = process.env.prodbuild || true;
 console.log("Prod build: ", prodBuild);
 
 const now = new Date(
@@ -291,5 +291,5 @@ export default command => {
         ]
     };
 
-    return [ commonJSBuild, esmBuild, browserBuilds];
+    return [ esmBuild, browserBuilds];
 };
