@@ -99,71 +99,6 @@ const nodePlugins = [
 const rollupSourceFile = 'src/index.ts';
 
 export default command => {
-    //const { collectLicenses, writeLicense } = getLicenseHandler();
-    const commonJSBuild = {
-        input: {
-            'pasar-sdk.js': rollupSourceFile
-        },
-        onwarn,
-        plugins: [
-            ...nodePlugins,
-            //!command.configTest && collectLicenses()
-            eslint()
-        ],
-        // fsevents is a dependency of chokidar that cannot be bundled as it contains binary code
-        external: [
-            'ipfs-http-client',
-            '@elastosfoundation/did-js-sdk',
-            '@elastosfoundation/hive-js-sdk'
-        ],
-        treeshake,
-        strictDeprecations: true,
-        output: {
-            //banner,
-            chunkFileNames: 'shared/[name].js',
-            dir: 'dist',
-            entryFileNames: '[name]',
-            externalLiveBindings: true,
-            format: 'cjs',
-            freeze: false,
-            // TODO: delete occurences of fsevents - not used in did sdk
-            interop: id => {
-                if (id === 'fsevents') {
-                    return 'defaultOnly';
-                }
-                return 'default';
-            },
-            manualChunks: { did: [rollupSourceFile] },
-            sourcemap: !prodBuild
-        }
-    };
-
-    if (command.configTest) {
-        return commonJSBuild;
-    }
-
-    const esmBuild = {
-        ...commonJSBuild,
-        input: { 'pasar-sdk.js': rollupSourceFile },
-        plugins: [
-            ...nodePlugins,
-            emitModulePackageFile(),
-            //collectLicenses()
-        ],
-        external: [
-            'ipfs-http-client',
-            '@elastosfoundation/did-js-sdk',
-            '@elastosfoundation/hive-js-sdk'
-        ],
-        output: {
-            ...commonJSBuild.output,
-            dir: 'dist/es',
-            format: 'es',
-            sourcemap: !prodBuild,
-            minifyInternalExports: false
-        }
-    };
-
     const browserBuilds = {
         input: rollupSourceFile,
         onwarn,
@@ -284,12 +219,12 @@ export default command => {
         strictDeprecations: true,
         output: [
             {
-                file: 'dist/es/pasar-sdk.browser.js',
+                file: 'dist/pasar-sdk.browser.js',
                 format: 'es',
                 sourcemap: !prodBuild,
             },
         ]
     };
 
-    return [ esmBuild, browserBuilds];
+    return [ browserBuilds];
 };
