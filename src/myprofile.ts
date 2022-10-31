@@ -448,7 +448,7 @@ export class MyProfile {
                 this.appContext.getMarketContract(),
                 tokenId,
                 collection,
-                price*1e18,
+                price,
                 pricingToken,
                 sellerURI,
                 gasPrice
@@ -471,7 +471,7 @@ export class MyProfile {
                 marketContract,
                 tokenId,
                 collection,
-                price*1e18,
+                price,
                 pricingToken,
                 sellerURI,
                 gasPrice
@@ -517,7 +517,7 @@ export class MyProfile {
             await this.contractHelper.changePrice(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
-                newPrice*1e18,
+                newPrice,
                 newPricingToken,
                 gasPrice
             )
@@ -675,9 +675,9 @@ export class MyProfile {
             await this.contractHelper.changePriceOnAuction(
                 this.appContext.getMarketContract(),
                 parseInt(orderId),
-                newMinPrice*1e18,
-                newReservedPrice*1e18,
-                newBuyoutPrice*1e18,
+                newMinPrice,
+                newReservedPrice,
+                newBuyoutPrice,
                 newPricingToken,
                 gasPrice
             )

@@ -270,7 +270,7 @@ export class ContractHelper {
         return new Promise((resolve, reject) => {
             let startTime = (new Date().getTime()/1000).toFixed();
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.createOrderForSale(
-                baseToken, tokenId, 1, quoteToken, price, startTime, sellerURI
+                baseToken, tokenId, 1, quoteToken, BigInt(price*1e18).toString(), startTime, sellerURI
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
@@ -327,7 +327,7 @@ export class ContractHelper {
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, contractMarket).methods.changeSaleOrderPrice(
-                orderId, newPrice, quoteToken
+                orderId, BigInt(newPrice*1e18).toString(), quoteToken
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
@@ -351,7 +351,7 @@ export class ContractHelper {
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             new this.web3.eth.Contract(marketV2ABI, marketContract).methods.changeAuctionOrderPrice(
-                orderId, newMinPrice, newReservedPrice, newBuyoutPrice, quoteToken
+                orderId, BigInt(newMinPrice*1e18).toString(), BigInt(newReservedPrice*1e18).toString(), BigInt(newBuyoutPrice*1e18).toString(), quoteToken
             ).send({
                 'from': this.account,
                 'gasPrice': gasPrice,
