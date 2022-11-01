@@ -1,6 +1,6 @@
 {
   "name": "@pasarprotocol/pasar-sdk-development",
-  "version": "0.0.265",
+  "version": "0.0.266",
   "description": "PasarProtocol NFT Marketplace SDK",
   "exports": {
     "node": "./dist/pasar-sdk.browser.js",
@@ -35,22 +35,11 @@
     "@elastosfoundation/essentials-connector-client-browser": "^1.0.37",
     "@types/fs-extra": "^9.0.13",
     "@walletconnect/web3-provider": "^1.8.0",
-    "axios": "^0.24.0",
     "browserfs": "^1.4.3",
     "bs58": "^5.0.0",
     "buffer": "^5.6.0",
-    "cd": "^0.3.3",
     "crypto-js": "^4.1.1",
-    "dayjs": "^1.10.4",
     "ipfs-http-client": "^55.0.0",
-    "jsrsasign": "^10.5.0",
-    "jsrsasign-util": "^1.0.2",
-    "postcss": "^8.4.4",
-    "pretend": "^3.1.0",
-    "promise-queue": "^2.2.5",
-    "raw.macro": "^0.6.2",
-    "tslib": "^2.3.1",
-    "url": "^0.11.0",
     "web3": "^1.6.0"
   },
   "devDependencies": {
