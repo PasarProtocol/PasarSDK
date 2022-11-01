@@ -116,9 +116,24 @@ export default command => {
             '@elastosfoundation/essentials-connector-client-browser',
             '@elastosfoundation/did-js-sdk',
             '@elastosfoundation/elastos-connectivity-sdk-js',
-            //'browserfs'
-            /* 'readable-stream',
-            'readable-stream/transform' */
+            '@types/fs-extra',
+            '@walletconnect/web3-provider',
+            'axios',
+            'browserfs',
+            'bs58',
+            'buffer',
+            'cd',
+            'crypto-js',
+            'dayjs',
+            'jsrsasign',
+            'jsrsasign-util',
+            'postcss',
+            'pretend',
+            'promise-queue',
+            'raw.macro',
+            'tslib',
+            'url',
+            'web3',
         ],
         plugins: [
             // IMPORTANT: DON'T CHANGE THE ORDER OF THINGS BELOW TOO MUCH! OTHERWISE YOU'LL GET
@@ -180,7 +195,6 @@ export default command => {
                 "entries": [
                     { "find": "buffer", "replacement": "buffer-es6" },
                     { "find": "process", "replacement": "process-es6" },
-                    //{ "find": "fs", "replacement": "browserfs/dist/shims/fs" },
                     { "find": "path", "replacement": "path-browserify" },
                     { "find": "crypto", "replacement": "crypto-browserify" },
                     { "find": "util/", "replacement": "node_modules/util/util.js" },
