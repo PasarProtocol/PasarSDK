@@ -114,13 +114,9 @@ export default command => {
             'ipfs-http-client',
             'stream',
             '@elastosfoundation/essentials-connector-client-browser',
-            '@elastosfoundation/did-js-sdk',
             '@elastosfoundation/elastos-connectivity-sdk-js',
-            '@types/fs-extra',
             '@walletconnect/web3-provider',
-            'browserfs',
             'bs58',
-            'buffer',
             'web3',
         ],
         plugins: [
@@ -181,7 +177,6 @@ export default command => {
             }),
             alias({
                 "entries": [
-                    { "find": "buffer", "replacement": "buffer-es6" },
                     { "find": "process", "replacement": "process-es6" },
                     { "find": "path", "replacement": "path-browserify" },
                     { "find": "crypto", "replacement": "crypto-browserify" },
@@ -198,26 +193,16 @@ export default command => {
                 mainFields: ['browser', 'module', 'jsnext:main', 'main'],
                 browser: true,
                 preferBuiltins: true,
-                dedupe: ['bn.js', 'browserfs', 'buffer-es6', 'process-es6', 'crypto-browserify', 'assert', 'events', 'browserify-sign']
             }),
             // Polyfills needed to replace readable-stream with stream (circular dep)
             commonjs({
                 esmExternals: true,
-                //requireReturnsDefault: "true", // "true" will generate build error: TypeError: Cannot read property 'deoptimizePath' of undefined
-                //requireReturnsDefault: "auto", // namespace, true, false, auto, preferred
                 transformMixedEsModules: true, // TMP trying to solve commonjs "circular dependency" errors at runtime
                 dynamicRequireTargets: [],
             }),
-            globals(), // Defines process, Buffer, etc
+            globals(),
             typescript({
                 exclude: "*.node.ts"
-            }),
-            /* nodePolyfills({
-                stream: true
-                // crypto:true // Broken, the polyfill just doesn't work. We have to use crypto-browserify directly in our TS code instead.
-            }), */ // To let some modules bundle NodeJS stream, util, fs ... in browser
-            inject({
-                "BrowserFS": "browserfs"
             }),
             size(),
             ...prodBuild ? [
