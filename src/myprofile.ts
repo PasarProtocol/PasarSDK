@@ -275,6 +275,9 @@ export class MyProfile {
                 thumbnailCID = imageCID
             }
 
+            let plainData = `0x${sha256(imageCID.path)}`;
+            let signedData = await requestSigndataOnTokenID(plainData);
+
             const creatorObject = {
                 "did": this.userDid,
                 "name": this.name,
@@ -286,6 +289,7 @@ export class MyProfile {
                 "kind": itemImage.type.replace('image/', ''),
                 "size": itemImage.size,
                 "thumbnail": `pasar:image:${thumbnailCID.path}`,
+                "signature": signedData && signedData.signature ? signedData.signature : ""
             }
 
             const metaObj = {
@@ -322,7 +326,7 @@ export class MyProfile {
         }
 
         try {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
+            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
             await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI);
             return tokenId
         } catch (error) {
