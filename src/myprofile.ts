@@ -249,14 +249,14 @@ export class MyProfile {
      * @param itemImage The actual image of an NFT item
      * @param properties properties of nft
      * @param sensitive Indicator whether the NFT item contains sensitive content or not
-     * @returns The result is the did information.
+     * @returns the tokenId and uri information
      */
     public async createTokenURI(itemName: string,
         itemDescription: string,
         itemImage: any,
         properties: any = null, // TODO: Must be json
         sensitive = false
-    ): Promise<string> {
+    ): Promise<any> {
         if (!checkParams(itemName) ||
             !checkParams(itemDescription) ||
             !checkParams(itemImage)) {
@@ -275,8 +275,8 @@ export class MyProfile {
                 thumbnailCID = imageCID
             }
 
-            let plainData = `0x${sha256(imageCID.path)}`;
-            let signedData = await requestSigndataOnTokenID(plainData);
+            let tokenId = `0x${sha256(imageCID.path)}`;
+            let signedData = await requestSigndataOnTokenID(tokenId);
 
             const creatorObject = {
                 "did": this.userDid,
@@ -304,7 +304,11 @@ export class MyProfile {
             }
 
             let metaData = await client.add(JSON.stringify(metaObj));
-            return `pasar:json:${metaData.path}`
+            
+            return {
+                uri: `pasar:json:${metaData.path}`,
+                tokenId: tokenId
+            }
         } catch(error) {
             throw new Error(`Create token URI error: ${error}`);
         }
@@ -317,18 +321,17 @@ export class MyProfile {
      * Notice: This function should be used for minting NFTs from dedicated collection.
      *
      * @param collection The collection contract where NFT items would be minted
+     * @param tokenId the id of new nft
      * @param tokenURI The token uri to this new NFT item
-     * @returns The tokenId of the new NFT.
+     * @returns 
      */
-    public async createItem(collection: string, tokenURI: string): Promise<string> {
-        if (!checkParams(collection) || !checkParams(tokenURI)) {
+    public async createItem(collection: string, tokenId: string, tokenURI: string): Promise<void> {
+        if (!checkParams(collection) || !checkParams(tokenId) || !checkParams(tokenURI)) {
             throw new Error("Parameters invalid with empty values")
         }
 
         try {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`;
             await this.contractHelper.mintERC721Item(collection, tokenId, tokenURI);
-            return tokenId
         } catch (error) {
             throw new Error(`Create NFT item error: ${error}`)
         }
@@ -340,21 +343,20 @@ export class MyProfile {
      * on tokenURI string of metadata json file on IPFS sotrage.
      * Notice: This function should be used for minting NFTs from public collection.
      *
+     * @param tokenId the id of new nft
      * @param tokenURI The token uri to this new NFT item
      * @param roylatyFee The royalty fee to the new NFT item
-     * @returns The tokenId of being minted a nft
+     * @returns
      */
-    public async createItemFromFeeds(tokenURI: string,roylatyFee: number): Promise<string> {
-        if (!checkParams(tokenURI) || !checkParams(roylatyFee)) {
+    public async createItemFromFeeds(tokenId: string, tokenURI: string,roylatyFee: number): Promise<void> {
+        if (!checkParams(tokenId) || !checkParams(tokenURI) || !checkParams(roylatyFee)) {
             throw new Error("Parameters invalid with empty values")
         }
 
         try {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromFeedsCollection(
                 this.appContext.getFeedsCollectionAddress(), tokenId, tokenURI, roylatyFee, ""
             );
-            return tokenId
         } catch (error) {
             throw new Error(`Create item from Feeds collection error: ${error}`)
         }
@@ -363,21 +365,20 @@ export class MyProfile {
     /**
      * Mint a nft on Pasar collection
      *
+     * @param tokenId the id of new nft
      * @param tokenURI The token uri to this new NFT item
      * @param roylatyFee The royalty fee to the new NFT item
-     * @returns The tokenId of being minted a nft
+     * @returns
      */
-    public async createItemFromPasar(tokenURI: string,roylatyFee: number): Promise<string> {
-        if (!checkParams(tokenURI) || !checkParams(roylatyFee)) {
+    public async createItemFromPasar(tokenId: string, tokenURI: string,roylatyFee: number): Promise<void> {
+        if ( !checkParams(tokenId) || !checkParams(tokenURI) || !checkParams(roylatyFee)) {
             throw new Error("Parameters invalid with empty values")
         }
 
         try {
-            let tokenId = `0x${sha256(tokenURI.replace("pasar:json:", ""))}`
             await this.contractHelper.mintFromPasarCollection(
                 this.appContext.getPasarCollectionAddress(), tokenId, tokenURI, roylatyFee
             );
-            return tokenId
         } catch (error) {
             throw new Error(`Create item from Pasar collection error: ${error}`)
         }

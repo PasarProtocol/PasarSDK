@@ -14,9 +14,9 @@ const MintNFT = () => {
             console.log(urlImage);
             let user = JSON.parse(localStorage.getItem("user"));
             const myProfile = new MyProfile(AppContext.getInstance(), user['did'], user['address'], user['name'], user['bio'], null);
-            let metaData = await myProfile.createTokenURI(name, description, urlImage, null, false);
-            let tokenId = await myProfile.createItemFromPasar(metaData, 10)
-            console.log(tokenId);
+            let returnData = await myProfile.createTokenURI(name, description, urlImage, null, false);
+            console.log(returnData);
+            await myProfile.createItemFromPasar(returnData.tokenId, returnData.uri, 10)
         } catch(err) {
             console.log(err);
         }
