@@ -57,7 +57,6 @@ export class ItemInfo {
         price: string = null,
         buyoutPrice: string = null,
         reservePrice: string = null,
-        minPrice: string = null,
         orderState: any = null,
         orderType: any = null) {
 
@@ -79,7 +78,6 @@ export class ItemInfo {
         this.fixedPrice = price;
         this.buyoutPrice = buyoutPrice;
         this.reservePrice = reservePrice;
-        this.minPrice = minPrice;
         this.orderState = orderState;
         this.orderType = orderType;
 
