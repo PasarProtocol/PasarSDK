@@ -22,7 +22,7 @@ export class Market {
      */
     public async queryItems(beforeTime: number, pageNum = 1, pageSize = 10,): Promise<ItemPage> {
         try {
-            return await getAllListedItems(this.assistUrl, beforeTime, "", pageNum, pageSize)
+            return await getAllListedItems(this.assistUrl, beforeTime, pageNum, pageSize)
         } catch (error) {
             throw new Error(`Query Items from marketplace error ${error}`)
         }

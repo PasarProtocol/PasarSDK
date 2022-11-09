@@ -18,7 +18,7 @@ function SigninEE() {
   const handleGetListedItem = async () => {
     now = (Date.now() / 1000).toFixed();
     console.log(now);
-    let result = await market.queryItems(now, 1, 10);
+    let result = await market.queryItems(0, 1, 10);
     console.log(result);
   }
 
