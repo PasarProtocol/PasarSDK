@@ -5,17 +5,18 @@ import { ItemInfo } from "./iteminfo";
 import { ItemPage } from "./itempage";
 import { ERCType } from "./erctype";
 
-const getAllListedItems = async (assistUrl: string, earilerThan:number, collectionAddr = '', pageNum = 1, pageSize = 10): Promise<ItemPage> => {
+const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum = 1, pageSize = 10): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getDetailedCollectiblesListed?startTime=${earilerThan}&collectionType=${collectionAddr}&tokenType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=0&keyword=&pageNum=${pageNum}&pageSize=${pageSize}`)
+        let response = await fetch(`${assistUrl}/api/v1/listCollectibles?type=listed&after=${earilerThan}&pageNum=${pageNum}&pageSize=${pageSize}`)
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch collection info failed");
         }
 
         let dataInfo = data['data'];
+
         let totalCount = dataInfo['total'];
-        let nftData = dataInfo['result'];
+        let nftData = dataInfo['data'];
         let listNftInfo: ItemInfo[] = [];
         for(var i = 0; i < nftData.length; i++) {
 
@@ -33,19 +34,19 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, collecti
                 nftData[i]['properties'],
                 nftData[i]['tokenJsonVersion'],
                 nftData[i]['marketPlace'],
-                nftData[i]['holder'],
+                nftData[i]['tokenOwner'],
                 nftData[i]['royaltyOwner'],
                 nftData[i]['createTime'],
                 parseInt(nftData[i]['marketTime']),
-                parseInt(nftData[i]['endTime']),
-                nftData[i]['orderId'],
-                nftData[i]['quoteToken'],
-                nftData[i]['price'],
-                nftData[i]['buyoutPrice'],
-                nftData[i]['reservePrice'],
-                nftData[i]['minPrice'],
-                nftData[i]['orderState'],
-                nftData[i]['orderType']);
+                parseInt(nftData[i]['order']['endTime']),
+                nftData[i]['order']['orderId'],
+                nftData[i]['order']['quoteToken'],
+                nftData[i]['order']['price'],
+                nftData[i]['order']['buyoutPrice'],
+                nftData[i]['order']['reservePrice'],
+                nftData[i]['order']['price'],
+                nftData[i]['order']['orderState'],
+                nftData[i]['order']['orderType']);
             listNftInfo.push(itemNft);
         }
         return new ItemPage(totalCount, 0, nftData.length, listNftInfo);
