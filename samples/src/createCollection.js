@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, Category, ERCType, SocialLinks, AppContext } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, Category, ERCType, SocialLinks, AppContext } from "@crypto-dev/pasar-sdk-development";
 
 const CreateCollection = () => {
     const [name, setName] = useState('');

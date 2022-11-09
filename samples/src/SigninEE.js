@@ -1,6 +1,6 @@
 
 import React, {useEffect, useState} from 'react'
-import {Profile, Market, AppContext } from '@pasarprotocol/pasar-sdk-development';
+import {Profile, Market, AppContext } from '@crypto-dev/pasar-sdk-development';
 import {
   useNavigate
 } from "react-router-dom";
