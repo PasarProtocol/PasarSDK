@@ -44,7 +44,6 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
                 nftData[i]['order']['price'],
                 nftData[i]['order']['buyoutPrice'],
                 nftData[i]['order']['reservePrice'],
-                nftData[i]['order']['price'],
                 nftData[i]['order']['orderState'],
                 nftData[i]['order']['orderType']);
             listNftInfo.push(itemNft);
@@ -59,7 +58,7 @@ const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chain
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainIndexByType(chainType)}`);
         let json = await response.json();
-        if (json['code'] != 200) {
+        if (json['status'] != 200) {
             throw new Error("Call API to fetch collection info failed");
         }
 
@@ -90,7 +89,7 @@ const getItemByTokenId = async (assistUrl: string, baseToken:string, tokenId:str
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch specific NFT failed");
         }
 
@@ -116,7 +115,6 @@ const getItemByTokenId = async (assistUrl: string, baseToken:string, tokenId:str
             itemInfo['Price'],
             itemInfo['buyoutPrice'],
             itemInfo['reservePrice'],
-            itemInfo['minPrice'],
             itemInfo['orderState'],
             itemInfo['orderType']
         );
@@ -129,7 +127,7 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getCollectionByOwner/${walletAddress}?marketPlace=1`)
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch owned Collections failed");
         }
         let collections: CollectionInfo[] = [];
@@ -171,31 +169,30 @@ const packItemPage = (dataArray: any): ItemPage => {
 
         let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
         let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
-
+        console.log(itemInfo['endTime']);
         let itemNft = new ItemInfo(
-            itemInfo['tokenId'],
-            itemInfo['tokenIdHex'],
-            itemInfo['name'],
-            itemInfo['description'],
+            itemInfo['tokenId'] !== undefined ? itemInfo['tokenId'] : itemInfo['token']['tokenId'],
+            itemInfo['tokenIdHex'] !== undefined ? itemInfo['tokenIdHex'] : itemInfo['token']['tokenIdHex'],
+            itemInfo['name'] !== undefined ? itemInfo['name'] : itemInfo['token']['name'],
+            itemInfo['description'] !== undefined ? itemInfo['description'] : itemInfo['token']['description'],
             thumbnail,
             image,
-            itemInfo['adult'],
-            itemInfo['properties'],
-            itemInfo['tokenJsonVersion'],
-            itemInfo['marketPlace'],
-            itemInfo['holder'],
-            itemInfo['royaltyOwner'],
-            itemInfo['createTime'],
-            parseInt(itemInfo['marketTime']),
-            parseInt(itemInfo['endTime']),
-            itemInfo['orderId'],
-            itemInfo['quoteToken'],
-            itemInfo['price'],
-            itemInfo['buyoutPrice'],
-            itemInfo['reservePrice'],
-            itemInfo['minPrice'],
-            itemInfo['orderState'],
-            itemInfo['orderType']
+            itemInfo['adult'] !== undefined? itemInfo['adult'] : itemInfo['token']['adult'],
+            itemInfo['properties'] !== undefined ? itemInfo['properties'] : itemInfo['token']['properties'],
+            itemInfo['version'] !== undefined ? itemInfo['version'] : itemInfo['token']['version'],
+            itemInfo['chain'] !== undefined ? itemInfo['chain'] : itemInfo['token']['chain'],
+            itemInfo['tokenOwner'] !== undefined ? itemInfo['tokenOwner'] : itemInfo['token']['tokenOwner'],
+            itemInfo['royaltyOwner'] !== undefined ? itemInfo['royaltyOwner'] : itemInfo['token']['royaltyOwner'],
+            itemInfo['createTime'] !== undefined ? itemInfo['createTime'] : itemInfo['token']['createTime'],
+            itemInfo['createTime'] !== undefined ? parseInt(itemInfo['createTime']) : parseInt(itemInfo['order']['createTime']),
+            itemInfo['endTime'] !== undefined ? parseInt(itemInfo['endTime']) : parseInt(itemInfo['order']['endTime']),
+            itemInfo['orderId'] !== undefined ? itemInfo['orderId'] : itemInfo['order']['orderId'],
+            itemInfo['quoteToken'] !== undefined ? itemInfo['quoteToken'] : itemInfo['order']['quoteToken'],
+            itemInfo['price'] !== undefined ? itemInfo['price'] : itemInfo['order']['price'],
+            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order']['buyoutPrice'],
+            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order']['reservePrice'],
+            itemInfo['orderState'] !== undefined ? itemInfo['orderState'] : itemInfo['order']['orderState'],
+            itemInfo['orderType'] !== undefined ? itemInfo['orderType'] : itemInfo['order']['orderType']
         );
         items.push(itemNft);
     }
@@ -207,7 +204,7 @@ const getOwnedItems = async (assistUrl: string, walletAddress: string): Promise<
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getOwnCollectiblesByAddress/${walletAddress}?orderType=0`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
         }
         return packItemPage(data['data'])
@@ -220,7 +217,7 @@ const getCreatedItems = async(assistUrl: string, walletAddress: string): Promise
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getCreatedCollectiblesByAddress/${walletAddress}?orderType=0`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
         }
         return packItemPage(data['data'])
@@ -231,9 +228,9 @@ const getCreatedItems = async(assistUrl: string, walletAddress: string): Promise
 
 const getListedItems = async (assistUrl: string, walletAddress: string): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getListedCollectiblesByAddress/${walletAddress}?orderType=0`);
+        let response = await fetch(`${assistUrl}/api/v1/getListedCollectiblesByWalletAddr?walletAddr=${walletAddress}`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
         }
         return packItemPage(data['data'])
@@ -246,7 +243,7 @@ const getBiddingItems = async (assistUrl: string, walletAddress: string): Promis
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getBidCollectiblesByAddress/${walletAddress}?orderType=0`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
         }
         return packItemPage(data['data'])
@@ -259,7 +256,7 @@ const getSoldItems = async (assistUrl: string, walletAddress: string): Promise<I
     try {
         let response = await fetch(`${assistUrl}/api/v2/sticker/getSoldCollectiblesByAddress/${walletAddress}?orderType=0`);
         let data = await response.json();
-        if (data['code'] != 200) {
+        if (data['status'] != 200) {
             throw new Error("Call API to fetch sold NFT failed");
         }
         return packItemPage(data['data'])
