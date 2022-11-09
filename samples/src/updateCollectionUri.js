@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Category, MyProfile, SocialLinks, AppContext } from "@pasarprotocol/pasar-sdk-development";
+import { Category, MyProfile, SocialLinks, AppContext } from "@crypto-dev/pasar-sdk-development";
 
 const UpdateCollectionInfo = () => {
     const [name, setName] = useState('');

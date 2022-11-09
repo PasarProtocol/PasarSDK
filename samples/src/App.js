@@ -1,5 +1,5 @@
 import SigninEE from './SigninEE'
-import { AppContext } from '@pasarprotocol/pasar-sdk-development';
+import { AppContext } from '@crypto-dev/pasar-sdk-development';
 
 function App() {
   AppContext.createInstance(true)

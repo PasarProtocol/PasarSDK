@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, ListType, Token, AppContext } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, ListType, Token, AppContext } from "@crypto-dev/pasar-sdk-development";
 
 const ListNFT = () => {
     const listPricingToken = Token.getToken();

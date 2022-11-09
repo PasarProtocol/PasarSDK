@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MyProfile, AppContext } from "@pasarprotocol/pasar-sdk-development";
+import { MyProfile, AppContext } from "@crypto-dev/pasar-sdk-development";
 
 const MintNFT = () => {
     const [name, setName] = useState('');
