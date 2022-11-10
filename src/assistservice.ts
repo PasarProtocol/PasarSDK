@@ -56,7 +56,7 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
 
 const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getCollection/${collectionAddr}?marketPlace=${getChainIndexByType(chainType)}`);
+        let response = await fetch(`${assistUrl}/api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${collectionAddr}`);
         let json = await response.json();
         if (json['status'] != 200) {
             throw new Error("Call API to fetch collection info failed");
@@ -202,7 +202,7 @@ const packItemPage = (dataArray: any): ItemPage => {
 
 const getOwnedItems = async (assistUrl: string, walletAddress: string): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getOwnCollectiblesByAddress/${walletAddress}?orderType=0`);
+        let response = await fetch(`${assistUrl}/api/v1/getOwnedCollectiblesByWalletAddr?walletAddr=${walletAddress}`);
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
@@ -215,7 +215,7 @@ const getOwnedItems = async (assistUrl: string, walletAddress: string): Promise<
 
 const getCreatedItems = async(assistUrl: string, walletAddress: string): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getCreatedCollectiblesByAddress/${walletAddress}?orderType=0`);
+        let response = await fetch(`${assistUrl}/api/v1/getMintedCollectiblesByWalletAddr?walletAddr=${walletAddress}`);
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
@@ -241,7 +241,7 @@ const getListedItems = async (assistUrl: string, walletAddress: string): Promise
 
 const getBiddingItems = async (assistUrl: string, walletAddress: string): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getBidCollectiblesByAddress/${walletAddress}?orderType=0`);
+        let response = await fetch(`${assistUrl}/api/v1/getBidsCollectiblesByWalletAddr?walletAddr=${walletAddress}`);
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch bidding NFT failed");
@@ -254,7 +254,7 @@ const getBiddingItems = async (assistUrl: string, walletAddress: string): Promis
 
 const getSoldItems = async (assistUrl: string, walletAddress: string): Promise<ItemPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getSoldCollectiblesByAddress/${walletAddress}?orderType=0`);
+        let response = await fetch(`${assistUrl}/api/v1/getSoldCollectiblesByWalletAddr?walletAddr=${walletAddress}`);
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch sold NFT failed");
