@@ -189,8 +189,8 @@ const packItemPage = (dataArray: any): ItemPage => {
             itemInfo['orderId'] !== undefined ? itemInfo['orderId'] : itemInfo['order']['orderId'],
             itemInfo['quoteToken'] !== undefined ? itemInfo['quoteToken'] : itemInfo['order']['quoteToken'],
             itemInfo['price'] !== undefined ? itemInfo['price'] : itemInfo['order']['price'],
-            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order']['buyoutPrice'],
-            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order']['reservePrice'],
+            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order']['buyoutPrice'] != undefined ? itemInfo['order']['buyoutPrice'] : null,
+            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order']['reservePrice'] != undefined ? itemInfo['order']['reservePrice'] : null,
             itemInfo['orderState'] !== undefined ? itemInfo['orderState'] : itemInfo['order']['orderState'],
             itemInfo['orderType'] !== undefined ? itemInfo['orderType'] : itemInfo['order']['orderType']
         );
