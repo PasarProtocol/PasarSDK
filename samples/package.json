@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@crypto-dev/pasar-sdk-development": "^0.0.3",
+    "@crypto-dev/pasar-sdk-development": "0.0.6",
+    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.23",
     "@ethersproject/providers": "^5.5.2",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
