@@ -167,9 +167,10 @@ const packItemPage = (dataArray: any): ItemPage => {
     for(var i = 0; i < dataArray.length; i++) {
         let itemInfo = dataArray[i];
 
-        let thumbnail = itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'];
-        let image = itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'];
-        console.log(itemInfo['endTime']);
+        let tokenData = itemInfo['token'] ? itemInfo['token'] : itemInfo;
+        let thumbnail = tokenData['data'] ? tokenData['data']['thumbnail'] : tokenData['thumbnail'];
+        let image = tokenData['data'] ? tokenData['data']['image'] : tokenData['image'];
+        
         let itemNft = new ItemInfo(
             itemInfo['tokenId'] !== undefined ? itemInfo['tokenId'] : itemInfo['token']['tokenId'],
             itemInfo['tokenIdHex'] !== undefined ? itemInfo['tokenIdHex'] : itemInfo['token']['tokenIdHex'],
@@ -189,11 +190,12 @@ const packItemPage = (dataArray: any): ItemPage => {
             itemInfo['orderId'] !== undefined ? itemInfo['orderId'] : itemInfo['order']['orderId'],
             itemInfo['quoteToken'] !== undefined ? itemInfo['quoteToken'] : itemInfo['order']['quoteToken'],
             itemInfo['price'] !== undefined ? itemInfo['price'] : itemInfo['order']['price'],
-            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order']['buyoutPrice'] != undefined ? itemInfo['order']['buyoutPrice'] : null,
-            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order']['reservePrice'] != undefined ? itemInfo['order']['reservePrice'] : null,
+            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order'] && itemInfo['order']['buyoutPrice'] !== undefined ? itemInfo['order']['buyoutPrice'] : null,
+            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order'] && itemInfo['order']['reservePrice'] !== undefined ? itemInfo['order']['reservePrice'] : null,
             itemInfo['orderState'] !== undefined ? itemInfo['orderState'] : itemInfo['order']['orderState'],
             itemInfo['orderType'] !== undefined ? itemInfo['orderType'] : itemInfo['order']['orderType']
         );
+        console.log(itemNft);
         items.push(itemNft);
     }
 
