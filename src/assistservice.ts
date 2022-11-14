@@ -28,32 +28,18 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
     }
 }
 
-const getAllCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
+const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${collectionAddr}`);
+        let response = await fetch(`${assistUrl}/api/v1/getCollectionInfo?chain=${chainType}&collection=${collectionAddr}`);
         let json = await response.json();
         if (json['status'] != 200) {
             throw new Error("Call API to fetch collection info failed");
         }
 
         let body = json['data'];
-        let data = body['tokenJson']['data'];
-
-        let info = new CollectionInfo(
-            body['token'],
-            chainType,
-            body['creatorDid'],
-            body['owner'],
-            body['name'],
-            body['symbol']
-        );
-
-        return info.setSocialLinks(data['socials'])
-            .setDescription(data['description'])
-            .setAvatar(data['avatar'])
-            .setDescription(data['description'])
-            .setCategory(data['category'])
-            .setErcType(body['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+        
+        let collectionInfo = parseCollectionInfo(body);
+        return collectionInfo;
     }catch (error) {
         throw new Error(`Failed to get Collection Info (erro: ${error}`);
     }
@@ -86,7 +72,7 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
         let body = data['data'];
 
         for (var i = 0; i < body.length; i++) {
-            let info = getCollectionInfo(body[i]);
+            let info = parseCollectionInfo(body[i]);
             collections.push(info);
         }
 
@@ -96,7 +82,7 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
     }
 }
 
-const getCollectionInfo = (itemInfo: any): CollectionInfo => {
+const parseCollectionInfo = (itemInfo: any): CollectionInfo => {
     let creator = itemInfo['creator'];
     let data = itemInfo['data'];
 
@@ -231,7 +217,7 @@ const getSoldItems = async (assistUrl: string, walletAddress: string): Promise<I
 
 export {
     getAllListedItems,
-    getAllCollectionInfo,
+    getCollectionInfo,
     getItemByTokenId,
     getOwnedCollections,
     getCreatedItems,
