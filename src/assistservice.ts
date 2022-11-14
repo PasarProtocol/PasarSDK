@@ -77,7 +77,7 @@ const getItemByTokenId = async (assistUrl: string, baseToken:string, tokenId:str
 
 const getOwnedCollections = async (assistUrl: string, walletAddress: string): Promise<CollectionPage> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getCollectionByOwner/${walletAddress}?marketPlace=1`)
+        let response = await fetch(`${assistUrl}/api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${walletAddress}`)
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch owned Collections failed");
@@ -87,23 +87,24 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
 
         for (var i = 0; i < body.length; i++) {
             let item = body[i];
-            let data = item['tokenJson']['data'];
+            let creator = item['creator'];
+            let data = item['data'];
 
             let info = new CollectionInfo(
                 item['token'],
-                ChainType.ESC,
-                item['creatorDid'],
+                item['chain'],
+                creator && creator['did'] ? creator['did'] : null,
                 item['owner'],
                 item['name'],
                 item['symbol']
             );
 
-            info.setSocialLinks(data['socials'])
-                .setDescription(data['description'])
-                .setAvatar(data['avatar'])
-                .setDescription(data['description'])
-                .setCategory(data['category'])
-                .setErcType(body['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+            info.setSocialLinks(data && data['socials'] ? data['socials'] : null)
+                .setDescription(data && data['description'] ? data['description'] : null)
+                .setAvatar(data && data['avatar'] ? data['avatar'] : null)
+                .setBanner(data && data['background'] ? data['background'] : null)
+                .setCategory(data && data['category'] ? data['category'] : null)
+                .setErcType(item['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
 
             collections.push(info);
         }
