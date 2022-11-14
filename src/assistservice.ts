@@ -28,7 +28,7 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
     }
 }
 
-const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
+const getAllCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
     try {
         let response = await fetch(`${assistUrl}/api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${collectionAddr}`);
         let json = await response.json();
@@ -86,26 +86,7 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
         let body = data['data'];
 
         for (var i = 0; i < body.length; i++) {
-            let item = body[i];
-            let creator = item['creator'];
-            let data = item['data'];
-
-            let info = new CollectionInfo(
-                item['token'],
-                item['chain'],
-                creator && creator['did'] ? creator['did'] : null,
-                item['owner'],
-                item['name'],
-                item['symbol']
-            );
-
-            info.setSocialLinks(data && data['socials'] ? data['socials'] : null)
-                .setDescription(data && data['description'] ? data['description'] : null)
-                .setAvatar(data && data['avatar'] ? data['avatar'] : null)
-                .setBanner(data && data['background'] ? data['background'] : null)
-                .setCategory(data && data['category'] ? data['category'] : null)
-                .setErcType(item['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
-
+            let info = getCollectionInfo(body[i]);
             collections.push(info);
         }
 
@@ -113,6 +94,29 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
     }catch (error) {
         throw new Error(`Failed to get listed NFTs with error: ${error}`);
     }
+}
+
+const getCollectionInfo = (itemInfo: any): CollectionInfo => {
+    let creator = itemInfo['creator'];
+    let data = itemInfo['data'];
+
+    let collectionInfo = new CollectionInfo(
+        itemInfo['token'],
+        itemInfo['chain'],
+        creator && creator['did'] ? creator['did'] : null,
+        itemInfo['owner'],
+        itemInfo['name'],
+        itemInfo['symbol']
+    );
+
+    collectionInfo.setSocialLinks(data && data['socials'] ? data['socials'] : null)
+        .setDescription(data && data['description'] ? data['description'] : null)
+        .setAvatar(data && data['avatar'] ? data['avatar'] : null)
+        .setBanner(data && data['background'] ? data['background'] : null)
+        .setCategory(data && data['category'] ? data['category'] : null)
+        .setErcType(itemInfo['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+
+    return collectionInfo;
 }
 
 const getItemInfo = (itemInfo:any):ItemInfo => {
@@ -227,7 +231,7 @@ const getSoldItems = async (assistUrl: string, walletAddress: string): Promise<I
 
 export {
     getAllListedItems,
-    getCollectionInfo,
+    getAllCollectionInfo,
     getItemByTokenId,
     getOwnedCollections,
     getCreatedItems,
