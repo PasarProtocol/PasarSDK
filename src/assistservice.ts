@@ -19,33 +19,7 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
         let nftData = dataInfo['data'];
         let listNftInfo: ItemInfo[] = [];
         for(var i = 0; i < nftData.length; i++) {
-
-            let thumbnail = nftData[i]['data'] ? nftData[i]['data']['thumbnail'] : nftData[i]['thumbnail'];
-            let image = nftData[i]['data'] ? nftData[i]['data']['image'] : nftData[i]['asset'];
-
-            let itemNft =  new ItemInfo(
-                nftData[i]['tokenId'],
-                nftData[i]['tokenIdHex'],
-                nftData[i]['name'],
-                nftData[i]['description'],
-                thumbnail,
-                image,
-                nftData[i]['adult'],
-                nftData[i]['properties'],
-                nftData[i]['tokenJsonVersion'],
-                nftData[i]['marketPlace'],
-                nftData[i]['tokenOwner'],
-                nftData[i]['royaltyOwner'],
-                nftData[i]['createTime'],
-                parseInt(nftData[i]['marketTime']),
-                parseInt(nftData[i]['order']['endTime']),
-                nftData[i]['order']['orderId'],
-                nftData[i]['order']['quoteToken'],
-                nftData[i]['order']['price'],
-                nftData[i]['order']['buyoutPrice'],
-                nftData[i]['order']['reservePrice'],
-                nftData[i]['order']['orderState'],
-                nftData[i]['order']['orderType']);
+            let itemNft =  getItemInfo(nftData[i]);
             listNftInfo.push(itemNft);
         }
         return new ItemPage(totalCount, 0, nftData.length, listNftInfo);
@@ -87,37 +61,15 @@ const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chain
 
 const getItemByTokenId = async (assistUrl: string, baseToken:string, tokenId:string): Promise<ItemInfo> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
+        let response = await fetch(`${assistUrl}/api/v1/getCollectibleInfo?baseToken=${baseToken}&chain=ela&tokenId=${tokenId}`);
         let data = await response.json();
         if (data['status'] != 200) {
             throw new Error("Call API to fetch specific NFT failed");
         }
 
         let itemInfo = data['data'];
-        return new ItemInfo(
-            itemInfo['tokenId'],
-            itemInfo['tokenIdHex'],
-            itemInfo['name'],
-            itemInfo['description'],
-            itemInfo['data'] ? itemInfo['data']['thumbnail'] : itemInfo['thumbnail'],
-            itemInfo['data'] ? itemInfo['data']['image'] : itemInfo['asset'],
-            itemInfo['adult'],
-            itemInfo['properties'],
-            itemInfo['tokenJsonVersion'],
-            itemInfo['marketPlace'],
-            itemInfo['holder'],
-            itemInfo['royaltyOwner'],
-            itemInfo['createTime'],
-            parseInt(itemInfo['marketTime']),
-            parseInt(itemInfo['endTime']),
-            itemInfo['OrderId'],
-            itemInfo['quoteToken'],
-            itemInfo['Price'],
-            itemInfo['buyoutPrice'],
-            itemInfo['reservePrice'],
-            itemInfo['orderState'],
-            itemInfo['orderType']
-        );
+        let itemNFT = getItemInfo(itemInfo);
+        return itemNFT;
     }catch (error) {
         throw new Error(`Failed to get listed NFTs with error: ${error}`);
     }
@@ -162,39 +114,43 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
     }
 }
 
+const getItemInfo = (itemInfo:any):ItemInfo => {
+    let tokenData = itemInfo['token'] ? itemInfo['token'] : itemInfo;
+    let thumbnail = tokenData['data'] ? tokenData['data']['thumbnail'] : tokenData['thumbnail'];
+    let image = tokenData['data'] ? tokenData['data']['image'] : tokenData['image'];
+
+    let itemNft = new ItemInfo(
+        itemInfo['tokenId'] !== undefined ? itemInfo['tokenId'] : itemInfo['token']['tokenId'],
+        itemInfo['tokenIdHex'] !== undefined ? itemInfo['tokenIdHex'] : itemInfo['token']['tokenIdHex'],
+        itemInfo['name'] !== undefined ? itemInfo['name'] : itemInfo['token']['name'],
+        itemInfo['description'] !== undefined ? itemInfo['description'] : itemInfo['token']['description'],
+        thumbnail,
+        image,
+        itemInfo['adult'] !== undefined? itemInfo['adult'] : itemInfo['token']['adult'],
+        itemInfo['properties'] !== undefined ? itemInfo['properties'] : itemInfo['token']['properties'],
+        itemInfo['version'] !== undefined ? itemInfo['version'] : itemInfo['token']['version'],
+        itemInfo['chain'] !== undefined ? itemInfo['chain'] : itemInfo['token']['chain'],
+        itemInfo['tokenOwner'] !== undefined ? itemInfo['tokenOwner'] : itemInfo['token']['tokenOwner'],
+        itemInfo['royaltyOwner'] !== undefined ? itemInfo['royaltyOwner'] : itemInfo['token']['royaltyOwner'],
+        itemInfo['createTime'] !== undefined ? itemInfo['createTime'] : itemInfo['token']['createTime'],
+        itemInfo['createTime'] !== undefined ? parseInt(itemInfo['createTime']) : parseInt(itemInfo['order']['createTime']),
+        itemInfo['endTime'] !== undefined ? parseInt(itemInfo['endTime']) : parseInt(itemInfo['order']['endTime']),
+        itemInfo['orderId'] !== undefined ? itemInfo['orderId'] : itemInfo['order']['orderId'],
+        itemInfo['quoteToken'] !== undefined ? itemInfo['quoteToken'] : itemInfo['order']['quoteToken'],
+        itemInfo['price'] !== undefined ? itemInfo['price'] : itemInfo['order']['price'],
+        itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order'] && itemInfo['order']['buyoutPrice'] !== undefined ? itemInfo['order']['buyoutPrice'] : null,
+        itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order'] && itemInfo['order']['reservePrice'] !== undefined ? itemInfo['order']['reservePrice'] : null,
+        itemInfo['orderState'] !== undefined ? itemInfo['orderState'] : itemInfo['order']['orderState'],
+        itemInfo['orderType'] !== undefined ? itemInfo['orderType'] : itemInfo['order']['orderType']
+    );
+
+    return itemNft;
+}
+
 const packItemPage = (dataArray: any): ItemPage => {
     let items: ItemInfo[] = [];
     for(var i = 0; i < dataArray.length; i++) {
-        let itemInfo = dataArray[i];
-
-        let tokenData = itemInfo['token'] ? itemInfo['token'] : itemInfo;
-        let thumbnail = tokenData['data'] ? tokenData['data']['thumbnail'] : tokenData['thumbnail'];
-        let image = tokenData['data'] ? tokenData['data']['image'] : tokenData['image'];
-        
-        let itemNft = new ItemInfo(
-            itemInfo['tokenId'] !== undefined ? itemInfo['tokenId'] : itemInfo['token']['tokenId'],
-            itemInfo['tokenIdHex'] !== undefined ? itemInfo['tokenIdHex'] : itemInfo['token']['tokenIdHex'],
-            itemInfo['name'] !== undefined ? itemInfo['name'] : itemInfo['token']['name'],
-            itemInfo['description'] !== undefined ? itemInfo['description'] : itemInfo['token']['description'],
-            thumbnail,
-            image,
-            itemInfo['adult'] !== undefined? itemInfo['adult'] : itemInfo['token']['adult'],
-            itemInfo['properties'] !== undefined ? itemInfo['properties'] : itemInfo['token']['properties'],
-            itemInfo['version'] !== undefined ? itemInfo['version'] : itemInfo['token']['version'],
-            itemInfo['chain'] !== undefined ? itemInfo['chain'] : itemInfo['token']['chain'],
-            itemInfo['tokenOwner'] !== undefined ? itemInfo['tokenOwner'] : itemInfo['token']['tokenOwner'],
-            itemInfo['royaltyOwner'] !== undefined ? itemInfo['royaltyOwner'] : itemInfo['token']['royaltyOwner'],
-            itemInfo['createTime'] !== undefined ? itemInfo['createTime'] : itemInfo['token']['createTime'],
-            itemInfo['createTime'] !== undefined ? parseInt(itemInfo['createTime']) : parseInt(itemInfo['order']['createTime']),
-            itemInfo['endTime'] !== undefined ? parseInt(itemInfo['endTime']) : parseInt(itemInfo['order']['endTime']),
-            itemInfo['orderId'] !== undefined ? itemInfo['orderId'] : itemInfo['order']['orderId'],
-            itemInfo['quoteToken'] !== undefined ? itemInfo['quoteToken'] : itemInfo['order']['quoteToken'],
-            itemInfo['price'] !== undefined ? itemInfo['price'] : itemInfo['order']['price'],
-            itemInfo['buyoutPrice'] !== undefined ? itemInfo['buyoutPrice'] : itemInfo['order'] && itemInfo['order']['buyoutPrice'] !== undefined ? itemInfo['order']['buyoutPrice'] : null,
-            itemInfo['reservePrice'] !== undefined ? itemInfo['reservePrice'] : itemInfo['order'] && itemInfo['order']['reservePrice'] !== undefined ? itemInfo['order']['reservePrice'] : null,
-            itemInfo['orderState'] !== undefined ? itemInfo['orderState'] : itemInfo['order']['orderState'],
-            itemInfo['orderType'] !== undefined ? itemInfo['orderType'] : itemInfo['order']['orderType']
-        );
+        let itemNft = getItemInfo(dataArray[i]);
         console.log(itemNft);
         items.push(itemNft);
     }
