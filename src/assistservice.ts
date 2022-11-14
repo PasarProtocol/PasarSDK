@@ -116,8 +116,9 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
 
 const getItemInfo = (itemInfo:any):ItemInfo => {
     let tokenData = itemInfo['token'] ? itemInfo['token'] : itemInfo;
-    let thumbnail = tokenData['data'] ? tokenData['data']['thumbnail'] : tokenData['thumbnail'];
-    let image = tokenData['data'] ? tokenData['data']['image'] : tokenData['image'];
+    let image = tokenData['image'] ? tokenData['image'] : tokenData['data'] && tokenData['data']['image'] ? tokenData['data']['image'] : null;
+    let thumbnail = tokenData['thumbnail'] ? tokenData['thumbnail'] : tokenData['data'] && tokenData['data']['thumbnail'] ? tokenData['data']['thumbnail'] : image;
+    let properties = tokenData['properties'] ? tokenData['properties'] : tokenData['attributes'] ? tokenData['attributes'] : null;
 
     let itemNft = new ItemInfo(
         itemInfo['tokenId'] !== undefined ? itemInfo['tokenId'] : itemInfo['token']['tokenId'],
@@ -126,8 +127,8 @@ const getItemInfo = (itemInfo:any):ItemInfo => {
         itemInfo['description'] !== undefined ? itemInfo['description'] : itemInfo['token']['description'],
         thumbnail,
         image,
-        itemInfo['adult'] !== undefined? itemInfo['adult'] : itemInfo['token']['adult'],
-        itemInfo['properties'] !== undefined ? itemInfo['properties'] : itemInfo['token']['properties'],
+        itemInfo['adult'] !== undefined? itemInfo['adult'] : itemInfo['token'] && itemInfo['token']['adult'] ? itemInfo['token']['adult'] : false,
+        itemInfo['properties'] !== properties,
         itemInfo['version'] !== undefined ? itemInfo['version'] : itemInfo['token']['version'],
         itemInfo['chain'] !== undefined ? itemInfo['chain'] : itemInfo['token']['chain'],
         itemInfo['tokenOwner'] !== undefined ? itemInfo['tokenOwner'] : itemInfo['token']['tokenOwner'],
