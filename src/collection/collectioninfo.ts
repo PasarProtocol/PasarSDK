@@ -20,8 +20,8 @@ class CollectionInfo {
     private uri: string;
     private items: number;
     private owners: number;
-    private lowestPrice: BigInt;
-    private tradingVolume: BigInt;
+    private lowestPrice: bigint;
+    private tradingVolume: bigint;
 
     constructor(contractAddr: string,
         network: ChainType,
@@ -83,12 +83,12 @@ class CollectionInfo {
         return this;
     }
 
-    public setLowestPrice(price: BigInt): CollectionInfo {
+    public setLowestPrice(price: bigint): CollectionInfo {
         this.lowestPrice = price;
         return this;
     }
 
-    public setTradingVolume(value: BigInt): CollectionInfo {
+    public setTradingVolume(value: bigint): CollectionInfo {
         this.tradingVolume = value;
         return this;
     }
@@ -153,11 +153,11 @@ class CollectionInfo {
         return this.items;
     }
 
-    public getLowestPrice(): BigInt {
+    public getLowestPrice(): bigint {
         return this.lowestPrice;
     }
 
-    public getTradingVolume(): BigInt {
+    public getTradingVolume(): bigint {
         return this.tradingVolume;
     }
 }

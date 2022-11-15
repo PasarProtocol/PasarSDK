@@ -101,8 +101,13 @@ const parseCollectionInfo = (itemInfo: any): CollectionInfo => {
         .setBanner(data && data['background'] ? data['background'] : null)
         .setCategory(data && data['category'] ? data['category'] : null)
         .setErcType(itemInfo['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+        .setUri(itemInfo['uri'])
+        .setItems(itemInfo['items'])
+        .setOwners(itemInfo['owners'])
+        .setLowestPrice(itemInfo['lowestPrice'])
+        .setTradingVolume(itemInfo['tradeVolume'])
 
-    return collectionInfo;
+        return collectionInfo;
 }
 
 const getItemInfo = (itemInfo:any):ItemInfo => {
