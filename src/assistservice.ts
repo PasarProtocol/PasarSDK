@@ -30,30 +30,16 @@ const getAllListedItems = async (assistUrl: string, earilerThan:number, pageNum 
 
 const getCollectionInfo = async (assistUrl: string, collectionAddr:string, chainType: ChainType): Promise<CollectionInfo> => {
     try {
-        let response = await fetch(`${assistUrl}/api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${collectionAddr}`);
+        let response = await fetch(`${assistUrl}/api/v1/getCollectionInfo?chain=${chainType}&collection=${collectionAddr}`);
         let json = await response.json();
         if (json['status'] != 200) {
             throw new Error("Call API to fetch collection info failed");
         }
 
         let body = json['data'];
-        let data = body['tokenJson']['data'];
-
-        let info = new CollectionInfo(
-            body['token'],
-            chainType,
-            body['creatorDid'],
-            body['owner'],
-            body['name'],
-            body['symbol']
-        );
-
-        return info.setSocialLinks(data['socials'])
-            .setDescription(data['description'])
-            .setAvatar(data['avatar'])
-            .setDescription(data['description'])
-            .setCategory(data['category'])
-            .setErcType(body['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+        
+        let collectionInfo = parseCollectionInfo(body);
+        return collectionInfo;
     }catch (error) {
         throw new Error(`Failed to get Collection Info (erro: ${error}`);
     }
@@ -86,26 +72,7 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
         let body = data['data'];
 
         for (var i = 0; i < body.length; i++) {
-            let item = body[i];
-            let creator = item['creator'];
-            let data = item['data'];
-
-            let info = new CollectionInfo(
-                item['token'],
-                item['chain'],
-                creator && creator['did'] ? creator['did'] : null,
-                item['owner'],
-                item['name'],
-                item['symbol']
-            );
-
-            info.setSocialLinks(data && data['socials'] ? data['socials'] : null)
-                .setDescription(data && data['description'] ? data['description'] : null)
-                .setAvatar(data && data['avatar'] ? data['avatar'] : null)
-                .setBanner(data && data['background'] ? data['background'] : null)
-                .setCategory(data && data['category'] ? data['category'] : null)
-                .setErcType(item['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
-
+            let info = parseCollectionInfo(body[i]);
             collections.push(info);
         }
 
@@ -113,6 +80,34 @@ const getOwnedCollections = async (assistUrl: string, walletAddress: string): Pr
     }catch (error) {
         throw new Error(`Failed to get listed NFTs with error: ${error}`);
     }
+}
+
+const parseCollectionInfo = (itemInfo: any): CollectionInfo => {
+    let creator = itemInfo['creator'];
+    let data = itemInfo['data'];
+
+    let collectionInfo = new CollectionInfo(
+        itemInfo['token'],
+        itemInfo['chain'],
+        creator && creator['did'] ? creator['did'] : null,
+        itemInfo['owner'],
+        itemInfo['name'],
+        itemInfo['symbol']
+    );
+
+    collectionInfo.setSocialLinks(data && data['socials'] ? data['socials'] : null)
+        .setDescription(data && data['description'] ? data['description'] : null)
+        .setAvatar(data && data['avatar'] ? data['avatar'] : null)
+        .setBanner(data && data['background'] ? data['background'] : null)
+        .setCategory(data && data['category'] ? data['category'] : null)
+        .setErcType(itemInfo['is721'] ? ERCType.ERC721 : ERCType.ERC1155)
+        .setUri(itemInfo['uri'])
+        .setItems(itemInfo['items'])
+        .setOwners(itemInfo['owners'])
+        .setLowestPrice(itemInfo['lowestPrice'])
+        .setTradingVolume(itemInfo['tradeVolume'])
+
+        return collectionInfo;
 }
 
 const getItemInfo = (itemInfo:any):ItemInfo => {

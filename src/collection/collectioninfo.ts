@@ -17,6 +17,11 @@ class CollectionInfo {
     private description: string;
     private ercType: ERCType;
     private category: Category;
+    private uri: string;
+    private items: number;
+    private owners: number;
+    private lowestPrice: bigint;
+    private tradingVolume: bigint;
 
     constructor(contractAddr: string,
         network: ChainType,
@@ -60,6 +65,31 @@ class CollectionInfo {
 
     public setCategory(category: Category): CollectionInfo {
         this.category = category;
+        return this;
+    }
+
+    public setUri(uri: string): CollectionInfo {
+        this.uri = uri;
+        return this;
+    }
+
+    public setItems(items: number): CollectionInfo {
+        this.items = items;
+        return this;
+    }
+
+    public setOwners(owners: number): CollectionInfo {
+        this.owners = owners;
+        return this;
+    }
+
+    public setLowestPrice(price: bigint): CollectionInfo {
+        this.lowestPrice = price;
+        return this;
+    }
+
+    public setTradingVolume(value: bigint): CollectionInfo {
+        this.tradingVolume = value;
         return this;
     }
 
@@ -109,6 +139,26 @@ class CollectionInfo {
 
     public getCategory(): string {
         return this.category;
+    }
+
+    public getUri(): string {
+        return this.uri;
+    }
+    
+    public getOwners(): number {
+        return this.owners;
+    }
+
+    public getItems(): number {
+        return this.items;
+    }
+
+    public getLowestPrice(): bigint {
+        return this.lowestPrice;
+    }
+
+    public getTradingVolume(): bigint {
+        return this.tradingVolume;
     }
 }
 
